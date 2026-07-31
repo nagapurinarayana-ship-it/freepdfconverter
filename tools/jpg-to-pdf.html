@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JPG to PDF — FreePDF Tools</title>
+  <meta name="description" content="Convert JPG/PNG images into a single PDF in your browser. Files are processed locally and are not uploaded.">
+  <meta name="theme-color" content="#07111f">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="../index.html" aria-label="FreePDF Tools homepage">
+        <span class="logo-mark" aria-hidden="true">PDF</span>
+        <span class="logo-text">FreePDF Tools</span>
+      </a>
+      <nav class="main-navigation" aria-label="Primary navigation">
+        <a href="../index.html#tools">All tools</a>
+        <a href="../index.html#how-it-works">How it works</a>
+        <a href="../index.html#privacy">Privacy</a>
+        <a href="../index.html#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container tool-page">
+    <section class="tool-introduction">
+      <p class="eyebrow">100% browser-based</p>
+      <h1>Convert JPG/PNG to PDF</h1>
+      <p>Drag and drop images or choose them from your device. Arrange, pick page size and download a single PDF.</p>
+    </section>
+
+    <section class="tool-panel" aria-labelledby="jpg-tool-heading">
+      <div id="jpgDropZone" class="drop-zone">
+        <span class="drop-zone-icon" aria-hidden="true">IMG</span>
+        <h2 id="jpg-tool-heading">Drop images here</h2>
+        <p>or choose files from your device</p>
+
+        <label class="choose-file-button" for="imageFiles">Choose images</label>
+        <input id="imageFiles" class="file-input" type="file" accept=".jpg,.jpeg,.png,image/*" multiple>
+        <p class="file-limit">Maximum 60 MB per image and 120 MB total</p>
+      </div>
+
+      <div class="selected-files-section" style="margin-top:18px;">
+        <div class="selected-files-header">
+          <h2>Selected images</h2>
+          <span id="imageCount" class="file-count">0 images selected</span>
+        </div>
+
+        <ul id="imageList" class="file-list" aria-label="Selected image files"></ul>
+      </div>
+
+      <div style="margin-top:18px; display:flex; gap:12px; align-items:center;">
+        <div style="flex:1;">
+          <label for="pageSize" style="display:block; font-weight:700;">Page size</label>
+          <select id="pageSize" style="padding:8px; border-radius:8px;">
+            <option value="A4">A4</option>
+            <option value="Letter">Letter</option>
+            <option value="Fit">Fit to image</option>
+          </select>
+        </div>
+
+        <div style="flex:1;">
+          <label for="outputFilename" style="display:block; font-weight:700;">Output filename</label>
+          <input id="outputFilename" type="text" placeholder="images" style="padding:8px; border-radius:8px; width:100%;">
+        </div>
+      </div>
+
+      <div class="tool-actions" style="margin-top:18px;">
+        <button id="convertButton" class="action-button" type="button" disabled>Convert to PDF</button>
+        <button id="jpgClearButton" class="clear-button" type="button">Clear images</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-track" role="progressbar" aria-label="Convert progress" aria-valuemin="0" aria-valuemax="100">
+          <div id="jpgProgressBar" class="progress-bar"></div>
+        </div>
+
+        <p id="jpgToolStatus" class="tool-status" aria-live="polite">Choose images to convert.</p>
+      </div>
+
+      <div class="privacy-message">
+        <span aria-hidden="true">🔒</span>
+        <p><strong>Private processing:</strong> the images remain in this browser and are not uploaded.</p>
+      </div>
+    </section>
+
+    <article class="tool-information-section">
+      <h2>How to convert images</h2>
+      <ol class="tool-steps">
+        <li>Select or drop images (JPG or PNG).</li>
+        <li>Arrange their order using the buttons beside each file.</li>
+        <li>Choose a page size or use “Fit to image”.</li>
+        <li>Click <strong>Convert to PDF</strong> — the PDF will download automatically.</li>
+      </ol>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid"><div class="footer-column"><h2>FreePDF Tools</h2><p>Private browser-based tools for everyday PDF tasks.</p></div><div class="footer-column"><h2>Tools</h2><ul class="footer-links"><li><a href="merge-pdf.html">Merge PDF</a></li><li><a href="split-pdf.html">Split PDF</a></li></ul></div><div class="footer-column"><h2>Information</h2><ul class="footer-links"><li><a href="../index.html#about">About</a></li><li><a href="../index.html#privacy">Privacy</a></li></ul></div></div>
+    <div class="container footer-bottom">© 2026 FreePDF Tools. Files are processed on your device.</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" crossorigin="anonymous" defer></script>
+  <script src="../assets/js/common.js" defer></script>
+  <script src="../assets/js/jpg-to-pdf.js" defer></script>
+</body>
+</html>
