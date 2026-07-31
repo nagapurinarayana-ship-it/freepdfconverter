@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Split PDF Online — Extract Pages & Export
+  </title>
+
+  <meta
+    name="description"
+    content="Split or extract pages from a PDF in your browser. Files are processed locally and are not uploaded."
+  >
+
+  <meta
+    name="theme-color"
+    content="#07111f"
+  >
+
+  <link
+    rel="stylesheet"
+    href="../assets/css/styles.css"
+  >
+</head>
+
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="../index.html" aria-label="FreePDF Tools homepage">
+        <span class="logo-mark" aria-hidden="true">PDF</span>
+        <span class="logo-text">FreePDF Tools</span>
+      </a>
+
+      <nav class="main-navigation" aria-label="Primary navigation">
+        <a href="../index.html#tools">All tools</a>
+        <a href="../index.html#how-it-works">How it works</a>
+        <a href="../index.html#privacy">Privacy</a>
+        <a href="../index.html#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container tool-page">
+    <section class="tool-introduction">
+      <p class="eyebrow">100% browser-based</p>
+      <h1>Split & Extract PDF pages</h1>
+      <p>Your PDF is read in this browser tab. Choose a page range to extract or split every page into separate files packaged as a ZIP archive.</p>
+    </section>
+
+    <section class="tool-panel" aria-labelledby="split-tool-heading">
+      <div id="splitDropZone" class="drop-zone">
+        <span class="drop-zone-icon" aria-hidden="true">✂</span>
+        <h2 id="split-tool-heading">Drop a PDF here</h2>
+        <p>or choose a file from your device</p>
+
+        <label class="choose-file-button" for="splitPdfFile">Choose PDF file</label>
+        <input id="splitPdfFile" class="file-input" type="file" accept=".pdf,application/pdf">
+        <p class="file-limit">Maximum 60 MB per file</p>
+      </div>
+
+      <div class="selected-files-section" style="margin-top:18px;">
+        <div class="selected-files-header">
+          <h2>Selected PDF</h2>
+          <span id="splitFileName" class="file-count">None</span>
+        </div>
+
+        <div style="margin-top:12px; display:flex; gap:12px; align-items:center;">
+          <div style="flex:1;">
+            <label for="fromPage" style="display:block; font-weight:700;">From</label>
+            <input id="fromPage" type="number" min="1" class="file-size" style="width:90px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:inherit;">
+          </div>
+
+          <div style="flex:1;">
+            <label for="toPage" style="display:block; font-weight:700;">To</label>
+            <input id="toPage" type="number" min="1" class="file-size" style="width:90px; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background:transparent; color:inherit;">
+          </div>
+
+          <div style="flex:1;">
+            <label style="display:block; font-weight:700;">Pages</label>
+            <span id="pageCount" class="file-count">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tool-actions" style="margin-top:18px;">
+        <button id="extractButton" class="action-button" type="button" disabled>Extract range</button>
+        <button id="splitButton" class="clear-button" type="button" disabled>Split into pages (ZIP)</button>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-track" role="progressbar" aria-label="Split progress" aria-valuemin="0" aria-valuemax="100">
+          <div id="splitProgressBar" class="progress-bar"></div>
+        </div>
+
+        <p id="splitToolStatus" class="tool-status" aria-live="polite">Choose a PDF to split or extract pages.</p>
+      </div>
+
+      <div class="privacy-message">
+        <span aria-hidden="true">🔒</span>
+        <p><strong>Private processing:</strong> the selected PDF remains in this browser and is not uploaded.</p>
+      </div>
+    </section>
+
+    <article class="tool-information-section">
+      <h2>How to extract pages</h2>
+      <ol class="tool-steps">
+        <li>Choose a PDF file or drop it into the area above.</li>
+        <li>Enter the page range to extract and select <strong>Extract range</strong>.</li>
+        <li>Or choose <strong>Split into pages (ZIP)</strong> to download every page as an individual PDF inside a ZIP file.</li>
+      </ol>
+
+      <h2>Notes</h2>
+      <p>Password-protected PDFs may not open. Remove passwords before using this tool.</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid"><div class="footer-column"><h2>FreePDF Tools</h2><p>Private browser-based tools for everyday PDF tasks.</p></div><div class="footer-column"><h2>Tools</h2><ul class="footer-links"><li><a href="merge-pdf.html">Merge PDF</a></li><li><a href="../index.html#tools">View all tools</a></li></ul></div><div class="footer-column"><h2>Information</h2><ul class="footer-links"><li><a href="../index.html#about">About</a></li><li><a href="../index.html#privacy">Privacy</a></li></ul></div></div>
+    <div class="container footer-bottom">© 2026 FreePDF Tools. Files are processed on your device.</div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" crossorigin="anonymous" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" crossorigin="anonymous" defer></script>
+  <script src="../assets/js/common.js" defer></script>
+  <script src="../assets/js/split-pdf.js" defer></script>
+</body>
+</html>
