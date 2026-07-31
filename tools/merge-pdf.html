@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>
+    Merge PDF Online Free — Private Browser Tool
+  </title>
+
+  <meta
+    name="description"
+    content="Merge multiple PDF files into one document for free. Files are processed locally in your browser and are not uploaded."
+  >
+
+  <meta
+    name="theme-color"
+    content="#07111f"
+  >
+
+  <link
+    rel="stylesheet"
+    href="../assets/css/styles.css"
+  >
+</head>
+
+<body>
+  <a
+    class="skip-link"
+    href="#main-content"
+  >
+    Skip to content
+  </a>
+
+  <!-- ==========================
+       HEADER
+       ========================== -->
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a
+        class="logo"
+        href="../index.html"
+        aria-label="FreePDF Tools homepage"
+      >
+        <span
+          class="logo-mark"
+          aria-hidden="true"
+        >
+          PDF
+        </span>
+
+        <span class="logo-text">
+          FreePDF Tools
+        </span>
+      </a>
+
+      <nav
+        class="main-navigation"
+        aria-label="Primary navigation"
+      >
+        <a href="../index.html#tools">
+          All tools
+        </a>
+
+        <a href="../index.html#how-it-works">
+          How it works
+        </a>
+
+        <a href="../index.html#privacy">
+          Privacy
+        </a>
+
+        <a href="../index.html#about">
+          About
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==========================
+       MAIN CONTENT
+       ========================== -->
+
+  <main
+    id="main-content"
+    class="container tool-page"
+  >
+    <section class="tool-introduction">
+      <p class="eyebrow">
+        100% browser-based
+      </p>
+
+      <h1>
+        Merge PDF files
+      </h1>
+
+      <p>
+        Combine two or more PDF documents into one file.
+        Your selected documents are processed in this browser
+        tab and are not uploaded by this tool.
+      </p>
+    </section>
+
+    <!-- ========================
+         MERGE TOOL
+         ======================== -->
+
+    <section
+      class="tool-panel"
+      aria-labelledby="merge-tool-heading"
+    >
+      <div
+        id="dropZone"
+        class="drop-zone"
+      >
+        <span
+          class="drop-zone-icon"
+          aria-hidden="true"
+        >
+          ＋
+        </span>
+
+        <h2 id="merge-tool-heading">
+          Drop PDF files here
+        </h2>
+
+        <p>
+          or choose files from your device
+        </p>
+
+        <label
+          class="choose-file-button"
+          for="pdfFiles"
+        >
+          Choose PDF files
+        </label>
+
+        <input
+          id="pdfFiles"
+          class="file-input"
+          type="file"
+          accept=".pdf,application/pdf"
+          multiple
+        >
+
+        <p class="file-limit">
+          Maximum 60 MB per file and 120 MB total
+        </p>
+      </div>
+
+      <!-- SELECTED FILES -->
+
+      <div class="selected-files-section">
+        <div class="selected-files-header">
+          <h2>
+            Selected PDFs
+          </h2>
+
+          <span
+            id="fileCount"
+            class="file-count"
+          >
+            0 files selected
+          </span>
+        </div>
+
+        <ul
+          id="fileList"
+          class="file-list"
+          aria-label="Selected PDF files"
+        ></ul>
+      </div>
+
+      <!-- ACTIONS -->
+
+      <div class="tool-actions">
+        <button
+          id="mergeButton"
+          class="action-button"
+          type="button"
+          disabled
+        >
+          Merge PDFs
+        </button>
+
+        <button
+          id="clearButton"
+          class="clear-button"
+          type="button"
+        >
+          Clear files
+        </button>
+      </div>
+
+      <!-- PROGRESS -->
+
+      <div class="progress-container">
+        <div
+          class="progress-track"
+          role="progressbar"
+          aria-label="Merge progress"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          <div
+            id="progressBar"
+            class="progress-bar"
+          ></div>
+        </div>
+
+        <p
+          id="toolStatus"
+          class="tool-status"
+          aria-live="polite"
+        >
+          Choose at least two PDF files.
+        </p>
+      </div>
+
+      <!-- PRIVACY MESSAGE -->
+
+      <div class="privacy-message">
+        <span aria-hidden="true">
+          🔒
+        </span>
+
+        <p>
+          <strong>Private processing:</strong>
+          the selected PDF contents remain in this browser
+          while the merge operation runs.
+        </p>
+      </div>
+    </section>
+
+    <!-- ========================
+         TOOL INFORMATION
+         ======================== -->
+
+    <article class="tool-information-section">
+      <h2>
+        How to merge PDF files
+      </h2>
+
+      <ol class="tool-steps">
+        <li>
+          Select two or more PDF files.
+        </li>
+
+        <li>
+          Use the up and down arrow buttons to arrange the
+          files in the required order.
+        </li>
+
+        <li>
+          Select <strong>Merge PDFs</strong>.
+        </li>
+
+        <li>
+          The merged document downloads automatically.
+        </li>
+      </ol>
+
+      <h2>
+        Why use browser-based PDF merging?
+      </h2>
+
+      <p>
+        This tool reads the selected documents through the
+        browser's File API. It combines their pages in browser
+        memory and creates the downloaded result without an
+        application upload endpoint.
+      </p>
+
+      <p>
+        This architecture also reduces server, storage and
+        document-cleanup costs, helping the website remain
+        free and easy to maintain.
+      </p>
+
+      <section class="tool-faq">
+        <h2>
+          Frequently asked questions
+        </h2>
+
+        <details>
+          <summary>
+            Can I merge password-protected PDFs?
+          </summary>
+
+          <p>
+            Password-protected or encrypted PDF files may not
+            open. Remove the password using trusted software
+            before merging them.
+          </p>
+        </details>
+
+        <details>
+          <summary>
+            Is there a PDF page limit?
+          </summary>
+
+          <p>
+            There is no fixed page-count limit in this page,
+            but available device memory controls how much the
+            browser can process. Smaller documents work more
+            reliably on mobile devices.
+          </p>
+        </details>
+
+        <details>
+          <summary>
+            Does merging modify my original files?
+          </summary>
+
+          <p>
+            No. The original PDF files remain unchanged. The
+            tool creates a new document named
+            <code>merged.pdf</code>.
+          </p>
+        </details>
+
+        <details>
+          <summary>
+            Why is the merged file downloading automatically?
+          </summary>
+
+          <p>
+            Once processing is complete, the browser creates a
+            temporary local download and saves the new PDF to
+            your normal downloads folder.
+          </p>
+        </details>
+      </section>
+    </article>
+  </main>
+
+  <!-- ==========================
+       FOOTER
+       ========================== -->
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-column">
+        <h2>
+          FreePDF Tools
+        </h2>
+
+        <p>
+          Private browser-based tools for everyday PDF tasks.
+        </p>
+      </div>
+
+      <div class="footer-column">
+        <h2>
+          Tools
+        </h2>
+
+        <ul class="footer-links">
+          <li>
+            <a href="merge-pdf.html">
+              Merge PDF
+            </a>
+          </li>
+
+          <li>
+            <a href="../index.html#tools">
+              View all tools
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h2>
+          Information
+        </h2>
+
+        <ul class="footer-links">
+          <li>
+            <a href="../index.html#about">
+              About
+            </a>
+          </li>
+
+          <li>
+            <a href="../index.html#privacy">
+              Privacy
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      © 2026 FreePDF Tools. Files are processed on your
+      device.
+    </div>
+  </footer>
+
+  <!--
+    pdf-lib is loaded before our own JavaScript files.
+    The version is pinned so a future library release does
+    not unexpectedly change this tool.
+  -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"
+    integrity="sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=="
+    crossorigin="anonymous"
+    defer
+  ></script>
+
+  <script
+    src="../assets/js/common.js"
+    defer
+  ></script>
+
+  <script
+    src="../assets/js/merge-pdf.js"
+    defer
+  ></script>
+</body>
+</html>
