@@ -80,7 +80,9 @@
     }
 
     incoming.forEach(file => {
-      selectedImages.push({ id: window.FreePDFTools.createId(), file });
+      // create a short-lived object URL for a thumbnail preview
+      const previewUrl = URL.createObjectURL(file);
+      selectedImages.push({ id: window.FreePDFTools.createId(), file, previewUrl });
     });
 
     elements.fileInput.value = '';
@@ -96,6 +98,18 @@
       const li = document.createElement('li');
       li.className = 'file-row';
       li.dataset.fileId = entry.id;
+
+      const thumb = document.createElement('img');
+      thumb.className = 'file-thumb';
+      thumb.alt = entry.file.name;
+      thumb.src = entry.previewUrl || '';
+      // inline styles for a consistent thumbnail appearance
+      thumb.style.width = '56px';
+      thumb.style.height = '56px';
+      thumb.style.objectFit = 'cover';
+      thumb.style.borderRadius = '9px';
+      thumb.style.marginRight = '12px';
+      thumb.loading = 'lazy';
 
       const pos = document.createElement('span');
       pos.className = 'file-position';
@@ -119,7 +133,14 @@
       const remove = createFileControlButton({ symbol: '×', action: 'remove', label: `Remove ${entry.file.name}`, disabled: processing, extraClass: 'remove' });
 
       controls.append(up, down, remove);
-      li.append(pos, info, controls);
+
+      // Assemble row: thumbnail, info, controls.
+      const left = document.createElement('div');
+      left.style.display = 'flex';
+      left.style.alignItems = 'center';
+      left.append(thumb, info);
+
+      li.append(left, controls);
       elements.fileList.appendChild(li);
     });
   }
@@ -145,7 +166,16 @@
     const action = btn.dataset.action;
     if (action === 'move-up') moveImage(idx, idx - 1);
     if (action === 'move-down') moveImage(idx, idx + 1);
-    if (action === 'remove') { selectedImages.splice(idx, 1); renderFileList(); updateButtonState(); setStatus(selectedImages.length ? 'Image removed.' : 'No images selected.', selectedImages.length ? 'success' : 'info'); }
+    if (action === 'remove') {
+      // revoke object URL for removed preview
+      const removed = selectedImages.splice(idx, 1)[0];
+      if (removed && removed.previewUrl) {
+        try { URL.revokeObjectURL(removed.previewUrl); } catch (e) { /* ignore */ }
+      }
+      renderFileList();
+      updateButtonState();
+      setStatus(selectedImages.length ? 'Image removed.' : 'No images selected.', selectedImages.length ? 'success' : 'info');
+    }
   });
 
   function moveImage(from, to) {
@@ -163,6 +193,13 @@
 
   function clearImages() {
     if (processing) return;
+    // revoke all preview URLs
+    selectedImages.forEach(entry => {
+      if (entry.previewUrl) {
+        try { URL.revokeObjectURL(entry.previewUrl); } catch (e) { /* ignore */ }
+      }
+    });
+
     selectedImages = [];
     elements.fileInput.value = '';
     renderFileList(); updateButtonState(); setProgress(0); setStatus('Choose images to convert.', 'info');
