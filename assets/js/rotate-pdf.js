@@ -1,189 +1,83 @@
-(() => {
+(function () {
   "use strict";
-
-  const MAX_SINGLE_FILE_BYTES = 60 * 1024 * 1024;
-
-  const elements = {
-    dropZone: document.getElementById("rotateDropZone"),
-    fileInput: document.getElementById("rotatePdfFile"),
-    fileName: document.getElementById("rotateFileName"),
-    pageCountLabel: document.getElementById("rotatePageCount"),
-    fromInput: document.getElementById("rotateFromPage"),
-    toInput: document.getElementById("rotateToPage"),
-    angleSelect: document.getElementById("rotateAngle"),
-    applyAllCheckbox: document.getElementById("rotateAllPages"),
-    rotateButton: document.getElementById("rotateButton"),
-    progressBar: document.getElementById("rotateProgressBar"),
-    status: document.getElementById("rotateToolStatus")
+  var U = window.FreePDF;
+  var MAX_FILE = 80 * U.MB;
+  var source = null;
+  var file = null;
+  var busy = false;
+  var el = {
+    zone: document.getElementById("dropZone"), input: document.getElementById("pdfFile"),
+    selected: document.getElementById("selectedFile"), pages: document.getElementById("pageCount"),
+    from: document.getElementById("fromPage"), to: document.getElementById("toPage"),
+    angle: document.getElementById("angle"), all: document.getElementById("allPages"),
+    rotate: document.getElementById("rotateButton"), clear: document.getElementById("clearButton"),
+    progress: document.getElementById("progressBar"), status: document.getElementById("toolStatus")
   };
 
-  let loadedDocument = null;
-  let loadedFile = null;
-  let processing = false;
-
-  function setStatus(message, type = "info") {
-    elements.status.textContent = message;
-    elements.status.dataset.type = type;
+  function controls() {
+    el.input.disabled = busy;
+    el.rotate.disabled = busy || !source;
+    el.clear.disabled = busy || !source;
+    el.from.disabled = busy || el.all.checked;
+    el.to.disabled = busy || el.all.checked;
   }
-
-  function setProgress(pct) {
-    const n = Math.max(0, Math.min(100, Number(pct) || 0));
-    elements.progressBar.style.width = `${n}%`;
+  function reset() {
+    source = null; file = null; el.selected.textContent = "No PDF selected"; el.pages.textContent = "0";
+    el.from.value = "1"; el.to.value = "1"; U.setProgress(el.progress, 0); U.setStatus(el.status, "Choose a PDF and rotation angle.", "info"); controls();
   }
-
-  function setProcessing(v) {
-    processing = Boolean(v);
-    elements.fileInput.disabled = processing;
-    elements.rotateButton.disabled = processing || !loadedDocument;
-  }
-
-  async function onFileSelected(file) {
-    if (!file) return;
-
-    if (!window.FreePDFTools.isPdfFile(file)) {
-      setStatus(`\"${file.name}\" is not a supported PDF file.`, "error");
-      return;
-    }
-
-    if (file.size > MAX_SINGLE_FILE_BYTES) {
-      setStatus(`\"${file.name}\" is larger than 60 MB.`, "error");
-      return;
-    }
-
-    setStatus("Reading PDF…", "info");
-    setProgress(5);
-
+  async function load(collection) {
+    if (busy) return;
+    var next = Array.from(collection || [])[0];
+    if (!next) return;
+    if (!U.isPdf(next)) return U.setStatus(el.status, "Please choose a PDF file.", "error");
+    if (next.size > MAX_FILE) return U.setStatus(el.status, "Keep the PDF below 80 MB for browser stability.", "error");
+    if (!window.PDFLib) return U.setStatus(el.status, "The PDF library did not load. Refresh and retry.", "error");
+    busy = true; controls(); U.setProgress(el.progress, 8); U.setStatus(el.status, "Reading PDF…", "info");
     try {
-      const bytes = await file.arrayBuffer();
-
-      if (!window.PDFLib || !window.PDFLib.PDFDocument) {
-        setStatus("The PDF library did not load. Refresh and try again.", "error");
-        return;
-      }
-
-      const { PDFDocument } = window.PDFLib;
-      const doc = await PDFDocument.load(bytes, { updateMetadata: false });
-
-      const pageCount = doc.getPageCount();
-
-      loadedDocument = doc;
-      loadedFile = file;
-
-      elements.fileName.textContent = file.name;
-      elements.pageCountLabel.textContent = String(pageCount);
-
-      elements.fromInput.value = "1";
-      elements.toInput.value = String(pageCount);
-
-      setStatus(`${pageCount} pages loaded. Choose rotation options.`, "success");
-      setProgress(100);
-    } catch (err) {
-      console.error("Failed to read PDF:", err);
-      setStatus("Could not open the PDF. It may be encrypted or invalid.", "error");
-      loadedDocument = null;
-      loadedFile = null;
-      elements.fileName.textContent = "";
-      elements.pageCountLabel.textContent = "0";
-      setProgress(0);
-    } finally {
-      setProcessing(false);
-    }
+      source = await window.PDFLib.PDFDocument.load(await next.arrayBuffer(), { updateMetadata: false });
+      file = next; var count = source.getPageCount();
+      el.selected.textContent = next.name + " · " + U.formatBytes(next.size); el.pages.textContent = String(count);
+      el.from.value = "1"; el.to.value = String(count); U.setProgress(el.progress, 100);
+      U.setStatus(el.status, count + " pages loaded. Choose what to rotate.", "success");
+    } catch (error) {
+      console.error(error); reset(); U.setStatus(el.status, "Could not open this PDF. It may be encrypted or invalid.", "error");
+    } finally { busy = false; controls(); }
   }
-
-  elements.fileInput.addEventListener("change", () => {
-    onFileSelected(elements.fileInput.files[0]);
-  });
-
-  ["dragenter", "dragover"].forEach((ev) => {
-    elements.dropZone.addEventListener(ev, (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      elements.dropZone.classList.add("is-dragging");
-    });
-  });
-
-  ["dragleave", "drop"].forEach((ev) => {
-    elements.dropZone.addEventListener(ev, (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      elements.dropZone.classList.remove("is-dragging");
-    });
-  });
-
-  elements.dropZone.addEventListener("drop", (e) => {
-    const file = e.dataTransfer.files[0];
-    onFileSelected(file);
-  });
-
-  async function rotatePdf() {
-    if (processing || !loadedDocument || !loadedFile) return;
-
-    const totalPages = loadedDocument.getPageCount();
-    const from = Math.max(1, Number(elements.fromInput.value) || 1);
-    const to = Math.min(Number(elements.toInput.value) || 1, totalPages);
-
-    if (from > to || from < 1) {
-      setStatus("Invalid page range.", "error");
-      return;
-    }
-
-    const angleValue = Number(elements.angleSelect.value) || 0;
-    const applyAll = elements.applyAllCheckbox.checked;
-
-    setProcessing(true);
-    setProgress(3);
-    setStatus("Applying rotation…", "info");
-
+  function selectedRange() {
+    var count = source.getPageCount();
+    if (el.all.checked) return { from: 1, to: count };
+    var from = Math.floor(Number(el.from.value)); var to = Math.floor(Number(el.to.value));
+    if (!Number.isFinite(from) || !Number.isFinite(to) || from < 1 || to > count || from > to) return null;
+    return { from: from, to: to };
+  }
+  async function rotate() {
+    if (busy || !source || !file) return;
+    var r = selectedRange();
+    if (!r) return U.setStatus(el.status, "Enter a valid page range.", "error");
+    var delta = Number(el.angle.value);
+    if ([90,180,270].indexOf(delta) < 0) return U.setStatus(el.status, "Choose 90°, 180°, or 270°.", "error");
+    busy = true; controls(); U.setProgress(el.progress, 3); U.setStatus(el.status, "Applying rotation…", "info");
     try {
-      const { PDFDocument, degrees } = window.PDFLib;
-
-      // We modify the loadedDocument in-place by setting rotations on pages and then save a copy
-      const outDoc = await PDFDocument.create();
-
-      // copy all pages first
-      const pageIndices = loadedDocument.getPageIndices();
-      const copiedPages = await outDoc.copyPages(loadedDocument, pageIndices);
-      copiedPages.forEach((p) => outDoc.addPage(p));
-
-      // Apply rotation to specified pages (indices are zero-based)
-      for (let i = 0; i < pageIndices.length; i += 1) {
-        const pageNumber = i + 1;
-        if (applyAll || (pageNumber >= from && pageNumber <= to)) {
-          const page = outDoc.getPage(i);
-          const current = page.getRotation?.() || { angle: 0 };
-          const newAngle = (current.angle + angleValue + 360) % 360;
-          page.setRotation?.(degrees(newAngle));
-        }
-
-        const pct = Math.round(((i + 1) / pageIndices.length) * 92);
-        setProgress(pct);
+      var out = await window.PDFLib.PDFDocument.create();
+      var indexes = source.getPageIndices();
+      var pages = await out.copyPages(source, indexes);
+      pages.forEach(function (page) { out.addPage(page); });
+      for (var i = r.from - 1; i <= r.to - 1; i += 1) {
+        var page = out.getPage(i);
+        var current = page.getRotation().angle || 0;
+        page.setRotation(window.PDFLib.degrees((current + delta) % 360));
+        U.setProgress(el.progress, 10 + ((i - r.from + 2) / (r.to - r.from + 1)) * 78);
       }
-
-      setStatus("Saving rotated PDF…", "info");
-      const outBytes = await outDoc.save({ useObjectStreams: true });
-
-      setProgress(98);
-      const blob = new Blob([outBytes], { type: "application/pdf" });
-      const base = window.FreePDFTools.getSafeBaseName(loadedFile.name);
-      const filename = `${base}-rotated.pdf`;
-
-      window.FreePDFTools.downloadBlob(blob, filename);
-
-      setProgress(100);
-      setStatus("Rotation complete. Download started.", "success");
-    } catch (err) {
-      console.error("Rotation failed:", err);
-      setStatus("Could not rotate the PDF. Try a different file.", "error");
-      setProgress(0);
-    } finally {
-      setProcessing(false);
-    }
+      var bytes = await out.save({ useObjectStreams: true });
+      U.downloadBlob(new Blob([bytes], { type: "application/pdf" }), U.safeBaseName(file.name) + "-rotated.pdf");
+      U.setProgress(el.progress, 100); U.setStatus(el.status, "Rotation complete. Download started.", "success");
+    } catch (error) {
+      console.error(error); U.setProgress(el.progress, 0); U.setStatus(el.status, "Could not rotate this PDF. Try another valid file.", "error");
+    } finally { busy = false; controls(); }
   }
-
-  elements.rotateButton.addEventListener("click", rotatePdf);
-
-  // initialize
-  setProcessing(false);
-  setProgress(0);
-  setStatus("Choose a PDF to rotate.", "info");
-})();
+  U.bindDropZone(el.zone, el.input, load);
+  el.all.addEventListener("change", controls);
+  el.rotate.addEventListener("click", rotate);
+  el.clear.addEventListener("click", reset);
+  reset();
+}());
