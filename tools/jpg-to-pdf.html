@@ -1,111 +1,23 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>JPG to PDF — FreePDF Tools</title>
-  <meta name="description" content="Convert JPG/PNG images into a single PDF in your browser. Files are processed locally and are not uploaded.">
-  <meta name="theme-color" content="#07111f">
-  <link rel="stylesheet" href="../assets/css/styles.css">
-</head>
-<body>
-  <a class="skip-link" href="#main-content">Skip to content</a>
-
-  <header class="site-header">
-    <div class="container header-inner">
-      <a class="logo" href="../index.html" aria-label="FreePDF Tools homepage">
-        <span class="logo-mark" aria-hidden="true">PDF</span>
-        <span class="logo-text">FreePDF Tools</span>
-      </a>
-      <nav class="main-navigation" aria-label="Primary navigation">
-        <a href="../index.html#tools">All tools</a>
-        <a href="../index.html#how-it-works">How it works</a>
-        <a href="../index.html#privacy">Privacy</a>
-        <a href="../index.html#about">About</a>
-      </nav>
-    </div>
-  </header>
-
-  <main id="main-content" class="container tool-page">
-    <section class="tool-introduction">
-      <p class="eyebrow">100% browser-based</p>
-      <h1>Convert JPG/PNG to PDF</h1>
-      <p>Drag and drop images or choose them from your device. Arrange, pick page size and download a single PDF.</p>
-    </section>
-
-    <section class="tool-panel" aria-labelledby="jpg-tool-heading">
-      <div id="jpgDropZone" class="drop-zone">
-        <span class="drop-zone-icon" aria-hidden="true">IMG</span>
-        <h2 id="jpg-tool-heading">Drop images here</h2>
-        <p>or choose files from your device</p>
-
-        <label class="choose-file-button" for="imageFiles">Choose images</label>
-        <input id="imageFiles" class="file-input" type="file" accept=".jpg,.jpeg,.png,image/*" multiple>
-        <p class="file-limit">Maximum 60 MB per image and 120 MB total</p>
-      </div>
-
-      <div class="selected-files-section" style="margin-top:18px;">
-        <div class="selected-files-header">
-          <h2>Selected images</h2>
-          <span id="imageCount" class="file-count">0 images selected</span>
-        </div>
-
-        <ul id="imageList" class="file-list" aria-label="Selected image files"></ul>
-      </div>
-
-      <div style="margin-top:18px; display:flex; gap:12px; align-items:center;">
-        <div style="flex:1;">
-          <label for="pageSize" style="display:block; font-weight:700;">Page size</label>
-          <select id="pageSize" style="padding:8px; border-radius:8px;">
-            <option value="A4">A4</option>
-            <option value="Letter">Letter</option>
-            <option value="Fit">Fit to image</option>
-          </select>
-        </div>
-
-        <div style="flex:1;">
-          <label for="outputFilename" style="display:block; font-weight:700;">Output filename</label>
-          <input id="outputFilename" type="text" placeholder="images" style="padding:8px; border-radius:8px; width:100%;">
-        </div>
-      </div>
-
-      <div class="tool-actions" style="margin-top:18px;">
-        <button id="convertButton" class="action-button" type="button" disabled>Convert to PDF</button>
-        <button id="jpgClearButton" class="clear-button" type="button">Clear images</button>
-      </div>
-
-      <div class="progress-container">
-        <div class="progress-track" role="progressbar" aria-label="Convert progress" aria-valuemin="0" aria-valuemax="100">
-          <div id="jpgProgressBar" class="progress-bar"></div>
-        </div>
-
-        <p id="jpgToolStatus" class="tool-status" aria-live="polite">Choose images to convert.</p>
-      </div>
-
-      <div class="privacy-message">
-        <span aria-hidden="true">🔒</span>
-        <p><strong>Private processing:</strong> the images remain in this browser and are not uploaded.</p>
-      </div>
-    </section>
-
-    <article class="tool-information-section">
-      <h2>How to convert images</h2>
-      <ol class="tool-steps">
-        <li>Select or drop images (JPG or PNG).</li>
-        <li>Arrange their order using the buttons beside each file.</li>
-        <li>Choose a page size or use “Fit to image”.</li>
-        <li>Click <strong>Convert to PDF</strong> — the PDF will download automatically.</li>
-      </ol>
-    </article>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-grid"><div class="footer-column"><h2>FreePDF Tools</h2><p>Private browser-based tools for everyday PDF tasks.</p></div><div class="footer-column"><h2>Tools</h2><ul class="footer-links"><li><a href="merge-pdf.html">Merge PDF</a></li><li><a href="split-pdf.html">Split PDF</a></li></ul></div><div class="footer-column"><h2>Information</h2><ul class="footer-links"><li><a href="../index.html#about">About</a></li><li><a href="../index.html#privacy">Privacy</a></li></ul></div></div>
-    <div class="container footer-bottom">© 2026 FreePDF Tools. Files are processed on your device.</div>
-  </footer>
-
-  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" crossorigin="anonymous" defer></script>
-  <script src="../assets/js/common.js" defer></script>
-  <script src="../assets/js/jpg-to-pdf.js" defer></script>
-</body>
-</html>
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JPG to PDF & PNG to PDF Free — Private Image Converter | FreePDF Tools</title>
+<meta name="description" content="Convert JPG and PNG images to PDF free in your browser. Reorder images, choose A4, Letter or Fit, and download without uploading your photos.">
+<meta name="robots" content="index,follow"><meta name="theme-color" content="#1f67ff">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/css/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" defer></script><script src="../assets/js/common.js" defer></script><script src="../assets/js/jpg-to-pdf.js" defer></script><script src="../assets/js/monetization-config.js" defer></script><script src="../assets/js/ads.js" defer></script>
+</head><body>
+<a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="container header-inner"><a class="logo" href="../index.html"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav"><a href="../index.html#tools">PDF tools</a><a href="../guides/index.html">Guides</a><a href="../privacy.html">Privacy</a><a href="../about.html">About</a></nav></div></header>
+<main id="main"><section class="tool-hero"><div class="container"><div class="breadcrumbs"><a href="../index.html">Home</a> / JPG to PDF</div><span class="eyebrow">JPG + PNG · private conversion</span><h1>Convert JPG or PNG to PDF</h1><p class="lead">Turn images into one ordered PDF with A4, Letter or image-sized pages. Photos stay on your device.</p></div></section>
+<div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>
+<div class="container tool-shell"><section class="tool-panel"><h2>Choose images</h2>
+  <div class="drop-zone" id="dropZone"><div><strong>Drop JPG or PNG images here</strong><p>Up to 30 MB each · 120 MB combined</p><label class="file-picker" for="imageFiles">Choose images</label><input class="file-input" id="imageFiles" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" multiple></div></div>
+  <p class="selected-file" id="fileCount">0 images selected</p><ol class="file-list" id="fileList"></ol>
+  <div class="control-grid"><div class="field"><label for="pageSize">PDF page size</label><select id="pageSize"><option value="A4">A4</option><option value="Letter">US Letter</option><option value="Fit">Fit page to image</option></select></div><div class="field"><label for="outputFilename">Output filename</label><input id="outputFilename" value="images" maxlength="80" autocomplete="off"></div></div>
+  <div class="action-row"><button class="button" id="convertButton" type="button" disabled>Create PDF</button><button class="button danger" id="clearButton" type="button" disabled>Clear</button></div><div class="progress"><span id="progressBar"></span></div><p class="status" id="toolStatus" role="status" aria-live="polite"></p>
+</section><aside class="tool-side"><div class="side-card"><h3>Image order = page order</h3><p>Use the arrows beside each thumbnail. The first image becomes page 1.</p></div><div class="side-card"><h3>Page-size choice</h3><p>A4 and Letter centre each image on a standard page. Fit makes the PDF page follow the image aspect ratio.</p></div></aside></div>
+<section class="content-section"><div class="container content-narrow"><h2>Make one PDF from photos or scanned pages</h2><p>Select one or more JPG or PNG files, put them in the right order and choose the page style. Oversized images are resized in the browser to reduce memory use while preserving their aspect ratio.</p><p>A4 is a good default for documents shared internationally. US Letter is useful for common North American office workflows. Fit works well when you want the PDF page to closely match the source image proportions.</p>
+<h2>Quality and privacy notes</h2><ul><li>JPG is best for photographs; PNG is often better for screenshots, diagrams and text-heavy images.</li><li>The tool never needs to upload your selected images to perform the conversion.</li><li>Very large camera images may be resized to protect browser memory.</li><li>Keep the original images until you have checked the generated PDF.</li></ul><div class="ad-container" data-ad-zone="content" aria-label="Advertisement"></div>
+<h2>Frequently asked questions</h2><div class="faq"><details><summary>Can I mix JPG and PNG files?</summary><p>Yes. Both formats can be selected together and will appear as pages in your chosen order.</p></details><details><summary>Can I change image order?</summary><p>Yes. Use the arrow buttons beside the preview thumbnails.</p></details><details><summary>Are photos uploaded?</summary><p>No. Image decoding, resizing and PDF creation happen in your browser.</p></details></div>
+</div></section></main>
+<footer class="site-footer"><div class="container"><div class="footer-grid"><div><a class="logo" href="../index.html"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><p>Free PDF tools designed to keep documents and images local.</p></div><div><h3>Tools</h3><ul class="footer-links"><li><a href="merge-pdf.html">Merge PDF</a></li><li><a href="split-pdf.html">Split PDF</a></li><li><a href="rotate-pdf.html">Rotate PDF</a></li><li><a href="pdf-to-image.html">PDF to JPG</a></li></ul></div><div><h3>Information</h3><ul class="footer-links"><li><a href="../guides/index.html">Guides</a></li><li><a href="../about.html">About</a></li><li><a href="../privacy.html">Privacy</a></li><li><a href="../terms.html">Terms</a></li></ul></div></div><div class="footer-bottom"><span>© <span data-current-year></span> FreePDF Tools</span><span>Private browser processing</span></div></div></footer>
+</body></html>
