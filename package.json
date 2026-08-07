@@ -1,0 +1,10 @@
+{
+  "name": "freepdf-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Private browser-based PDF utilities",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs"
+  }
+}
