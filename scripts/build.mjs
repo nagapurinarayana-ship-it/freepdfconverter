@@ -3,8 +3,11 @@ import path from "node:path";
 
 const root = process.cwd();
 const dist = path.join(root, "dist");
-const productionBranch = !process.env.CF_PAGES_BRANCH || process.env.CF_PAGES_BRANCH === "main";
-const suppliedOrigin = String(process.env.SITE_ORIGIN || (productionBranch ? process.env.CF_PAGES_URL || "" : "")).replace(/\/+$/, "");
+const branch = process.env.CF_PAGES_BRANCH || process.env.WORKERS_CI_BRANCH || "";
+const productionBranch = !branch || branch === "main";
+const defaultWorkersOrigin = "https://freepdfconverter.all-in-one-all.workers.dev";
+const workersOrigin = process.env.WORKERS_CI && productionBranch ? defaultWorkersOrigin : "";
+const suppliedOrigin = String(process.env.SITE_ORIGIN || (productionBranch ? process.env.CF_PAGES_URL || workersOrigin : "")).replace(/\/+$/, "");
 const origin = /^https?:\/\/[^/]+$/i.test(suppliedOrigin) ? suppliedOrigin : "";
 const files = ["index.html", "about.html", "privacy.html", "terms.html", "contact.html", "404.html", "robots.txt", "_headers"];
 const directories = ["assets", "tools", "guides"];
