@@ -14,7 +14,7 @@ const adsenseHead = [
   '<meta name="google-adsense-account" content="' + adsensePublisherId + '">',
   '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + adsensePublisherId + '" crossorigin="anonymous"></script>'
 ].join("\n");
-const files = ["index.html", "about.html", "privacy.html", "terms.html", "contact.html", "404.html", "robots.txt", "ads.txt", "_headers"];
+const files = ["index.html", "about.html", "privacy.html", "terms.html", "contact.html", "404.html", "robots.txt", "ads.txt", "google0982473b0f1ce198.html", "_headers"];
 const directories = ["assets", "tools", "guides"];
 
 await rm(dist, { recursive: true, force: true });
