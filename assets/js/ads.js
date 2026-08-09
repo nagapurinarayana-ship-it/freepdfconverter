@@ -5,11 +5,14 @@
   var client = String(config.adsenseClient || "").trim();
   if (!/^ca-pub-\d+$/.test(client)) return;
 
-  var script = document.createElement("script");
-  script.async = true;
-  script.crossOrigin = "anonymous";
-  script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + encodeURIComponent(client);
-  document.head.appendChild(script);
+  var script = document.querySelector('script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]');
+  if (!script) {
+    script = document.createElement("script");
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + encodeURIComponent(client);
+    document.head.appendChild(script);
+  }
 
   document.querySelectorAll("[data-ad-zone]").forEach(function (container) {
     var zone = container.dataset.adZone;
