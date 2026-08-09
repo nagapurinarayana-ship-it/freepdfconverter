@@ -2,6 +2,8 @@
 
 Free, privacy-first PDF utilities that run in the browser. Selected documents are processed locally rather than uploaded to an application server.
 
+**Live site:** [freepdfconverter-all-in-one.pages.dev](https://freepdfconverter-all-in-one.pages.dev/)
+
 ## Included tools
 
 - Merge PDF
@@ -47,7 +49,7 @@ Pages injects `CF_PAGES_URL`; the build uses it to create canonical URLs and `si
 
 ## Local checks
 
-Run `npm run check` and `npm run build`. No npm packages are required for these scripts.
+Run `npm run verify` to validate local references, metadata, clean canonical URLs, JSON-LD and the generated sitemap. No npm packages are required for these scripts.
 
 ## Monetization
 

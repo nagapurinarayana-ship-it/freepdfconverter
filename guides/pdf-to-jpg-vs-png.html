@@ -1,0 +1,43 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PDF to JPG vs PNG: Which Format Is Best? | FreePDF Tools</title>
+<meta name="description" content="Compare JPG and PNG for PDF pages by clarity, file size, transparency and use case, then choose the right resolution and quality setting.">
+<meta name="robots" content="index,follow,max-image-preview:large"><meta name="theme-color" content="#1f67ff">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/css/styles.css">
+<script src="../assets/js/common.js" defer></script><script src="../assets/js/monetization-config.js" defer></script><script src="../assets/js/ads.js" defer></script>
+</head><body>
+<a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="container header-inner"><a class="logo" href="../index.html"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav" aria-label="Main navigation"><a href="../index.html#tools">PDF tools</a><a href="index.html">Guides</a><a href="../privacy.html">Privacy</a><a href="../about.html">About</a></nav></div></header>
+<main id="main"><article class="article container">
+  <div class="breadcrumbs"><a href="../index.html">Home</a> / <a href="index.html">PDF Guides</a> / PDF to JPG vs PNG</div>
+  <span class="eyebrow">PDF to image guide</span><h1>PDF to JPG vs PNG: which image format is better?</h1>
+  <p class="lead">Choose JPG for smaller photo-heavy pages or PNG for lossless screenshots, forms, diagrams and text-heavy content.</p>
+  <p class="updated">Updated August 9, 2026 · By <a href="../about.html">FreePDF Tools</a> · 6 minute read</p>
+  <nav class="article-toc" aria-label="Guide contents"><strong>In this guide</strong><ol><li><a href="#comparison">JPG and PNG compared</a></li><li><a href="#use-cases">Best format by use case</a></li><li><a href="#resolution">Resolution and JPG quality</a></li><li><a href="#steps">Convert PDF pages</a></li><li><a href="#limits">Limits and troubleshooting</a></li></ol></nav>
+
+  <h2 id="comparison">JPG and PNG compared</h2>
+  <div class="table-wrap"><table class="comparison-table"><thead><tr><th>Feature</th><th>JPG</th><th>PNG</th></tr></thead><tbody><tr><td>Compression</td><td>Lossy; discards some visual detail to reduce size</td><td>Lossless; preserves exported pixel values</td></tr><tr><td>Typical file size</td><td>Usually smaller for scans and photographs</td><td>Often larger, especially for photo-heavy pages</td></tr><tr><td>Sharp text and lines</td><td>Can show compression artefacts</td><td>Usually cleaner for screenshots, forms and diagrams</td></tr><tr><td>Transparency</td><td>Not supported; the tool uses a white background</td><td>Supported by the format</td></tr><tr><td>Best general use</td><td>Email, previews, photo scans and smaller downloads</td><td>UI screenshots, line art, text and lossless archiving of the rendered page</td></tr></tbody></table></div>
+  <p>Both formats contain pixels. Once a PDF page has been rendered as an image, searchable text, selectable text, links and vector scaling are not preserved inside that image file. Keep the source PDF whenever those features matter.</p>
+
+  <h2 id="use-cases">Choose the format by page content</h2>
+  <ul><li><strong>Scanned photograph or brochure:</strong> JPG usually gives a practical balance of detail and size.</li><li><strong>Application form or text-heavy page:</strong> PNG avoids JPG ringing around sharp characters and lines.</li><li><strong>Software screenshot:</strong> PNG generally preserves interface edges and small labels better.</li><li><strong>Quick sharing preview:</strong> JPG is often easier when attachment size matters.</li><li><strong>Page requiring transparency:</strong> choose PNG, although most PDF pages render against an opaque background.</li></ul>
+
+  <h2 id="resolution">Standard, high or very-high resolution</h2>
+  <p>Resolution controls the number of output pixels, not the amount of detail present in the source. <strong>Standard</strong> is faster and uses less memory. <strong>High</strong> is the balanced default for reading and normal sharing. <strong>Very high</strong> is useful for zooming or print preparation, but it increases memory use and output size.</p>
+  <p>For JPG, the Smaller, Balanced and Maximum settings control compression quality. Maximum does not create detail that the PDF lacks; it simply preserves more of the rendered pixels and produces a larger file.</p>
+
+  <h2 id="steps">How to convert PDF pages to JPG or PNG</h2>
+  <ol><li>Open <a href="../tools/pdf-to-image.html">PDF to JPG / PNG</a> and select your PDF.</li><li>Enter the first and last page to convert.</li><li>Choose JPG or PNG.</li><li>Select a resolution. If using JPG, choose the required quality.</li><li>Start conversion and leave the tab open while pages render.</li><li>A single page downloads as an image; multiple pages download together as a ZIP.</li></ol>
+  <div class="tool-cta"><div><h2>Convert selected PDF pages</h2><p>Render up to 60 pages per batch directly in your browser.</p></div><a class="button" href="../tools/pdf-to-image.html">Open PDF to JPG / PNG</a></div>
+
+  <div class="ad-container" data-ad-zone="content" aria-label="Advertisement"></div>
+
+  <h2 id="limits">Browser limits and troubleshooting</h2>
+  <p>The tool limits one batch to 60 pages to protect browser memory. Very-high resolution multiplies the pixel area of every rendered page, so a shorter range may be necessary on phones or low-memory computers.</p>
+  <div class="table-wrap"><table class="comparison-table"><thead><tr><th>Problem</th><th>What to try</th></tr></thead><tbody><tr><td>Text looks blurred</td><td>Choose PNG or increase the resolution; also check whether the original PDF already contains a low-resolution scan.</td></tr><tr><td>Files are too large</td><td>Use JPG with Balanced quality or lower the resolution.</td></tr><tr><td>The browser slows down</td><td>Convert a smaller page range, choose Standard resolution and close unused tabs.</td></tr><tr><td>The PDF will not open</td><td>It may be encrypted or invalid. Verify it in a trusted PDF reader.</td></tr><tr><td>Several images downloaded as ZIP</td><td>This is expected and prevents the browser from prompting separately for every page.</td></tr></tbody></table></div>
+
+  <h2>Rendering is not image extraction</h2>
+  <p>This tool uses PDF.js to draw the complete visible page—text, vectors, images and layout—onto a browser canvas. It does not extract the original image objects stored inside the PDF. The output therefore represents the whole page as it appears at the selected resolution.</p>
+  <div class="related-guides"><h2>Related guides</h2><ul><li><a href="jpg-png-to-pdf.html">Convert JPG and PNG images back to PDF →</a></li><li><a href="split-extract-pdf-pages.html">Extract PDF pages without rasterising them →</a></li></ul></div>
+</article></main>
+<footer class="site-footer"><div class="container"><div class="footer-grid"><div><a class="logo" href="../index.html"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><p>Private browser-based PDF utilities and practical document guides.</p></div><div><h3>Tools</h3><ul class="footer-links"><li><a href="../tools/pdf-to-image.html">PDF to JPG</a></li><li><a href="../tools/jpg-to-pdf.html">JPG to PDF</a></li><li><a href="../tools/split-pdf.html">Split PDF</a></li><li><a href="../tools/rotate-pdf.html">Rotate PDF</a></li></ul></div><div><h3>Information</h3><ul class="footer-links"><li><a href="index.html">PDF guides</a></li><li><a href="../about.html">About</a></li><li><a href="../privacy.html">Privacy</a></li><li><a href="../contact.html">Contact</a></li></ul></div></div><div class="footer-bottom"><span>© <span data-current-year></span> FreePDF Tools</span><span>Local PDF rendering</span></div></div></footer>
+</body></html>
