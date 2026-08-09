@@ -5,6 +5,7 @@
   "description": "Private browser-based PDF utilities",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "verify": "npm run check && SITE_ORIGIN=https://freepdfconverter-all-in-one.pages.dev npm run build && node scripts/check-build.mjs"
   }
 }

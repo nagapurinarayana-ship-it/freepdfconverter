@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to Rotate PDF Pages Without Quality Loss | FreePDF Tools</title>
+<meta name="description" content="Fix sideways or upside-down PDF pages with the correct 90°, 180° or 270° rotation while preserving page content and quality.">
+<meta name="robots" content="index,follow,max-image-preview:large"><meta name="theme-color" content="#1f67ff">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/css/styles.css">
+<script src="../assets/js/common.js" defer></script><script src="../assets/js/monetization-config.js" defer></script><script src="../assets/js/ads.js" defer></script>
+</head><body>
+<a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="container header-inner"><a class="logo" href="../index.html"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav" aria-label="Main navigation"><a href="../index.html#tools">PDF tools</a><a href="index.html">Guides</a><a href="../privacy.html">Privacy</a><a href="../about.html">About</a></nav></div></header>
+<main id="main"><article class="article container">
+  <div class="breadcrumbs"><a href="../index.html">Home</a> / <a href="index.html">PDF Guides</a> / Rotate PDF</div>
+  <span class="eyebrow">Rotate PDF guide</span><h1>How to rotate PDF pages without losing quality</h1>
+  <p class="lead">Correct scanned pages that display sideways or upside down without intentionally converting text and vector content into images.</p>
+  <p class="updated">Updated August 9, 2026 · By <a href="../about.html">FreePDF Tools</a> · 5 minute read</p>
+  <nav class="article-toc" aria-label="Guide contents"><strong>In this guide</strong><ol><li><a href="#rotation">How PDF rotation works</a></li><li><a href="#angle">Choose the right angle</a></li><li><a href="#steps">Rotate all or selected pages</a></li><li><a href="#problems">Troubleshooting</a></li></ol></nav>
+
+  <h2 id="rotation">How PDF page rotation works</h2>
+  <p>A PDF page can contain a rotation setting that tells readers how to display its existing content. Changing that setting is different from rendering the entire page as an image and rotating the resulting pixels. Text, links and vector drawings therefore avoid an intentional raster conversion when the page's rotation value is adjusted.</p>
+  <p>Rotation is cumulative. If a page already has a 90° rotation and you apply another 90°, its final rotation becomes 180°. When possible, return to the original PDF if you need to retry; repeated edits make it harder to remember which rotation has already been applied.</p>
+
+  <h2 id="angle">Choose 90°, 180° or 270°</h2>
+  <div class="table-wrap"><table class="comparison-table"><thead><tr><th>Current appearance</th><th>Choose</th><th>Effect</th></tr></thead><tbody><tr><td>Page needs a quarter-turn to the right</td><td>90° clockwise</td><td>Top edge moves to the right</td></tr><tr><td>Page is upside down</td><td>180°</td><td>Page turns half a circle</td></tr><tr><td>Page needs a quarter-turn to the left</td><td>270° clockwise</td><td>Equivalent to 90° anticlockwise</td></tr></tbody></table></div>
+  <p>If you are uncertain, test one page first. Open the downloaded result before applying the same angle to a long page range.</p>
+
+  <h2 id="steps">How to rotate PDF pages</h2>
+  <ol><li>Open the <a href="../tools/rotate-pdf.html">Rotate PDF tool</a> and select your document.</li><li>Choose the required rotation angle.</li><li>Leave <strong>Rotate all pages</strong> selected if every page is wrong.</li><li>If only some pages need correction, clear that option and enter the first and last affected page.</li><li>Select <strong>Rotate &amp; download</strong>, then inspect the new file.</li></ol>
+  <div class="tool-cta"><div><h2>Fix a sideways PDF now</h2><p>Rotate every page or a selected range locally in your browser.</p></div><a class="button" href="../tools/rotate-pdf.html">Open Rotate PDF</a></div>
+
+  <div class="ad-container" data-ad-zone="content" aria-label="Advertisement"></div>
+
+  <h2>Rotate one page or several separate pages</h2>
+  <p>To rotate one page, clear <strong>Rotate all pages</strong> and use the same number for From and To. The current tool rotates one continuous range at a time. For separate pages with different directions, start from the original document and perform the necessary operations carefully, checking each downloaded result.</p>
+  <p>Printed page numbers can differ from PDF page positions when a cover or contents page is present. Use the PDF reader's page-position indicator to identify the actual range.</p>
+
+  <h2 id="problems">Common rotation problems</h2>
+  <div class="table-wrap"><table class="comparison-table"><thead><tr><th>Problem</th><th>Likely cause and fix</th></tr></thead><tbody>
+    <tr><td>The page turned the wrong way</td><td>Use 270° clockwise for a left turn, or return to the original and select the correct angle.</td></tr>
+    <tr><td>Only part of the document is wrong</td><td>Clear Rotate all pages and enter the affected PDF page range.</td></tr>
+    <tr><td>The visible scan remains oddly aligned</td><td>The scan may include large margins or skew inside the page. Rotation changes direction; it does not crop or deskew the scanned image.</td></tr>
+    <tr><td>The PDF cannot be loaded</td><td>The document may be encrypted or malformed. Open it in a trusted reader and save an accessible copy if permitted.</td></tr>
+    <tr><td>A digital signature is no longer valid</td><td>Any document modification can invalidate signatures. Preserve the original signed PDF.</td></tr>
+  </tbody></table></div>
+
+  <h2>Does PDF rotation change file quality?</h2>
+  <p>The tool changes page rotation and copies pages into a new PDF; it does not deliberately render every page to JPG. This protects the sharpness of text and vector elements. As with other PDF edits, advanced document-level features may not be identical in the newly created output, so keep the source file when forms, bookmarks, layers or signatures are important.</p>
+  <div class="related-guides"><h2>Related guides</h2><ul><li><a href="merge-pdf-safely.html">Merge corrected PDFs in the right order →</a></li><li><a href="pdf-to-jpg-vs-png.html">Convert PDF pages to JPG or PNG →</a></li></ul></div>
+</article></main>
+<footer class="site-footer"><div class="container"><div class="footer-grid"><div><a class="logo" href="../index.html"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><p>Private browser-based PDF utilities and practical document guides.</p></div><div><h3>Tools</h3><ul class="footer-links"><li><a href="../tools/rotate-pdf.html">Rotate PDF</a></li><li><a href="../tools/merge-pdf.html">Merge PDF</a></li><li><a href="../tools/split-pdf.html">Split PDF</a></li><li><a href="../tools/watermark-pdf.html">Watermark PDF</a></li></ul></div><div><h3>Information</h3><ul class="footer-links"><li><a href="index.html">PDF guides</a></li><li><a href="../about.html">About</a></li><li><a href="../privacy.html">Privacy</a></li><li><a href="../contact.html">Contact</a></li></ul></div></div><div class="footer-bottom"><span>© <span data-current-year></span> FreePDF Tools</span><span>Browser-only processing</span></div></div></footer>
+</body></html>
