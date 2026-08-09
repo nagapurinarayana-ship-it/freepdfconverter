@@ -9,6 +9,11 @@ const defaultWorkersOrigin = "https://freepdfconverter.all-in-one-all.workers.de
 const workersOrigin = process.env.WORKERS_CI && productionBranch ? defaultWorkersOrigin : "";
 const suppliedOrigin = String(process.env.SITE_ORIGIN || (productionBranch ? process.env.CF_PAGES_URL || workersOrigin : "")).replace(/\/+$/, "");
 const origin = /^https?:\/\/[^/]+$/i.test(suppliedOrigin) ? suppliedOrigin : "";
+const adsensePublisherId = "ca-pub-6638412579880225";
+const adsenseHead = [
+  '<meta name="google-adsense-account" content="' + adsensePublisherId + '">',
+  '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + adsensePublisherId + '" crossorigin="anonymous"></script>'
+].join("\n");
 const files = ["index.html", "about.html", "privacy.html", "terms.html", "contact.html", "404.html", "robots.txt", "_headers"];
 const directories = ["assets", "tools", "guides"];
 
@@ -28,6 +33,13 @@ const indexable = [
   "tools/watermark-pdf.html",
   "guides/index.html"
 ];
+
+const htmlFiles = [...new Set([...indexable, "privacy.html", "terms.html", "contact.html", "404.html"])];
+for (const relative of htmlFiles) {
+  const file = path.join(dist, relative);
+  const html = await readFile(file, "utf8");
+  await writeFile(file, html.replace("</head>", adsenseHead + "\n</head>"), "utf8");
+}
 
 if (origin) {
   for (const relative of indexable) {
