@@ -1,6 +1,7 @@
-import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
-import { articlePages, indexablePages, pageLabels, pagePathname, supplementalPages } from "./site-config.mjs";
+import { articlePages, articlePublishedDates, indexablePages, pageDates, pageLabels, pagePathname, supplementalPages } from "./site-config.mjs";
 
 const root = process.cwd();
 const dist = path.join(root, "dist");
@@ -15,7 +16,11 @@ const adsenseHead = [
   '<meta name="google-adsense-account" content="' + adsensePublisherId + '">',
   '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + adsensePublisherId + '" crossorigin="anonymous"></script>'
 ].join("\n");
-const files = ["index.html", "about.html", "privacy.html", "terms.html", "contact.html", "404.html", "robots.txt", "ads.txt", "google0982473b0f1ce198.html", "_headers"];
+const appHead = [
+  '<link rel="manifest" href="/manifest.webmanifest">',
+  '<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">'
+].join("\n");
+const files = ["index.html", "about.html", "how-local-processing.html", "privacy.html", "terms.html", "contact.html", "404.html", "offline.html", "manifest.webmanifest", "service-worker.js", "robots.txt", "ads.txt", "google0982473b0f1ce198.html", "_headers"];
 const directories = ["assets", "tools", "guides"];
 
 await rm(dist, { recursive: true, force: true });
@@ -28,7 +33,7 @@ for (const relative of htmlFiles) {
   const file = path.join(dist, relative);
   const html = await readFile(file, "utf8");
   const withCleanLinks = rewriteInternalLinks(html);
-  const head = relative === "404.html" ? "" : adsenseHead + "\n";
+  const head = relative === "404.html" ? "" : appHead + "\n" + adsenseHead + "\n";
   await writeFile(file, withCleanLinks.replace("</head>", head + "</head>"), "utf8");
 }
 
@@ -41,29 +46,41 @@ if (origin) {
     const title = extract(html, /<title>([^<]+)<\/title>/i);
     const description = extract(html, /<meta\s+name="description"\s+content="([^"]+)"/i);
     const socialType = articlePages.has(relative) ? "article" : "website";
+    const socialImage = origin + "/assets/images/freepdf-tools-social.jpg";
+    const published = articlePublishedDates[relative] || pageDates[relative] || "2026-08-11";
+    const modified = pageDates[relative] || published;
     const metadata = [
       '<link rel="canonical" href="' + canonical + '">',
       html.includes('property="og:title"') ? "" : '<meta property="og:title" content="' + escapeAttribute(title) + '">',
       html.includes('property="og:description"') ? "" : '<meta property="og:description" content="' + escapeAttribute(description) + '">',
       html.includes('property="og:type"') ? "" : '<meta property="og:type" content="' + socialType + '">',
       '<meta property="og:url" content="' + canonical + '">',
-      '<meta name="twitter:card" content="summary">',
+      '<meta property="og:image" content="' + socialImage + '">',
+      '<meta property="og:image:width" content="1200">',
+      '<meta property="og:image:height" content="630">',
+      '<meta property="og:image:alt" content="FreePDF Tools private browser PDF utilities">',
+      '<meta name="twitter:card" content="summary_large_image">',
       '<meta name="twitter:title" content="' + escapeAttribute(title) + '">',
       '<meta name="twitter:description" content="' + escapeAttribute(description) + '">',
-      articlePages.has(relative) ? '<meta property="article:published_time" content="2026-08-09">' : "",
-      articlePages.has(relative) ? '<meta property="article:modified_time" content="2026-08-09">' : "",
+      '<meta name="twitter:image" content="' + socialImage + '">',
+      '<meta name="twitter:image:alt" content="FreePDF Tools private browser PDF utilities">',
+      articlePages.has(relative) ? '<meta property="article:published_time" content="' + published + '">' : "",
+      articlePages.has(relative) ? '<meta property="article:modified_time" content="' + modified + '">' : "",
       structuredData(relative, canonical, title, description)
     ].filter(Boolean).join("\n");
     const next = html.replace("</head>", metadata + "\n</head>");
     await writeFile(file, next, "utf8");
   }
   const urls = indexablePages.map((relative) => {
-    return "  <url><loc>" + origin + pagePathname(relative) + "</loc></url>";
+    return "  <url><loc>" + origin + pagePathname(relative) + "</loc><lastmod>" + pageDates[relative] + "</lastmod></url>";
   }).join("\n");
   const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '\n</urlset>\n';
   await writeFile(path.join(dist, "sitemap.xml"), sitemap, "utf8");
   await writeFile(path.join(dist, "robots.txt"), "User-agent: *\nAllow: /\n\nSitemap: " + origin + "/sitemap.xml\n", "utf8");
 }
+
+const fingerprintedAssets = await fingerprintAssets();
+await buildServiceWorker(fingerprintedAssets);
 
 console.log("Built FreePDF Tools" + (origin ? " for " + origin : " without production canonical URLs"));
 
@@ -125,13 +142,15 @@ function structuredData(relative, canonical, title, description) {
     itemListElement: breadcrumbItems
   }];
   if (articlePages.has(relative)) {
+    const published = articlePublishedDates[relative] || pageDates[relative];
     graph.push({
       "@type": "Article",
       headline: pageLabels[relative],
       description,
       mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
-      datePublished: "2026-08-09",
-      dateModified: "2026-08-09",
+      datePublished: published,
+      dateModified: pageDates[relative],
+      image: [origin + "/assets/images/freepdf-tools-social.jpg"],
       inLanguage: "en",
       author: { "@type": "Organization", name: "FreePDF Tools", url: origin + "/about" },
       publisher: { "@type": "Organization", name: "FreePDF Tools", url: origin + "/about" }
@@ -141,4 +160,69 @@ function structuredData(relative, canonical, title, description) {
     "@context": "https://schema.org",
     "@graph": graph
   }).replace(/</g, "\\u003c") + "</script>";
+}
+
+async function fingerprintAssets() {
+  const assetRoot = path.join(dist, "assets");
+  const vendorTargets = (await walk(path.join(assetRoot, "vendor"))).filter((file) => /\.(?:js|mjs)$/i.test(file));
+  const vendorMappings = await fingerprintGroup(vendorTargets);
+  const applicationTargets = (await walk(assetRoot)).filter((file) => /\.(?:css|js|mjs)$/i.test(file) && !file.startsWith(path.join(assetRoot, "vendor") + path.sep));
+  const applicationMappings = await fingerprintGroup(applicationTargets);
+  return [...vendorMappings, ...applicationMappings];
+}
+
+async function fingerprintGroup(targets) {
+  const mappings = [];
+  for (const file of targets) {
+    const content = await readFile(file);
+    const hash = createHash("sha256").update(content).digest("hex").slice(0, 10);
+    const extension = path.extname(file);
+    const fingerprinted = file.slice(0, -extension.length) + "." + hash + extension;
+    mappings.push({
+      file,
+      fingerprinted,
+      oldPath: path.relative(dist, file).split(path.sep).join("/"),
+      newPath: path.relative(dist, fingerprinted).split(path.sep).join("/")
+    });
+  }
+
+  const textFiles = (await walk(dist)).filter((file) => /\.(?:html|js|mjs|css|json|webmanifest)$/i.test(file) || path.basename(file) === "service-worker.js");
+  for (const file of textFiles) {
+    let content = await readFile(file, "utf8");
+    for (const mapping of mappings) content = content.split(mapping.oldPath).join(mapping.newPath);
+    await writeFile(file, content, "utf8");
+  }
+  for (const mapping of mappings) await rename(mapping.file, mapping.fingerprinted);
+  return mappings;
+}
+
+async function buildServiceWorker(mappings) {
+  const serviceWorkerPath = path.join(dist, "service-worker.js");
+  let source = await readFile(serviceWorkerPath, "utf8");
+  const urls = [
+    "/",
+    "/offline",
+    "/manifest.webmanifest",
+    "/assets/favicon.svg",
+    "/assets/icons/icon-192.png",
+    "/assets/icons/icon-512.png",
+    "/assets/images/freepdf-tools-social.jpg",
+    ...indexablePages.filter((relative) => relative !== "index.html").map(pagePathname),
+    ...mappings.map((mapping) => "/" + mapping.newPath)
+  ];
+  const uniqueUrls = [...new Set(urls)];
+  const version = createHash("sha256").update(JSON.stringify(uniqueUrls)).digest("hex").slice(0, 10);
+  source = source.replace('"__CACHE_VERSION__"', JSON.stringify(version));
+  source = source.replace("/*__PRECACHE_URLS__*/[]", JSON.stringify(uniqueUrls, null, 2));
+  await writeFile(serviceWorkerPath, source, "utf8");
+}
+
+async function walk(directory) {
+  const result = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const full = path.join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...await walk(full));
+    else if (entry.isFile()) result.push(full);
+  }
+  return result;
 }

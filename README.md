@@ -12,8 +12,17 @@ Free, privacy-first PDF utilities that run in the browser. Selected documents ar
 - JPG / PNG to PDF
 - PDF to JPG / PNG
 - Text watermark PDF
+- Organize, reorder and delete PDF pages
+- Add page numbers to PDF
+- Remove common PDF metadata
+- Crop PDF pages
+- Extract selectable PDF text
 
-The site is static HTML, CSS and JavaScript. PDF processing uses the open-source pdf-lib, Mozilla PDF.js and JSZip browser libraries.
+The site is static HTML, CSS and JavaScript. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js and JSZip browser libraries. A progressive web app service worker caches the public tool code for offline use; selected documents are never placed in that cache.
+
+## Verify the privacy model
+
+The browser reads selected files through the File API and passes their bytes directly to the local PDF library. There is no application upload endpoint or server-side conversion job. See the live [technical explanation](https://freepdfconverter-all-in-one.pages.dev/how-local-processing) and inspect `assets/js/` to verify each workflow.
 
 ## Recommended free production hosting
 
