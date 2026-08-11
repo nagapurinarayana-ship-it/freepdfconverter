@@ -6,6 +6,7 @@ const root = process.cwd();
 const required = [
   "index.html", "about.html", "privacy.html", "terms.html", "contact.html",
   "tools/merge-pdf.html", "tools/split-pdf.html", "tools/rotate-pdf.html",
+  "tools/unlock-pdf.html",
   "tools/jpg-to-pdf.html", "tools/pdf-to-image.html", "tools/watermark-pdf.html",
   "tools/organize-pdf.html", "tools/add-page-numbers.html", "tools/remove-pdf-metadata.html",
   "tools/crop-pdf.html", "tools/extract-pdf-text.html", "how-local-processing.html",
@@ -14,8 +15,11 @@ const required = [
   "assets/js/rotate-pdf.js", "assets/js/jpg-to-pdf.js", "assets/js/pdf-to-image.js",
   "assets/js/watermark-pdf.js", "assets/css/styles.css"
   , "assets/js/organize-pdf.js", "assets/js/add-page-numbers.js", "assets/js/remove-pdf-metadata.js",
-  "assets/js/crop-pdf.js", "assets/js/extract-pdf-text.js", "assets/vendor/pdf-lib/pdf-lib.min.js",
+  "assets/js/crop-pdf.js", "assets/js/extract-pdf-text.js", "assets/js/unlock-pdf.js", "assets/js/unlock-pdf-worker.js",
+  "assets/vendor/pdf-lib/pdf-lib.min.js",
   "assets/vendor/jszip/jszip.min.js", "assets/vendor/pdfjs/pdf.min.mjs", "assets/vendor/pdfjs/pdf.worker.min.mjs",
+  "assets/vendor/qpdf/qpdf.js", "assets/vendor/qpdf/qpdf.wasm", "assets/vendor/qpdf/LICENSE-QPDF-WASM.txt",
+  "assets/vendor/qpdf/LICENSE-QPDF.txt", "assets/vendor/qpdf/NOTICE-QPDF.md", "assets/vendor/qpdf/README.md",
   "assets/images/freepdf-tools-social.jpg", "manifest.webmanifest", "service-worker.js", "offline.html"
 ];
 for (const relative of required) await access(path.join(root, relative));
@@ -66,6 +70,7 @@ for (const [description, pages] of descriptions) if (pages.length > 1) broken.pu
 const toolScripts = {
   "tools/merge-pdf.html": "assets/js/merge-pdf.js",
   "tools/split-pdf.html": "assets/js/split-pdf.js",
+  "tools/unlock-pdf.html": "assets/js/unlock-pdf.js",
   "tools/rotate-pdf.html": "assets/js/rotate-pdf.js",
   "tools/jpg-to-pdf.html": "assets/js/jpg-to-pdf.js",
   "tools/pdf-to-image.html": "assets/js/pdf-to-image.js",

@@ -91,8 +91,10 @@ h3 { font-size: 1.16rem; margin: 0 0 8px; }
 .field input,.field select,.field textarea { width: 100%; min-height: 43px; border: 1px solid #cdd8e6; border-radius: 10px; padding: 9px 11px; color: var(--ink); background: #fff; outline: none; }
 .field textarea { min-height: 90px; resize: vertical; }
 .field input:focus,.field select:focus,.field textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(31,103,255,.13); }
+.field-help { color: var(--muted); font-size: .82rem; }
 .inline-check { display: flex; gap: 9px; align-items: center; margin-top: 13px; color: #415168; font-weight: 650; }
-.inline-check input { width: 18px; height: 18px; accent-color: var(--brand); }
+.inline-check input { flex: 0 0 auto; width: 18px; height: 18px; accent-color: var(--brand); }
+.authorization-check { align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px; background: #f8faff; }
 .action-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 .action-row .button { border: 0; }
 .progress { height: 8px; overflow: hidden; margin-top: 18px; background: #e8edf4; border-radius: 99px; }
