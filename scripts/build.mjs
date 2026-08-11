@@ -20,7 +20,7 @@ const appHead = [
   '<link rel="manifest" href="/manifest.webmanifest">',
   '<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">'
 ].join("\n");
-const files = ["index.html", "about.html", "how-local-processing.html", "privacy.html", "terms.html", "contact.html", "404.html", "offline.html", "manifest.webmanifest", "service-worker.js", "robots.txt", "ads.txt", "google0982473b0f1ce198.html", "_headers"];
+const files = ["index.html", "about.html", "how-local-processing.html", "privacy.html", "terms.html", "contact.html", "404.html", "offline.html", "manifest.webmanifest", "service-worker.js", "robots.txt", "ads.txt", "favicon.ico", "google0982473b0f1ce198.html", "_headers", "_redirects"];
 const directories = ["assets", "tools", "guides"];
 
 await rm(dist, { recursive: true, force: true });
@@ -203,6 +203,7 @@ async function buildServiceWorker(mappings) {
     "/",
     "/offline",
     "/manifest.webmanifest",
+    "/favicon.ico",
     "/assets/favicon.svg",
     "/assets/icons/icon-192.png",
     "/assets/icons/icon-512.png",
