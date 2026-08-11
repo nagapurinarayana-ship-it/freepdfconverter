@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { articlePages, indexablePages, pageDates, pagePathname } from "./site-config.mjs";
 
@@ -42,6 +42,15 @@ if (/assets\/css\/styles\.css|assets\/js\/common\.js/.test(home)) failures.push(
 
 const serviceWorker = await readFile(path.join(dist, "service-worker.js"), "utf8");
 if (serviceWorker.includes("__CACHE_VERSION__") || serviceWorker.includes("__PRECACHE_URLS__")) failures.push("service-worker.js -> build placeholders remain");
+
+const qpdfFiles = await readdir(path.join(dist, "assets/vendor/qpdf"));
+const qpdfScript = qpdfFiles.find((file) => /^qpdf\.[a-f0-9]{10}\.js$/.test(file));
+const qpdfWasm = qpdfFiles.find((file) => /^qpdf\.[a-f0-9]{10}\.wasm$/.test(file));
+if (!qpdfScript) failures.push("build -> qpdf script is not fingerprinted");
+if (!qpdfWasm) failures.push("build -> qpdf WebAssembly is not fingerprinted");
+if (qpdfFiles.includes("qpdf.js") || qpdfFiles.includes("qpdf.wasm")) failures.push("build -> unfingerprinted qpdf runtime remains");
+if (qpdfScript && !serviceWorker.includes("/assets/vendor/qpdf/" + qpdfScript)) failures.push("service-worker.js -> fingerprinted qpdf script is not precached");
+if (qpdfWasm && !serviceWorker.includes("/assets/vendor/qpdf/" + qpdfWasm)) failures.push("service-worker.js -> fingerprinted qpdf WebAssembly is not precached");
 
 if (failures.length) {
   console.error("Production SEO checks failed:\n" + failures.join("\n"));

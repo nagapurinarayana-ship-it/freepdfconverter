@@ -4,6 +4,7 @@ import path from "node:path";
 const guides = [
   { slug: "merge-pdf-safely", title: "Merge PDFs safely", steps: ["Choose two or more PDFs", "Put files in final order", "Merge and verify pages"], checks: ["Correct file order", "Unlocked source files", "Originals kept safely"] },
   { slug: "split-extract-pdf-pages", title: "Split or extract pages", steps: ["Choose one PDF", "Set the page range", "Download PDF or ZIP"], checks: ["Page numbers checked", "Range includes every page", "Output opened and reviewed"] },
+  { slug: "unlock-password-protected-pdf", title: "Unlock a PDF locally", steps: ["Choose an authorized PDF", "Enter the known password", "Download and verify the copy"], checks: ["Correct file opened", "Encryption removed", "Signed original preserved"] },
   { slug: "rotate-pdf-pages", title: "Rotate PDF pages", steps: ["Choose the sideways PDF", "Select range and angle", "Rotate and inspect"], checks: ["90° clockwise is correct", "Only target pages selected", "Text stays sharp"] },
   { slug: "jpg-png-to-pdf", title: "Images to one PDF", steps: ["Choose JPG or PNG files", "Order and size images", "Build and review PDF"], checks: ["Images are in sequence", "Page size is suitable", "Margins leave safe space"] },
   { slug: "pdf-to-jpg-vs-png", title: "PDF pages to images", steps: ["Choose PDF pages", "Select JPG or PNG", "Render and compare"], checks: ["JPG for photographs", "PNG for sharp diagrams", "Resolution fits the use"] },

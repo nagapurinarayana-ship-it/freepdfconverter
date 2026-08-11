@@ -8,6 +8,7 @@ Free, privacy-first PDF utilities that run in the browser. Selected documents ar
 
 - Merge PDF
 - Split / extract PDF pages
+- Unlock password-protected PDFs with a known password
 - Rotate PDF pages
 - JPG / PNG to PDF
 - PDF to JPG / PNG
@@ -18,7 +19,7 @@ Free, privacy-first PDF utilities that run in the browser. Selected documents ar
 - Crop PDF pages
 - Extract selectable PDF text
 
-The site is static HTML, CSS and JavaScript. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js and JSZip browser libraries. A progressive web app service worker caches the public tool code for offline use; selected documents are never placed in that cache.
+The site is static HTML, CSS and JavaScript. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js, JSZip and QPDF WebAssembly libraries. QPDF runs in a dedicated browser worker for the Unlock PDF workflow. A progressive web app service worker caches the public tool code for offline use; selected documents and passwords are never placed in that cache.
 
 ## Verify the privacy model
 

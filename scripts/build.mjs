@@ -164,7 +164,7 @@ function structuredData(relative, canonical, title, description) {
 
 async function fingerprintAssets() {
   const assetRoot = path.join(dist, "assets");
-  const vendorTargets = (await walk(path.join(assetRoot, "vendor"))).filter((file) => /\.(?:js|mjs)$/i.test(file));
+  const vendorTargets = (await walk(path.join(assetRoot, "vendor"))).filter((file) => /\.(?:js|mjs|wasm)$/i.test(file));
   const vendorMappings = await fingerprintGroup(vendorTargets);
   const applicationTargets = (await walk(assetRoot)).filter((file) => /\.(?:css|js|mjs)$/i.test(file) && !file.startsWith(path.join(assetRoot, "vendor") + path.sep));
   const applicationMappings = await fingerprintGroup(applicationTargets);
