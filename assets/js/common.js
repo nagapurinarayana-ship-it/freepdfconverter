@@ -1,6 +1,27 @@
 (function () {
   "use strict";
 
+  if (typeof Uint8Array.prototype.toHex !== "function") {
+    Object.defineProperty(Uint8Array.prototype, "toHex", {
+      configurable: true,
+      value: function () {
+        return Array.prototype.map.call(this, function (byte) { return byte.toString(16).padStart(2, "0"); }).join("");
+      }
+    });
+  }
+  if (typeof Promise.withResolvers !== "function") {
+    Promise.withResolvers = function () {
+      var resolve; var reject;
+      var promise = new Promise(function (res, rej) { resolve = res; reject = rej; });
+      return { promise: promise, resolve: resolve, reject: reject };
+    };
+  }
+  if (typeof URL.parse !== "function") {
+    URL.parse = function (value, base) {
+      try { return new URL(value, base); } catch { return null; }
+    };
+  }
+
   var KB = 1024;
   var MB = KB * 1024;
   var GB = MB * 1024;
@@ -111,4 +132,12 @@
   document.querySelectorAll("[data-current-year]").forEach(function (node) {
     node.textContent = String(new Date().getFullYear());
   });
+
+  if ("serviceWorker" in navigator && /^https?:$/.test(window.location.protocol)) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("/service-worker.js").catch(function () {
+        /* The tools still work normally if service-worker registration is unavailable. */
+      });
+    });
+  }
 }());

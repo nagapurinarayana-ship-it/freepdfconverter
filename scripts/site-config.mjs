@@ -1,19 +1,30 @@
 export const indexablePages = [
   "index.html",
   "about.html",
+  "how-local-processing.html",
   "tools/merge-pdf.html",
   "tools/split-pdf.html",
   "tools/rotate-pdf.html",
   "tools/jpg-to-pdf.html",
   "tools/pdf-to-image.html",
   "tools/watermark-pdf.html",
+  "tools/organize-pdf.html",
+  "tools/add-page-numbers.html",
+  "tools/remove-pdf-metadata.html",
+  "tools/crop-pdf.html",
+  "tools/extract-pdf-text.html",
   "guides/index.html",
   "guides/merge-pdf-safely.html",
   "guides/split-extract-pdf-pages.html",
   "guides/rotate-pdf-pages.html",
   "guides/jpg-png-to-pdf.html",
   "guides/pdf-to-jpg-vs-png.html",
-  "guides/watermark-pdf-documents.html"
+  "guides/watermark-pdf-documents.html",
+  "guides/organize-pdf-pages.html",
+  "guides/add-page-numbers-to-pdf.html",
+  "guides/remove-pdf-metadata.html",
+  "guides/crop-pdf-pages.html",
+  "guides/extract-text-from-pdf.html"
 ];
 
 export const supplementalPages = ["privacy.html", "terms.html", "contact.html"];
@@ -24,11 +35,33 @@ export const articlePages = new Set([
   "guides/rotate-pdf-pages.html",
   "guides/jpg-png-to-pdf.html",
   "guides/pdf-to-jpg-vs-png.html",
-  "guides/watermark-pdf-documents.html"
+  "guides/watermark-pdf-documents.html",
+  "guides/organize-pdf-pages.html",
+  "guides/add-page-numbers-to-pdf.html",
+  "guides/remove-pdf-metadata.html",
+  "guides/crop-pdf-pages.html",
+  "guides/extract-text-from-pdf.html"
 ]);
+
+export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-11"]));
+
+export const articlePublishedDates = {
+  "guides/merge-pdf-safely.html": "2026-08-09",
+  "guides/split-extract-pdf-pages.html": "2026-08-09",
+  "guides/rotate-pdf-pages.html": "2026-08-09",
+  "guides/jpg-png-to-pdf.html": "2026-08-09",
+  "guides/pdf-to-jpg-vs-png.html": "2026-08-09",
+  "guides/watermark-pdf-documents.html": "2026-08-09",
+  "guides/organize-pdf-pages.html": "2026-08-11",
+  "guides/add-page-numbers-to-pdf.html": "2026-08-11",
+  "guides/remove-pdf-metadata.html": "2026-08-11",
+  "guides/crop-pdf-pages.html": "2026-08-11",
+  "guides/extract-text-from-pdf.html": "2026-08-11"
+};
 
 export const pageLabels = {
   "about.html": "About",
+  "how-local-processing.html": "How Local PDF Processing Works",
   "privacy.html": "Privacy Policy",
   "terms.html": "Terms of Use",
   "contact.html": "Contact",
@@ -38,13 +71,23 @@ export const pageLabels = {
   "tools/jpg-to-pdf.html": "JPG and PNG to PDF",
   "tools/pdf-to-image.html": "PDF to JPG or PNG",
   "tools/watermark-pdf.html": "Watermark PDF",
+  "tools/organize-pdf.html": "Organize PDF Pages",
+  "tools/add-page-numbers.html": "Add Page Numbers to PDF",
+  "tools/remove-pdf-metadata.html": "Remove PDF Metadata",
+  "tools/crop-pdf.html": "Crop PDF Pages",
+  "tools/extract-pdf-text.html": "Extract PDF Text",
   "guides/index.html": "PDF Guides",
   "guides/merge-pdf-safely.html": "How to Merge PDFs Safely",
   "guides/split-extract-pdf-pages.html": "How to Split and Extract PDF Pages",
   "guides/rotate-pdf-pages.html": "How to Rotate PDF Pages",
   "guides/jpg-png-to-pdf.html": "How to Convert JPG or PNG to PDF",
   "guides/pdf-to-jpg-vs-png.html": "PDF to JPG vs PNG",
-  "guides/watermark-pdf-documents.html": "How to Watermark PDF Documents"
+  "guides/watermark-pdf-documents.html": "How to Watermark PDF Documents",
+  "guides/organize-pdf-pages.html": "How to Organize PDF Pages",
+  "guides/add-page-numbers-to-pdf.html": "How to Add Page Numbers to a PDF",
+  "guides/remove-pdf-metadata.html": "How to Remove PDF Metadata",
+  "guides/crop-pdf-pages.html": "How to Crop PDF Pages",
+  "guides/extract-text-from-pdf.html": "How to Extract Text from a PDF"
 };
 
 export function pagePathname(relative) {

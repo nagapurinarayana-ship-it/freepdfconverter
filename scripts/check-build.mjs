@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { indexablePages, pagePathname } from "./site-config.mjs";
+import { articlePages, indexablePages, pageDates, pagePathname } from "./site-config.mjs";
 
 const root = process.cwd();
 const dist = path.join(root, "dist");
@@ -13,13 +13,15 @@ for (const relative of indexablePages) {
   const canonical = html.match(/<link rel="canonical" href="([^"]+)">/i)?.[1];
   if (canonical !== expectedCanonical) failures.push(relative + " -> unexpected canonical " + canonical);
   if (!html.includes('<meta property="og:url" content="' + expectedCanonical + '">')) failures.push(relative + " -> missing og:url");
-  if (!html.includes('<meta name="twitter:card" content="summary">')) failures.push(relative + " -> missing Twitter card metadata");
+  if (!html.includes('<meta name="twitter:card" content="summary_large_image">')) failures.push(relative + " -> missing large Twitter card metadata");
+  if (!html.includes('<meta property="og:image" content="' + origin + '/assets/images/freepdf-tools-social.jpg">')) failures.push(relative + " -> missing social image metadata");
   for (const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     try { JSON.parse(match[1]); } catch { failures.push(relative + " -> invalid JSON-LD"); }
   }
   if (relative === "index.html" && !html.includes('"@type":"WebSite"')) failures.push(relative + " -> missing WebSite structured data");
   if (relative !== "index.html" && !html.includes('"@type":"BreadcrumbList"')) failures.push(relative + " -> missing breadcrumb structured data");
   if (relative.startsWith("guides/") && relative !== "guides/index.html" && !html.includes('"@type":"Article"')) failures.push(relative + " -> missing Article structured data");
+  if (articlePages.has(relative) && !html.includes('"image":["' + origin + '/assets/images/freepdf-tools-social.jpg"]')) failures.push(relative + " -> Article structured data missing image");
   const localHtmlLinks = [...html.matchAll(/href="(?!https?:)([^"]+\.html(?:[?#][^"]*)?)"/g)].map((match) => match[1]);
   if (localHtmlLinks.length) failures.push(relative + " -> redirecting .html links: " + localHtmlLinks.join(", "));
 }
@@ -29,6 +31,17 @@ const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => m
 const expectedLocations = indexablePages.map((relative) => origin + pagePathname(relative));
 if (JSON.stringify(locations) !== JSON.stringify(expectedLocations)) failures.push("sitemap.xml -> URL set does not match indexable pages");
 if (locations.some((location) => location.endsWith(".html"))) failures.push("sitemap.xml -> contains redirecting .html URL");
+const lastmods = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
+const expectedLastmods = indexablePages.map((relative) => pageDates[relative]);
+if (JSON.stringify(lastmods) !== JSON.stringify(expectedLastmods)) failures.push("sitemap.xml -> lastmod set does not match page dates");
+
+const home = await readFile(path.join(dist, "index.html"), "utf8");
+if (!/assets\/css\/styles\.[a-f0-9]{10}\.css/.test(home)) failures.push("build -> stylesheet is not fingerprinted");
+if (!/assets\/js\/common\.[a-f0-9]{10}\.js/.test(home)) failures.push("build -> common script is not fingerprinted");
+if (/assets\/css\/styles\.css|assets\/js\/common\.js/.test(home)) failures.push("build -> unfingerprinted core asset reference remains");
+
+const serviceWorker = await readFile(path.join(dist, "service-worker.js"), "utf8");
+if (serviceWorker.includes("__CACHE_VERSION__") || serviceWorker.includes("__PRECACHE_URLS__")) failures.push("service-worker.js -> build placeholders remain");
 
 if (failures.length) {
   console.error("Production SEO checks failed:\n" + failures.join("\n"));
