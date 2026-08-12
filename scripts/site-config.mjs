@@ -2,6 +2,7 @@ export const indexablePages = [
   "index.html",
   "about.html",
   "how-local-processing.html",
+  "unlock-pdf-online.html",
   "merge-pdf-online.html",
   "split-pdf-online.html",
   "jpg-to-pdf-online.html",
@@ -73,6 +74,7 @@ export const articlePublishedDates = {
 export const pageLabels = {
   "about.html": "About",
   "how-local-processing.html": "How Local PDF Processing Works",
+  "unlock-pdf-online.html": "Unlock PDF Online",
   "merge-pdf-online.html": "Merge PDF Online",
   "split-pdf-online.html": "Split PDF Online",
   "jpg-to-pdf-online.html": "JPG to PDF Online",
