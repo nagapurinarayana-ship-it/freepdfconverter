@@ -43,6 +43,8 @@ if (/assets\/css\/styles\.css|assets\/js\/common\.js/.test(home)) failures.push(
 const serviceWorker = await readFile(path.join(dist, "service-worker.js"), "utf8");
 if (serviceWorker.includes("__CACHE_VERSION__") || serviceWorker.includes("__PRECACHE_URLS__")) failures.push("service-worker.js -> build placeholders remain");
 if (!serviceWorker.includes('"/favicon.ico"')) failures.push("service-worker.js -> root favicon is not precached");
+if (!serviceWorker.includes("if (!response.ok) return response;")) failures.push("service-worker.js -> failed navigation responses can be cached");
+if (!serviceWorker.includes('caches.match("/offline.html")')) failures.push("service-worker.js -> offline fallback does not include /offline.html");
 
 await access(path.join(dist, "favicon.ico"));
 const redirects = await readFile(path.join(dist, "_redirects"), "utf8");
