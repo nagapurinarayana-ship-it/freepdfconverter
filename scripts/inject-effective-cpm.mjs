@@ -8,7 +8,7 @@ const POPUNDER = '<script src="https://pl30806638.effectivecpmnetwork.com/64/d8/
 const NATIVE = '<script async="async" data-cfasync="false" src="https://pl30806640.effectivecpmnetwork.com/d0874cab14ed56771eb0d709062b71da/invoke.js"></script><div id="container-d0874cab14ed56771eb0d709062b71da"></div>';
 const SOCIAL = '<script src="https://pl30806641.effectivecpmnetwork.com/a8/89/7e/a8897ecee48386eabd13ef3cbb2661c5.js"></script>';
 const SMARTLINK = '<div class="ad-smartlink"><span class="ad-label">Sponsored</span><a href="https://www.effectivecpmnetwork.com/c1kt57md?key=16cfe2b361699a8b0b12a8dc0c8c79b7" target="_blank" rel="sponsored noopener noreferrer">Explore sponsored offers</a></div>';
-const BANNER_728 = '<div class="ad-banner-728" aria-label="Sponsored advertisement"><span class="ad-label">Advertisement · 728×90</span><script>atOptions = { \'key\' : \'7b9ff27e517a15dcbdb8b889b758ec1b\', \'format\' : \'iframe\', \'height\' : 90, \'width\' : 728, \'params\' : {} };</script><script src="https://www.highperformanceformat.com/7b9ff27e517a15dcbdb8b889b758ec1b/invoke.js"></script></div>';
+const BANNER_728 = '<div class="ad-banner-728" style="max-width:100%;overflow:hidden;text-align:center" aria-label="Sponsored advertisement"><span class="ad-label">Advertisement · 728×90</span><script>atOptions = { \'key\' : \'7b9ff27e517a15dcbdb8b889b758ec1b\', \'format\' : \'iframe\', \'height\' : 90, \'width\' : 728, \'params\' : {} };</script><script src="https://www.highperformanceformat.com/7b9ff27e517a15dcbdb8b889b758ec1b/invoke.js"></script></div>';
 
 for (const file of htmlFiles) {
   let html = await readFile(file, "utf8");
