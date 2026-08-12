@@ -26,7 +26,9 @@ export const indexablePages = [
   "guides/add-page-numbers-to-pdf.html",
   "guides/remove-pdf-metadata.html",
   "guides/crop-pdf-pages.html",
-  "guides/extract-text-from-pdf.html"
+  "guides/extract-text-from-pdf.html",
+  "guides/are-online-pdf-converters-safe.html",
+  "guides/pdf-converter-without-upload.html"
 ];
 
 export const supplementalPages = ["privacy.html", "terms.html", "contact.html"];
@@ -47,6 +49,8 @@ export const articlePages = new Set([
 ]);
 
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-11"]));
+pageDates["guides/are-online-pdf-converters-safe.html"] = "2026-08-12";
+pageDates["guides/pdf-converter-without-upload.html"] = "2026-08-12";
 
 export const articlePublishedDates = {
   "guides/merge-pdf-safely.html": "2026-08-09",
@@ -93,11 +97,13 @@ export const pageLabels = {
   "guides/add-page-numbers-to-pdf.html": "How to Add Page Numbers to a PDF",
   "guides/remove-pdf-metadata.html": "How to Remove PDF Metadata",
   "guides/crop-pdf-pages.html": "How to Crop PDF Pages",
-  "guides/extract-text-from-pdf.html": "How to Extract Text from a PDF"
+  "guides/extract-text-from-pdf.html": "How to Extract Text from a PDF",
+  "guides/are-online-pdf-converters-safe.html": "Are Online PDF Converters Safe?",
+  "guides/pdf-converter-without-upload.html": "How to Convert PDFs Without Uploading Files"
 };
 
 export function pagePathname(relative) {
   if (relative === "index.html") return "/";
-  const withoutIndex = relative.replace(/index\.html$/, "");
-  return "/" + withoutIndex.replace(/\.html$/, "");
+  const withoutIndex = relative.replace(/index\\.html$/, "");
+  return "/" + withoutIndex.replace(/\\.html$/, "");
 }
