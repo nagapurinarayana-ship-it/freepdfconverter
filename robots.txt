@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://freepdfconverter-all-in-one.pages.dev/sitemap.xml
