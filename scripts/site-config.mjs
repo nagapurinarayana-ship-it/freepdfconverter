@@ -2,6 +2,9 @@ export const indexablePages = [
   "index.html",
   "about.html",
   "how-local-processing.html",
+  "merge-pdf-online.html",
+  "split-pdf-online.html",
+  "jpg-to-pdf-online.html",
   "tools/merge-pdf.html",
   "tools/split-pdf.html",
   "tools/unlock-pdf.html",
@@ -48,7 +51,7 @@ export const articlePages = new Set([
   "guides/extract-text-from-pdf.html"
 ]);
 
-export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-11"]));
+export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
 pageDates["guides/are-online-pdf-converters-safe.html"] = "2026-08-12";
 pageDates["guides/pdf-converter-without-upload.html"] = "2026-08-12";
 
@@ -70,6 +73,9 @@ export const articlePublishedDates = {
 export const pageLabels = {
   "about.html": "About",
   "how-local-processing.html": "How Local PDF Processing Works",
+  "merge-pdf-online.html": "Merge PDF Online",
+  "split-pdf-online.html": "Split PDF Online",
+  "jpg-to-pdf-online.html": "JPG to PDF Online",
   "privacy.html": "Privacy Policy",
   "terms.html": "Terms of Use",
   "contact.html": "Contact",
