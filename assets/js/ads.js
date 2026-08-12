@@ -9,21 +9,19 @@
   var SMARTLINK_URL = "https://www.effectivecpmnetwork.com/c1kt57md?key=16cfe2b361699a8b0b12a8dc0c8c79b7";
   var NATIVE_CONTAINER_ID = "freepdf-native-ad";
 
-  function loadExternalScript(src, attributes) {
-    if (document.querySelector('script[src="' + src + '"]')) return;
+  function appendScript(parent, src, attributes) {
+    if (document.querySelector('script[src="' + src + '"]')) return null;
     var script = document.createElement("script");
     script.src = src;
     Object.keys(attributes || {}).forEach(function (key) {
       if (attributes[key] !== null && attributes[key] !== undefined) script.setAttribute(key, attributes[key]);
     });
-    document.head.appendChild(script);
+    parent.appendChild(script);
+    return script;
   }
 
-  // Site-wide Popunder: load the supplied network script once per page.
-  loadExternalScript(POPUNDER_SRC);
-
-  // Site-wide Social Bar: load the supplied network script once per page.
-  loadExternalScript(SOCIAL_BAR_SRC);
+  // Popunder: the supplied publisher instruction is "before </head>".
+  appendScript(document.head, POPUNDER_SRC);
 
   function addSmartlink(parent) {
     var wrapper = document.createElement("div");
@@ -63,16 +61,23 @@
 
     var networkContainer = document.createElement("div");
     networkContainer.id = "container-d0874cab14ed56771eb0d709062b71da";
+
+    // Keep the EffectiveCPM native snippet together: script immediately before its container.
+    var networkScript = document.createElement("script");
+    networkScript.async = true;
+    networkScript.setAttribute("data-cfasync", "false");
+    networkScript.src = NATIVE_SRC;
+    native.appendChild(networkScript);
     native.appendChild(networkContainer);
 
     contentZone.parentNode.insertBefore(native, contentZone.nextSibling);
-
-    loadExternalScript(NATIVE_SRC, {
-      async: "async",
-      "data-cfasync": "false"
-    });
-
     addSmartlink(native);
+  }
+
+  function addSocialBar() {
+    // Publisher instruction: Social Bar goes immediately above </body>.
+    if (document.querySelector('script[src="' + SOCIAL_BAR_SRC + '"]')) return;
+    appendScript(document.body, SOCIAL_BAR_SRC);
   }
 
   // Preserve the existing optional AdSense integration when configured.
@@ -109,10 +114,14 @@
     });
   }
 
-  // Native banner is deliberately placed outside upload/process/download controls.
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", addNativeBanner, { once: true });
-  } else {
+  function initEffectiveCpm() {
     addNativeBanner();
+    addSocialBar();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initEffectiveCpm, { once: true });
+  } else {
+    initEffectiveCpm();
   }
 }());
