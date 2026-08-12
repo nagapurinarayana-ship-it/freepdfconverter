@@ -33,12 +33,18 @@ self.addEventListener("fetch", function (event) {
 
   if (request.mode === "navigate") {
     event.respondWith(fetch(request).then(function (response) {
+      if (!response.ok) return response;
+
       const copy = response.clone();
-      caches.open(RUNTIME_CACHE).then(function (cache) { cache.put(request, copy); });
+      event.waitUntil(caches.open(RUNTIME_CACHE).then(function (cache) {
+        return cache.put(request, copy);
+      }));
       return response;
     }).catch(function () {
       return caches.match(request).then(function (cached) {
-        return cached || caches.match("/offline");
+        return cached || caches.match("/offline").then(function (offline) {
+          return offline || caches.match("/offline.html");
+        });
       });
     }));
     return;
@@ -50,7 +56,9 @@ self.addEventListener("fetch", function (event) {
       return fetch(request).then(function (response) {
         if (response.ok) {
           const copy = response.clone();
-          caches.open(RUNTIME_CACHE).then(function (cache) { cache.put(request, copy); });
+          event.waitUntil(caches.open(RUNTIME_CACHE).then(function (cache) {
+            return cache.put(request, copy);
+          }));
         }
         return response;
       });
