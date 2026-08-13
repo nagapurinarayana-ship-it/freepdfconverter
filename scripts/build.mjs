@@ -53,6 +53,8 @@ if (origin) {
     const modified = pageDates[relative] || published;
     const metadata = [
       '<link rel="canonical" href="' + canonical + '">',
+      '<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">',
+      html.includes('property="og:site_name"') ? "" : '<meta property="og:site_name" content="FreePDF Tools">',
       html.includes('property="og:title"') ? "" : '<meta property="og:title" content="' + escapeAttribute(title) + '">',
       html.includes('property="og:description"') ? "" : '<meta property="og:description" content="' + escapeAttribute(description) + '">',
       html.includes('property="og:type"') ? "" : '<meta property="og:type" content="' + socialType + '">',
@@ -116,9 +118,15 @@ function structuredData(relative, canonical, title, description) {
       name: "FreePDF Tools",
       url: origin + "/",
       description,
-      inLanguage: "en"
+      inLanguage: "en",
+      publisher: {
+        "@type": "Organization",
+        name: "FreePDF Tools",
+        url: origin + "/about"
+      }
     }) + "</script>";
   }
+
   const breadcrumbItems = [{
     "@type": "ListItem",
     position: 1,
@@ -136,13 +144,55 @@ function structuredData(relative, canonical, title, description) {
   breadcrumbItems.push({
     "@type": "ListItem",
     position: breadcrumbItems.length + 1,
-    name: pageLabels[relative] || title.replace(/\s*\|.*$/, "")
+    name: pageLabels[relative] || title.replace(/\s*\|.*$/, ""),
+    item: canonical
   });
 
   const graph = [{
     "@type": "BreadcrumbList",
     itemListElement: breadcrumbItems
   }];
+
+  if (relative === "guides/index.html") {
+    graph.push({
+      "@type": "CollectionPage",
+      name: pageLabels[relative] || "PDF Guides",
+      url: canonical,
+      description,
+      isPartOf: { "@type": "WebSite", name: "FreePDF Tools", url: origin + "/" },
+      inLanguage: "en"
+    });
+  }
+
+  const toolPages = new Set([
+    "tools/merge-pdf.html",
+    "tools/split-pdf.html",
+    "tools/unlock-pdf.html",
+    "tools/rotate-pdf.html",
+    "tools/jpg-to-pdf.html",
+    "tools/pdf-to-image.html",
+    "tools/watermark-pdf.html",
+    "tools/organize-pdf.html",
+    "tools/add-page-numbers.html",
+    "tools/remove-pdf-metadata.html",
+    "tools/crop-pdf.html",
+    "tools/extract-pdf-text.html"
+  ]);
+
+  if (toolPages.has(relative)) {
+    graph.push({
+      "@type": "SoftwareApplication",
+      name: pageLabels[relative] || title.replace(/\s*\|.*$/, ""),
+      url: canonical,
+      applicationCategory: "UtilitiesApplication",
+      operatingSystem: "Web browser",
+      description,
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      isAccessibleForFree: true,
+      inLanguage: "en"
+    });
+  }
+
   if (articlePages.has(relative)) {
     const published = articlePublishedDates[relative] || pageDates[relative];
     graph.push({
@@ -158,6 +208,7 @@ function structuredData(relative, canonical, title, description) {
       publisher: { "@type": "Organization", name: "FreePDF Tools", url: origin + "/about" }
     });
   }
+
   return '<script type="application/ld+json">' + JSON.stringify({
     "@context": "https://schema.org",
     "@graph": graph
