@@ -1,5 +1,6 @@
 export const indexablePages = [
   "index.html",
+  "pdf-converter-online.html",
   "about.html",
   "how-local-processing.html",
   "unlock-pdf-online.html",
@@ -75,6 +76,7 @@ export const articlePublishedDates = {
 };
 
 export const pageLabels = {
+  "pdf-converter-online.html": "Free PDF Converter Online",
   "about.html": "About",
   "how-local-processing.html": "How Local PDF Processing Works",
   "unlock-pdf-online.html": "Unlock PDF Online",
