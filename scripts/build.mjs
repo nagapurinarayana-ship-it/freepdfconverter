@@ -11,11 +11,7 @@ const defaultWorkersOrigin = "https://freepdfconverter.all-in-one-all.workers.de
 const workersOrigin = process.env.WORKERS_CI && productionBranch ? defaultWorkersOrigin : "";
 const suppliedOrigin = String(process.env.SITE_ORIGIN || (productionBranch ? process.env.CF_PAGES_URL || workersOrigin : "")).replace(/\/+$/, "");
 const origin = /^https?:\/\/[^/]+$/i.test(suppliedOrigin) ? suppliedOrigin : "";
-const adsensePublisherId = "ca-pub-6638412579880225";
-const adsenseHead = [
-  '<meta name="google-adsense-account" content="' + adsensePublisherId + '">',
-  '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + adsensePublisherId + '" crossorigin="anonymous"></script>'
-].join("\n");
+
 const appHead = [
   '<link rel="manifest" href="/manifest.webmanifest">',
   '<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">'
@@ -39,7 +35,7 @@ for (const relative of htmlFiles) {
   const file = path.join(dist, relative);
   const html = await readFile(file, "utf8");
   const withCleanLinks = rewriteInternalLinks(html);
-  const head = relative === "404.html" ? "" : appHead + "\n" + adsenseHead + "\n";
+  const head = relative === "404.html" ? "" : appHead + "\n";
   await writeFile(file, withCleanLinks.replace("</head>", head + "</head>"), "utf8");
 }
 
