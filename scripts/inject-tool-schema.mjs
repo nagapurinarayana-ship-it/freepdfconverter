@@ -14,13 +14,19 @@ const files = (await readdir(toolsDir, { withFileTypes: true }))
 for (const name of files) {
   const file = path.join(toolsDir, name);
   let html = await readFile(file, "utf8");
-  html = html.replace(/\n?\s*<script type="application\/ld\+json" data-tool-schema>[\s\S]*?<\/script>/i, "");
+  html = html.replace(/\n?\s*<script type="application\/ld\+json" data-tool-schema>[\s\S]*?<\/script>/gi, "");
 
   const title = decodeHtml(extract(html, /<title>([^<]+)<\/title>/i));
   const description = decodeHtml(extract(html, /<meta\s+name="description"\s+content="([^"]+)"/i));
   const h1 = decodeHtml(extract(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim());
   const label = h1 || title.replace(/\s*—.*$/i, "").replace(/\s*\|.*$/i, "").trim();
-  const canonical = extract(html, /<link\s+rel="canonical"\s+href="([^"]+)"/i) || `${origin}/tools/${name.replace(/\.html$/i, "")}`;
+  const canonical = `${origin}/tools/${name.replace(/\.html$/i, "")}`;
+
+  // Keep exactly one canonical URL on each tool page. The build step owns
+  // canonicalization; source templates may contain an older .html hint.
+  html = html.replace(/\n?\s*<link\s+rel="canonical"\s+href="[^"]+"\s*\/?>/gi, "");
+  html = html.replace("</head>", `<link rel="canonical" href="${canonical}">\n</head>`);
+
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
