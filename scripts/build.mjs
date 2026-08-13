@@ -12,6 +12,45 @@ const workersOrigin = process.env.WORKERS_CI && productionBranch ? defaultWorker
 const suppliedOrigin = String(process.env.SITE_ORIGIN || (productionBranch ? process.env.CF_PAGES_URL || workersOrigin : "")).replace(/\/+$/, "");
 const origin = /^https?:\/\/[^/]+$/i.test(suppliedOrigin) ? suppliedOrigin : "";
 
+const pageKeywords = {
+  "index.html": ["free pdf tools", "free pdf converter", "pdf tools online", "merge pdf", "split pdf", "convert pdf", "pdf converter online", "private pdf tools"],
+  "pdf-converter-online.html": ["free pdf converter online", "pdf converter", "online pdf converter", "convert pdf files", "private pdf converter", "pdf converter without upload"],
+  "unlock-pdf-online.html": ["unlock pdf online", "remove pdf password", "unlock password protected pdf", "pdf password remover", "decrypt pdf"],
+  "merge-pdf-online.html": ["merge pdf online", "combine pdf files", "merge pdf free", "combine pdf documents", "pdf merger"],
+  "split-pdf-online.html": ["split pdf online", "split pdf free", "extract pages from pdf", "pdf splitter", "separate pdf pages"],
+  "jpg-to-pdf-online.html": ["jpg to pdf", "jpg to pdf online", "png to pdf", "image to pdf", "convert jpg to pdf"],
+  "rotate-pdf-online.html": ["rotate pdf online", "rotate pdf pages", "rotate pdf free", "fix rotated pdf", "turn pdf pages"],
+  "crop-pdf-online.html": ["crop pdf online", "crop pdf pages", "trim pdf margins", "remove pdf borders", "pdf cropper"],
+  "remove-pdf-metadata-online.html": ["remove pdf metadata", "pdf metadata remover", "clean pdf metadata", "remove author from pdf", "pdf privacy"],
+  "tools/merge-pdf.html": ["merge pdf", "merge pdf online", "combine pdf files", "pdf merger", "merge pdf free"],
+  "tools/split-pdf.html": ["split pdf", "split pdf online", "extract pdf pages", "pdf splitter", "separate pdf pages"],
+  "tools/unlock-pdf.html": ["unlock pdf", "unlock pdf online", "remove pdf password", "password protected pdf", "decrypt pdf"],
+  "tools/rotate-pdf.html": ["rotate pdf", "rotate pdf online", "rotate pdf pages", "pdf page rotator", "fix sideways pdf"],
+  "tools/jpg-to-pdf.html": ["jpg to pdf", "png to pdf", "jpg to pdf online", "image to pdf", "convert images to pdf"],
+  "tools/pdf-to-image.html": ["pdf to jpg", "pdf to png", "pdf to image", "convert pdf to jpg", "convert pdf pages to images"],
+  "tools/watermark-pdf.html": ["watermark pdf", "add watermark to pdf", "pdf watermark online", "watermark pdf free", "confidential pdf watermark"],
+  "tools/organize-pdf.html": ["organize pdf", "reorder pdf pages", "delete pdf pages", "organize pdf online", "pdf page organizer"],
+  "tools/add-page-numbers.html": ["add page numbers to pdf", "pdf page numbers", "number pdf pages", "add pdf page numbers online", "pdf numbering"],
+  "tools/remove-pdf-metadata.html": ["remove pdf metadata", "clean pdf metadata", "pdf metadata remover", "remove author from pdf", "pdf metadata cleaner"],
+  "tools/crop-pdf.html": ["crop pdf", "crop pdf pages", "crop pdf online", "trim pdf pages", "pdf cropper"],
+  "tools/extract-pdf-text.html": ["extract text from pdf", "pdf text extractor", "extract pdf text online", "copy text from pdf", "pdf to text"],
+  "guides/index.html": ["pdf guides", "pdf help", "how to use pdf tools", "pdf tutorials", "pdf tips"],
+  "guides/merge-pdf-safely.html": ["how to merge pdfs", "merge pdf safely", "combine pdf files", "merge pdf without losing quality", "pdf merger guide"],
+  "guides/split-extract-pdf-pages.html": ["how to split a pdf", "extract pages from pdf", "split pdf guide", "separate pdf pages", "pdf page extraction"],
+  "guides/unlock-password-protected-pdf.html": ["how to unlock a pdf", "remove pdf password", "password protected pdf", "unlock pdf safely", "pdf password guide"],
+  "guides/rotate-pdf-pages.html": ["how to rotate pdf pages", "rotate pdf guide", "fix sideways pdf", "rotate pdf online", "pdf page rotation"],
+  "guides/jpg-png-to-pdf.html": ["jpg to pdf guide", "png to pdf", "convert images to pdf", "how to convert jpg to pdf", "image to pdf guide"],
+  "guides/pdf-to-jpg-vs-png.html": ["pdf to jpg vs png", "convert pdf to jpg", "convert pdf to png", "pdf image format", "pdf page images"],
+  "guides/watermark-pdf-documents.html": ["how to watermark a pdf", "pdf watermark guide", "add watermark to pdf", "confidential watermark pdf", "watermark pdf documents"],
+  "guides/organize-pdf-pages.html": ["how to organize pdf pages", "reorder pdf pages", "delete pages from pdf", "organize pdf guide", "pdf page order"],
+  "guides/add-page-numbers-to-pdf.html": ["how to add page numbers to pdf", "pdf page numbering", "number pages in pdf", "add pdf page numbers", "pdf numbering guide"],
+  "guides/remove-pdf-metadata.html": ["how to remove pdf metadata", "pdf metadata privacy", "remove author from pdf", "clean pdf metadata", "pdf metadata guide"],
+  "guides/crop-pdf-pages.html": ["how to crop pdf pages", "crop pdf guide", "remove pdf margins", "trim pdf pages", "pdf crop guide"],
+  "guides/extract-text-from-pdf.html": ["how to extract text from a pdf", "pdf text extraction", "extract pdf text", "pdf to text guide", "copy text from pdf"],
+  "guides/are-online-pdf-converters-safe.html": ["are online pdf converters safe", "pdf privacy", "safe online pdf converter", "secure pdf conversion", "pdf converter privacy"],
+  "guides/pdf-converter-without-upload.html": ["pdf converter without upload", "convert pdf without uploading", "private pdf converter", "offline pdf converter", "local pdf processing"]
+};
+
 const appHead = [
   '<link rel="manifest" href="/manifest.webmanifest">',
   '<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">'
@@ -51,9 +90,11 @@ if (origin) {
     const socialImage = origin + "/assets/images/freepdf-tools-social.jpg";
     const published = articlePublishedDates[relative] || pageDates[relative] || "2026-08-11";
     const modified = pageDates[relative] || published;
+    const keywords = pageKeywords[relative] || [];
     const metadata = [
       '<link rel="canonical" href="' + canonical + '">',
       '<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">',
+      keywords.length ? '<meta name="keywords" content="' + escapeAttribute(keywords.join(", ")) + '">' : "",
       html.includes('property="og:site_name"') ? "" : '<meta property="og:site_name" content="FreePDF Tools">',
       html.includes('property="og:title"') ? "" : '<meta property="og:title" content="' + escapeAttribute(title) + '">',
       html.includes('property="og:description"') ? "" : '<meta property="og:description" content="' + escapeAttribute(description) + '">',
