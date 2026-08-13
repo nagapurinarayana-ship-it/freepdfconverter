@@ -79,7 +79,16 @@ for (const relative of allPages) {
   if (relative.endsWith("/index.html")) redirects.add("/" + relative + " " + canonical + " 301");
 }
 await writeFile(path.join(dist, "_redirects"), [...redirects].join("\n") + "\n", "utf8");
-console.log("Normalized internal URLs, canonicals, sitemap URLs, and legacy extensionless redirects");
+
+const serviceWorkerPath = path.join(dist, "service-worker.js");
+let serviceWorker = await readFile(serviceWorkerPath, "utf8").catch(() => "");
+for (const [alias, canonical] of aliases) {
+  if (alias === canonical || !alias.startsWith("/") || alias.length <= 1) continue;
+  serviceWorker = serviceWorker.split('"' + alias + '"').join('"' + canonical + '"');
+}
+if (serviceWorker) await writeFile(serviceWorkerPath, serviceWorker, "utf8");
+
+console.log("Normalized internal URLs, canonicals, sitemap URLs, service-worker URLs, and legacy extensionless redirects");
 
 function canonicalPath(relative) {
   if (relative === "index.html") return "/";
