@@ -79,7 +79,9 @@ ${MARKER_START}
 ${MARKER_END}`;
 
 if (html.includes(anchor)) {
-  html = html.replace(anchor, anchor + homeAds);
+  // Replace the existing top placeholder with the same four placement types
+  // used by CraftMyPage rather than leaving an extra inactive ad slot behind.
+  html = html.replace(anchor, homeAds);
 }
 
 html = html.replace("</body>", SOCIAL_BAR + "\n</body>");
