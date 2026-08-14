@@ -1,8 +1,7 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const dist = path.join(process.cwd(), "dist");
-const INDEX = path.join(dist, "index.html");
 
 // Keep the EffectiveCPM implementation aligned with CraftMyPage.
 const POPUNDER = '<script src="https://pl30815332.effectivecpmnetwork.com/98/cd/4d/98cd4d37b3a5c234c49c85952c033714.js"></script>';
@@ -18,17 +17,18 @@ const SMARTLINK = "https://www.effectivecpmnetwork.com/hcit0ft2?key=3383ae2b2a94
 const MARKER_START = "<!-- freepdf-effectivecpm:start -->";
 const MARKER_END = "<!-- freepdf-effectivecpm:end -->";
 
-let html = await readFile(INDEX, "utf8");
-html = stripExisting(html);
+const htmlFiles = [];
+await collectHtml(dist);
 
-// Same global scripts as CraftMyPage: popunder in <head>, social bar before </body>.
-html = html.replace("</head>", POPUNDER + "\n</head>");
+for (const file of htmlFiles) {
+  let html = await readFile(file, "utf8");
+  html = stripExisting(html);
 
-// Equivalent of CraftMyPage's EffectiveCpmHomeAds component, expressed as
-// static HTML so it fits FreePDF's existing static build without changing
-// any SEO/meta markup or page content.
-const anchor = '<div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>';
-const homeAds = `
+  // Same global scripts as CraftMyPage: popunder in <head>, social bar before </body>.
+  if (html.includes("</head>")) html = html.replace("</head>", POPUNDER + "\n</head>");
+
+  // Apply the same four monetization formats to every generated HTML page.
+  const pageAds = `
 ${MARKER_START}
 <section class="section" aria-label="Advertisements">
   <div class="container">
@@ -78,20 +78,34 @@ ${MARKER_START}
 </section>
 ${MARKER_END}`;
 
-if (html.includes(anchor)) {
-  // Replace the existing top placeholder with the same four placement types
-  // used by CraftMyPage rather than leaving an extra inactive ad slot behind.
-  html = html.replace(anchor, homeAds);
+  // Keep the existing SEO/meta/content untouched. Insert ads only in the body.
+  if (html.includes("<main")) {
+    html = html.replace(/(<main\b[^>]*>)/i, `$1${pageAds}`);
+  } else if (html.includes("<body")) {
+    html = html.replace(/(<body\b[^>]*>)/i, `$1${pageAds}`);
+  }
+
+  if (html.includes("</body>")) html = html.replace("</body>", SOCIAL_BAR + "\n</body>");
+  await writeFile(file, html, "utf8");
 }
 
-html = html.replace("</body>", SOCIAL_BAR + "\n</body>");
-await writeFile(INDEX, html, "utf8");
+console.log(`EffectiveCPM monetization injected into ${htmlFiles.length} FreePDF HTML pages using the CraftMyPage implementation.`);
 
-console.log("EffectiveCPM monetization injected into FreePDF homepage using the CraftMyPage implementation.");
+async function collectHtml(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      await collectHtml(full);
+    } else if (entry.isFile() && entry.name.toLowerCase().endsWith(".html")) {
+      htmlFiles.push(full);
+    }
+  }
+}
 
 function stripExisting(source) {
-  const escapedStart = MARKER_START.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
-  const escapedEnd = MARKER_END.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&");
+  const escapedStart = MARKER_START.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const escapedEnd = MARKER_END.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const managed = new RegExp(`${escapedStart}[\\s\\S]*?${escapedEnd}`, "g");
 
   return source
