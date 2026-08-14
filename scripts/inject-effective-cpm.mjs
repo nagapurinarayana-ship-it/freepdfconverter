@@ -22,13 +22,12 @@ for (const file of htmlFiles) {
   let html = await readFile(file, "utf8");
   html = stripExisting(html);
 
-  // FreePDF's own Popunder: one per page, before </head>.
+  // Provider-required Popunder placement: one per page, before </head>.
   if (html.includes("</head>")) html = html.replace("</head>", POPUNDER + "\n</head>");
 
-  // FreePDF's own four body placements: Native, 728x90, Smartlink.
   const pageAds = `
 ${MARKER_START}
-<section class="section" aria-label="Advertisements">
+<section class="section freepdf-ad-section" aria-label="Advertisements">
   <div class="container">
     <div class="ad-container ad-native-container" aria-label="Sponsored advertisement">
       <div class="ad-label">Advertisement</div>
@@ -36,7 +35,7 @@ ${MARKER_START}
       <script async data-cfasync="false" src="${NATIVE_SRC}"></script>
     </div>
 
-    <div class="ad-container" aria-label="Sponsored advertisement">
+    <div class="ad-container ad-banner-728-container" aria-label="Sponsored advertisement">
       <div class="ad-label">Advertisement · 728×90</div>
       <div class="ad-banner-728" style="max-width:100%;overflow:hidden;text-align:center">
         <script>
@@ -52,7 +51,7 @@ ${MARKER_START}
       </div>
     </div>
 
-    <div class="ad-container" aria-label="Sponsored offers">
+    <div class="ad-container ad-smartlink-container" aria-label="Sponsored offers">
       <span class="ad-label">Sponsored</span>
       <a href="${SMARTLINK}" target="_blank" rel="sponsored noopener noreferrer">Explore sponsored offers →</a>
     </div>
@@ -60,14 +59,43 @@ ${MARKER_START}
 </section>
 ${MARKER_END}`;
 
-  // Keep existing SEO/meta/content untouched. Insert managed ads only in the body.
-  if (html.includes("<main")) {
-    html = html.replace(/(<main\b[^>]*>)/i, `$1${pageAds}`);
+  // Keep the primary page content first. This reduces the chance that the ad block
+  // becomes the initial LCP and gives the tool/hero a stable position before ads load.
+  // On tool pages insert after .tool-hero; on the homepage/other pages insert after
+  // the first top-level section inside <main>. Existing page content is untouched.
+  if (html.includes("</main>")) {
+    const toolHeroEnd = html.indexOf("</section>", html.indexOf("<section class=\"tool-hero\""));
+    if (toolHeroEnd !== -1) {
+      const insertAt = toolHeroEnd + "</section>".length;
+      html = html.slice(0, insertAt) + pageAds + html.slice(insertAt);
+    } else {
+      const mainOpenEnd = html.indexOf(">", html.search(/<main\b/i));
+      if (mainOpenEnd !== -1) {
+        const mainStart = mainOpenEnd + 1;
+        const sectionMatch = html.slice(mainStart).match(/<section\b/i);
+        if (sectionMatch) {
+          const sectionStart = mainStart + sectionMatch.index;
+          const sectionEnd = html.indexOf("</section>", sectionStart);
+          if (sectionEnd !== -1) {
+            const insertAt = sectionEnd + "</section>".length;
+            html = html.slice(0, insertAt) + pageAds + html.slice(insertAt);
+          } else {
+            html = html.slice(0, mainStart) + pageAds + html.slice(mainStart);
+          }
+        } else {
+          html = html.slice(0, mainStart) + pageAds + html.slice(mainStart);
+        }
+      }
+    }
   } else if (html.includes("<body")) {
-    html = html.replace(/(<body\b[^>]*>)/i, `$1${pageAds}`);
+    const bodyOpenEnd = html.indexOf(">", html.search(/<body\b/i));
+    if (bodyOpenEnd !== -1) {
+      const bodyStart = bodyOpenEnd + 1;
+      html = html.slice(0, bodyStart) + pageAds + html.slice(bodyStart);
+    }
   }
 
-  // FreePDF's own Social Bar: immediately before </body>.
+  // Provider-required Social Bar placement: immediately before </body>.
   if (html.includes("</body>")) html = html.replace("</body>", SOCIAL_BAR + "\n</body>");
   await writeFile(file, html, "utf8");
 }
@@ -78,11 +106,8 @@ async function collectHtml(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   for (const entry of entries) {
     const full = path.join(directory, entry.name);
-    if (entry.isDirectory()) {
-      await collectHtml(full);
-    } else if (entry.isFile() && entry.name.toLowerCase().endsWith(".html")) {
-      htmlFiles.push(full);
-    }
+    if (entry.isDirectory()) await collectHtml(full);
+    else if (entry.isFile() && entry.name.toLowerCase().endsWith(".html")) htmlFiles.push(full);
   }
 }
 
