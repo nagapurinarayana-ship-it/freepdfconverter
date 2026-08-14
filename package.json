@@ -5,7 +5,7 @@
   "description": "Private browser-based PDF utilities",
   "scripts": {
     "generate:guide-images": "node scripts/generate-guide-images.mjs",
-    "build": "node scripts/build.mjs && node scripts/ensure-sitemap.mjs && node scripts/inject-effective-cpm.mjs && node scripts/inject-tool-schema.mjs",
+    "build": "node scripts/build.mjs && node scripts/ensure-sitemap.mjs && node scripts/inject-effective-cpm.mjs && node scripts/seo-enhance.mjs && node scripts/inject-tool-schema.mjs",
     "check": "node scripts/check.mjs",
     "test:pdf": "node scripts/test-pdf-operations.mjs && node scripts/test-unlock-pdf.mjs",
     "verify": "npm run check && npm run test:pdf && SITE_ORIGIN=https://freepdfconverter-all-in-one.pages.dev npm run build && node scripts/check-build.mjs && node scripts/check-tool-schema.mjs"
