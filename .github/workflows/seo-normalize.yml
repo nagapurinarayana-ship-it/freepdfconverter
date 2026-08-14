@@ -20,7 +20,7 @@ jobs:
       - name: Normalize HTML SEO metadata
         run: node scripts/normalize-seo.mjs
 
-      - name: Commit SEO fixes
+      - name: Push normalized SEO files to branch
         run: |
           if git diff --quiet; then
             echo "No SEO metadata changes needed."
@@ -30,4 +30,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add '*.html' '**/*.html'
           git commit -m "Normalize SEO metadata"
-          git push
+          git push origin HEAD:seo/normalize-html-2026-08-14 --force
