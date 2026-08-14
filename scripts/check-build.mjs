@@ -33,9 +33,11 @@ for (const relative of indexablePages) {
   if (relative.startsWith("guides/") && relative !== "guides/index.html" && !html.includes('"@type":"Article"')) failures.push(relative + " -> missing Article structured data");
   if (articlePages.has(relative) && !html.includes('"image":["' + origin + '/assets/images/freepdf-tools-social.jpg"]')) failures.push(relative + " -> Article structured data missing image");
 
-  const localHtmlLinks = [...html.matchAll(/href="(?!https?:)([^"]+\.html(?:[?#][^"]*)?)"/g)].map((match) => match[1]);
-  if (localHtmlLinks.some((href) => href.includes(".html"))) failures.push(relative + " -> redirecting .html links: " + localHtmlLinks.join(", "));
-  if (!localHtmlLinks.length && relative !== "index.html") failures.push(relative + " -> no crawlable internal HTML links found");
+  const crawlableInternalLinks = [...html.matchAll(/href="([^"]+)"/g)]
+    .map((match) => match[1])
+    .filter((href) => !/^(?:https?:|mailto:|tel:|data:|#|javascript:)/i.test(href));
+  if (!crawlableInternalLinks.length) failures.push(relative + " -> no crawlable internal links found");
+  if (crawlableInternalLinks.some((href) => /\.html(?:[?#]|$)/i.test(href))) failures.push(relative + " -> redirecting .html link remains: " + crawlableInternalLinks.filter((href) => /\.html(?:[?#]|$)/i.test(href)).join(", "));
 
   if (relative.startsWith("guides/") && relative !== "guides/index.html") {
     if (!html.includes("freepdf-guide-links:start")) failures.push(relative + " -> missing related guide links block");
