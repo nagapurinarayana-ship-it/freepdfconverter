@@ -15,6 +15,16 @@ for (const relative of indexablePages) {
   if (!html.includes('<meta property="og:url" content="' + expectedCanonical + '">')) failures.push(relative + " -> missing og:url");
   if (!html.includes('<meta name="twitter:card" content="summary_large_image">')) failures.push(relative + " -> missing large Twitter card metadata");
   if (!html.includes('<meta property="og:image" content="' + origin + '/assets/images/freepdf-tools-social.jpg">')) failures.push(relative + " -> missing social image metadata");
+
+  const title = html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim() || "";
+  const description = html.match(/<meta\s+name="description"\s+content="([^"]*)"/i)?.[1]?.trim() || "";
+  const h1Count = (html.match(/<h1\b/gi) || []).length;
+  if (!title) failures.push(relative + " -> missing title");
+  if (title.length > 70) failures.push(relative + " -> title is unusually long (" + title.length + " chars)");
+  if (!description) failures.push(relative + " -> missing meta description");
+  if (description.length > 180) failures.push(relative + " -> meta description is unusually long (" + description.length + " chars)");
+  if (h1Count !== 1) failures.push(relative + " -> expected exactly one H1, found " + h1Count);
+
   for (const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     try { JSON.parse(match[1]); } catch { failures.push(relative + " -> invalid JSON-LD"); }
   }
@@ -22,8 +32,16 @@ for (const relative of indexablePages) {
   if (relative !== "index.html" && !html.includes('"@type":"BreadcrumbList"')) failures.push(relative + " -> missing breadcrumb structured data");
   if (relative.startsWith("guides/") && relative !== "guides/index.html" && !html.includes('"@type":"Article"')) failures.push(relative + " -> missing Article structured data");
   if (articlePages.has(relative) && !html.includes('"image":["' + origin + '/assets/images/freepdf-tools-social.jpg"]')) failures.push(relative + " -> Article structured data missing image");
+
   const localHtmlLinks = [...html.matchAll(/href="(?!https?:)([^"]+\.html(?:[?#][^"]*)?)"/g)].map((match) => match[1]);
-  if (localHtmlLinks.length) failures.push(relative + " -> redirecting .html links: " + localHtmlLinks.join(", "));
+  if (localHtmlLinks.some((href) => href.includes(".html"))) failures.push(relative + " -> redirecting .html links: " + localHtmlLinks.join(", "));
+  if (!localHtmlLinks.length && relative !== "index.html") failures.push(relative + " -> no crawlable internal HTML links found");
+
+  if (relative.startsWith("guides/") && relative !== "guides/index.html") {
+    if (!html.includes("freepdf-guide-links:start")) failures.push(relative + " -> missing related guide links block");
+    if (!html.includes("freepdf-internal-links:start")) failures.push(relative + " -> missing matching tool link block");
+  }
+  if (relative.startsWith("tools/") && !html.includes("freepdf-internal-links:start")) failures.push(relative + " -> missing tool-guide link block");
 }
 
 const sitemap = await readFile(path.join(dist, "sitemap.xml"), "utf8");
@@ -60,7 +78,7 @@ if (qpdfScript && !serviceWorker.includes("/assets/vendor/qpdf/" + qpdfScript)) 
 if (qpdfWasm && !serviceWorker.includes("/assets/vendor/qpdf/" + qpdfWasm)) failures.push("service-worker.js -> fingerprinted qpdf WebAssembly is not precached");
 
 if (failures.length) {
-  console.error("Production SEO checks failed:\n" + failures.join("\n"));
+  console.error("Production SEO/quality checks failed:\n" + failures.join("\n"));
   process.exit(1);
 }
-console.log("Production SEO checks passed for " + indexablePages.length + " indexable URLs.");
+console.log("Production SEO/quality checks passed for " + indexablePages.length + " indexable URLs.");
