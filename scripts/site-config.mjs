@@ -56,7 +56,11 @@ export const articlePages = new Set([
   "guides/extract-text-from-pdf.html"
 ]);
 
+// Keep sitemap lastmod aligned with substantive page updates. This is the
+// modification date, not the original publication date.
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
+pageDates["tools/organize-pdf.html"] = "2026-08-15";
+pageDates["guides/pdf-to-jpg-vs-png.html"] = "2026-08-15";
 pageDates["guides/are-online-pdf-converters-safe.html"] = "2026-08-12";
 pageDates["guides/pdf-converter-without-upload.html"] = "2026-08-12";
 
@@ -120,6 +124,6 @@ export const pageLabels = {
 
 export function pagePathname(relative) {
   if (relative === "index.html") return "/";
-  const withoutIndex = relative.replace(/index\\.html$/, "");
-  return "/" + withoutIndex.replace(/\\.html$/, "");
+  const withoutIndex = relative.replace(/index\.html$/, "");
+  return "/" + withoutIndex.replace(/\.html$/, "");
 }
