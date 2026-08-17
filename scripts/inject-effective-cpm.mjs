@@ -4,8 +4,6 @@ import path from "node:path";
 const dist = path.join(process.cwd(), "dist");
 
 // FreePDFConverter's own Adsterra / EffectiveCPM ad units only.
-const POPUNDER = '<script src="https://pl30806638.effectivecpmnetwork.com/64/d8/80/64d880a1349413fe7dcb55cf8a8b6379.js"></script>';
-const SOCIAL_BAR = '<script src="https://pl30806641.effectivecpmnetwork.com/a8/89/7e/a8897ecee48386eabd13ef3cbb2661c5.js"></script>';
 const NATIVE_SRC = "https://pl30806640.effectivecpmnetwork.com/d0874cab14ed56771eb0d709062b71da/invoke.js";
 const NATIVE_CONTAINER_ID = "container-d0874cab14ed56771eb0d709062b71da";
 const BANNER_728_SRC = "https://www.highperformanceformat.com/7b9ff27e517a15dcbdb8b889b758ec1b/invoke.js";
@@ -22,8 +20,6 @@ for (const file of htmlFiles) {
   let html = await readFile(file, "utf8");
   html = stripExisting(html);
 
-  // Provider-required Popunder placement: one per page, before </head>.
-  if (html.includes("</head>")) html = html.replace("</head>", POPUNDER + "\n</head>");
 
   const pageAds = `
 ${MARKER_START}
@@ -95,12 +91,10 @@ ${MARKER_END}`;
     }
   }
 
-  // Provider-required Social Bar placement: immediately before </body>.
-  if (html.includes("</body>")) html = html.replace("</body>", SOCIAL_BAR + "\n</body>");
   await writeFile(file, html, "utf8");
 }
 
-console.log(`FreePDF's own EffectiveCPM monetization injected into ${htmlFiles.length} HTML pages.`);
+console.log(`FreePDF safe Adsterra Native, Banner and sponsored-link monetization injected into ${htmlFiles.length} HTML pages.`);
 
 async function collectHtml(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
