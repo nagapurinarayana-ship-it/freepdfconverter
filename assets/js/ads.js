@@ -1,9 +1,9 @@
 (function () {
   "use strict";
 
-  var config = window.FreePDFMonetization || {};
-  var client = String(config.adsenseClient || "").trim();
   var key = "7b9ff27e517a15dcbdb8b889b758ec1b";
+  var popunderSrc = "https://pl30806638.effectivecpmnetwork.com/64/d8/80/64d880a1349413fe7dcb55cf8a8b6379.js";
+  var socialBarSrc = "https://pl30806641.effectivecpmnetwork.com/a8/89/7e/a8897ecee48386eabd13ef3cbb2661c5.js";
   var zone = document.querySelector('[data-ad-zone="top"]');
 
   if (zone && !zone.dataset.bannerLoaded) {
@@ -34,19 +34,22 @@
     nativeFrame.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
     nativeFrame.srcdoc = '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;overflow:auto;background:transparent}</style></head><body><script async data-cfasync="false" src="https://pl30806640.effectivecpmnetwork.com/d0874cab14ed56771eb0d709062b71da/invoke.js"><\/script><div id="container-d0874cab14ed56771eb0d709062b71da"></div></body></html>';
 
-    zone.replaceChildren(label, frame, nativeLabel, nativeFrame);
+    var extraLabel = document.createElement("span");
+    extraLabel.className = "ad-label";
+    extraLabel.textContent = "More sponsored offers";
+    var extraFrame = document.createElement("iframe");
+    extraFrame.title = "More sponsored offers";
+    extraFrame.width = "100%";
+    extraFrame.height = "140";
+    extraFrame.loading = "lazy";
+    extraFrame.style.cssText = "display:block;width:100%;max-width:760px;height:140px;margin:20px auto 0;border:0;overflow:hidden";
+    extraFrame.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation");
+    extraFrame.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
+    extraFrame.srcdoc = '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;min-height:120px;overflow:hidden;background:transparent}</style></head><body><script src="' + popunderSrc + '"><\/script><script src="' + socialBarSrc + '"><\/script></body></html>';
+
+    zone.replaceChildren(label, frame, nativeLabel, nativeFrame, extraLabel, extraFrame);
     zone.classList.add("is-active");
     zone.dataset.bannerLoaded = "1";
   }
 
-  if (/^ca-pub-\d+$/.test(client)) {
-    var script = document.querySelector('script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]');
-    if (!script) {
-      script = document.createElement("script");
-      script.async = true;
-      script.crossOrigin = "anonymous";
-      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + encodeURIComponent(client);
-      document.head.appendChild(script);
-    }
-  }
 }());
