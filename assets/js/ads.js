@@ -3,12 +3,29 @@
 
   var config = window.FreePDFMonetization || {};
   var client = String(config.adsenseClient || "").trim();
+  var key = "7b9ff27e517a15dcbdb8b889b758ec1b";
+  var zone = document.querySelector('[data-ad-zone="top"]');
 
-  // EffectiveCPM is injected directly into the generated HTML by scripts/build.mjs.
-  // Keeping those snippets in the HTML preserves the publisher-provided placement
-  // and keeps the native script immediately adjacent to its required container.
+  if (zone && !zone.dataset.bannerLoaded) {
+    var label = document.createElement("span");
+    label.className = "ad-label";
+    label.textContent = "Advertisement · 728×90";
 
-  // Preserve the existing optional AdSense integration when configured.
+    var frame = document.createElement("iframe");
+    frame.title = "Advertisement";
+    frame.width = "728";
+    frame.height = "90";
+    frame.loading = "eager";
+    frame.style.cssText = "display:block;width:728px;max-width:100%;height:90px;margin:8px auto 0;border:0;overflow:hidden";
+    frame.setAttribute("sandbox", "allow-scripts allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation");
+    frame.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
+    frame.srcdoc = '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;overflow:hidden;background:transparent}</style></head><body><script>atOptions={key:"' + key + '",format:"iframe",height:90,width:728,params:{}};<\/script><script src="https://www.highperformanceformat.com/' + key + '/invoke.js"><\/script></body></html>';
+
+    zone.replaceChildren(label, frame);
+    zone.classList.add("is-active");
+    zone.dataset.bannerLoaded = "1";
+  }
+
   if (/^ca-pub-\d+$/.test(client)) {
     var script = document.querySelector('script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]');
     if (!script) {
@@ -18,27 +35,5 @@
       script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + encodeURIComponent(client);
       document.head.appendChild(script);
     }
-
-    document.querySelectorAll("[data-ad-zone]").forEach(function (container) {
-      var zone = container.dataset.adZone;
-      var slot = String((config.slots && config.slots[zone]) || "").trim();
-      if (!/^\d+$/.test(slot)) return;
-
-      var label = document.createElement("span");
-      label.className = "ad-label";
-      label.textContent = "Advertisement";
-
-      var unit = document.createElement("ins");
-      unit.className = "adsbygoogle";
-      unit.style.display = "block";
-      unit.dataset.adClient = client;
-      unit.dataset.adSlot = slot;
-      unit.dataset.adFormat = "auto";
-      unit.dataset.fullWidthResponsive = "true";
-
-      container.replaceChildren(label, unit);
-      container.classList.add("is-active");
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    });
   }
 }());
