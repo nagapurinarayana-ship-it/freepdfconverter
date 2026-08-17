@@ -4,11 +4,8 @@ import path from "node:path";
 const dist = path.join(process.cwd(), "dist");
 
 // FreePDFConverter's own Adsterra / EffectiveCPM ad units only.
-const NATIVE_SRC = "https://pl30806640.effectivecpmnetwork.com/d0874cab14ed56771eb0d709062b71da/invoke.js";
-const NATIVE_CONTAINER_ID = "container-d0874cab14ed56771eb0d709062b71da";
 const BANNER_728_SRC = "https://www.highperformanceformat.com/7b9ff27e517a15dcbdb8b889b758ec1b/invoke.js";
 const BANNER_728_KEY = "7b9ff27e517a15dcbdb8b889b758ec1b";
-const SMARTLINK = "https://www.effectivecpmnetwork.com/c1kt57md?key=16cfe2b361699a8b0b12a8dc0c8c79b7";
 
 const MARKER_START = "<!-- freepdf-effectivecpm:start -->";
 const MARKER_END = "<!-- freepdf-effectivecpm:end -->";
@@ -25,12 +22,6 @@ for (const file of htmlFiles) {
 ${MARKER_START}
 <section class="section freepdf-ad-section" aria-label="Advertisements">
   <div class="container">
-    <div class="ad-container ad-native-container" aria-label="Sponsored advertisement">
-      <div class="ad-label">Advertisement</div>
-      <div id="${NATIVE_CONTAINER_ID}"></div>
-      <script async data-cfasync="false" src="${NATIVE_SRC}"></script>
-    </div>
-
     <div class="ad-container ad-banner-728-container" aria-label="Sponsored advertisement">
       <div class="ad-label">Advertisement · 728×90</div>
       <div class="ad-banner-728" style="max-width:100%;overflow:hidden;text-align:center">
@@ -47,10 +38,6 @@ ${MARKER_START}
       </div>
     </div>
 
-    <div class="ad-container ad-smartlink-container" aria-label="Sponsored offers">
-      <span class="ad-label">Sponsored</span>
-      <a href="${SMARTLINK}" target="_blank" rel="sponsored noopener noreferrer">Explore sponsored offers →</a>
-    </div>
   </div>
 </section>
 ${MARKER_END}`;
@@ -94,7 +81,7 @@ ${MARKER_END}`;
   await writeFile(file, html, "utf8");
 }
 
-console.log(`FreePDF safe Adsterra Native, Banner and sponsored-link monetization injected into ${htmlFiles.length} HTML pages.`);
+console.log(`FreePDF banner-only Adsterra monetization injected into ${htmlFiles.length} HTML pages.`);
 
 async function collectHtml(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
