@@ -52,14 +52,4 @@
     zone.dataset.bannerLoaded = "1";
   }
 
-  if (/^ca-pub-\d+$/.test(client)) {
-    var script = document.querySelector('script[src^="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]');
-    if (!script) {
-      script = document.createElement("script");
-      script.async = true;
-      script.crossOrigin = "anonymous";
-      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + encodeURIComponent(client);
-      document.head.appendChild(script);
-    }
-  }
 }());
