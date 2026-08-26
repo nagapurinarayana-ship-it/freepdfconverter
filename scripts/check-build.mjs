@@ -26,7 +26,7 @@ for (const relative of indexablePages) {
   if (h1Count !== 1) failures.push(relative + " -> expected exactly one H1, found " + h1Count);
 
   const adMarkerIndex = html.indexOf("<!-- freepdf-effectivecpm:start -->");
-  const h1Index = html.search(/<h1\\b/i);
+  const h1Index = html.search(/<h1\b/i);
   if (adMarkerIndex === -1) failures.push(relative + " -> missing managed advertisement block");
   if (adMarkerIndex !== -1 && h1Index !== -1 && adMarkerIndex < h1Index) {
     failures.push(relative + " -> advertisement block appears before primary H1 content");
