@@ -44,8 +44,8 @@ ${MARKER_END}`;
 
   // Keep the primary page content first. This reduces the chance that the ad block
   // becomes the initial LCP and gives the tool/hero a stable position before ads load.
-  // On tool pages insert after .tool-hero; on the homepage/other pages insert after
-  // the first top-level section inside <main>. Existing page content is untouched.
+  // On tool pages insert after .tool-hero. On article pages insert after the
+  // article; otherwise insert after the first section inside <main>.
   if (html.includes("</main>")) {
     const toolHeroEnd = html.indexOf("</section>", html.indexOf("<section class=\"tool-hero\""));
     if (toolHeroEnd !== -1) {
@@ -55,8 +55,18 @@ ${MARKER_END}`;
       const mainOpenEnd = html.indexOf(">", html.search(/<main\b/i));
       if (mainOpenEnd !== -1) {
         const mainStart = mainOpenEnd + 1;
+        const articleMatch = html.slice(mainStart).match(/<article\b/i);
         const sectionMatch = html.slice(mainStart).match(/<section\b/i);
-        if (sectionMatch) {
+        if (articleMatch && (!sectionMatch || articleMatch.index < sectionMatch.index)) {
+          const articleStart = mainStart + articleMatch.index;
+          const articleEnd = html.indexOf("</article>", articleStart);
+          if (articleEnd !== -1) {
+            const insertAt = articleEnd + "</article>".length;
+            html = html.slice(0, insertAt) + pageAds + html.slice(insertAt);
+          } else {
+            html = html.slice(0, mainStart) + pageAds + html.slice(mainStart);
+          }
+        } else if (sectionMatch) {
           const sectionStart = mainStart + sectionMatch.index;
           const sectionEnd = html.indexOf("</section>", sectionStart);
           if (sectionEnd !== -1) {

@@ -25,6 +25,13 @@ for (const relative of indexablePages) {
   if (description.length > 180) failures.push(relative + " -> meta description is unusually long (" + description.length + " chars)");
   if (h1Count !== 1) failures.push(relative + " -> expected exactly one H1, found " + h1Count);
 
+  const adMarkerIndex = html.indexOf("<!-- freepdf-effectivecpm:start -->");
+  const h1Index = html.search(/<h1\b/i);
+  if (adMarkerIndex === -1) failures.push(relative + " -> missing managed advertisement block");
+  if (adMarkerIndex !== -1 && h1Index !== -1 && adMarkerIndex < h1Index) {
+    failures.push(relative + " -> advertisement block appears before primary H1 content");
+  }
+
   for (const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     try { JSON.parse(match[1]); } catch { failures.push(relative + " -> invalid JSON-LD"); }
   }
