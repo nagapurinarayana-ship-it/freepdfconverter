@@ -205,35 +205,6 @@ function structuredData(relative, canonical, title, description) {
     });
   }
 
-  const toolPages = new Set([
-    "tools/merge-pdf.html",
-    "tools/split-pdf.html",
-    "tools/unlock-pdf.html",
-    "tools/rotate-pdf.html",
-    "tools/jpg-to-pdf.html",
-    "tools/pdf-to-image.html",
-    "tools/watermark-pdf.html",
-    "tools/organize-pdf.html",
-    "tools/add-page-numbers.html",
-    "tools/remove-pdf-metadata.html",
-    "tools/crop-pdf.html",
-    "tools/extract-pdf-text.html"
-  ]);
-
-  if (toolPages.has(relative)) {
-    graph.push({
-      "@type": "SoftwareApplication",
-      name: pageLabels[relative] || title.replace(/\s*\|.*$/, ""),
-      url: canonical,
-      applicationCategory: "UtilitiesApplication",
-      operatingSystem: "Web browser",
-      description,
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      isAccessibleForFree: true,
-      inLanguage: "en"
-    });
-  }
-
   if (articlePages.has(relative)) {
     const published = articlePublishedDates[relative] || pageDates[relative];
     graph.push({
