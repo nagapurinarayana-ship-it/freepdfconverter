@@ -7,7 +7,7 @@ const dist = path.join(process.cwd(), "dist");
 // metadata; PDF tools, page content, ads, and functionality are left untouched.
 const seo = {
   "index.html": [
-    "Free PDF Converter Online — Merge, Split & Convert PDFs | FreePDF Tools",
+    "Free PDF Converter — Merge, Split & Convert | FreePDF Tools",
     "Free PDF converter and online PDF tools for merging, splitting, unlocking, organizing and converting PDFs. Process files privately in your browser with no uploads or account."
   ],
   "pdf-converter-online.html": [
