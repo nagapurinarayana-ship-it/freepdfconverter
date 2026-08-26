@@ -1,7 +1,9 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { pagePathname } from "./site-config.mjs";
 
 const dist = path.join(process.cwd(), "dist");
+const origin = (process.env.SITE_ORIGIN || "https://freepdfconverter-all-in-one.pages.dev").replace(/\/$/, "");
 
 // Keep SEO copy specific to the actual page intent. This changes only search-facing
 // metadata; PDF tools, page content, ads, and functionality are left untouched.
@@ -58,16 +60,22 @@ await collectHtml(dist);
 for (const file of htmlFiles) {
   const relative = path.relative(dist, file).replaceAll(path.sep, "/");
   const values = seo[relative];
-  if (!values) continue;
 
   let html = await readFile(file, "utf8");
-  const [title, description] = values;
-  html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);
-  html = html.replace(/<meta\s+name=["']description["']\s+content=["'][\s\S]*?["'][^>]*>/i, `<meta name="description" content="${escapeAttribute(description)}">`);
-  html = replaceMeta(html, "og:title", title);
-  html = replaceMeta(html, "og:description", description);
-  html = replaceMeta(html, "twitter:title", title);
-  html = replaceMeta(html, "twitter:description", description);
+  const canonicalUrl = origin + pagePathname(relative);
+  html = html.replace(/<link\s+rel=["']canonical["']\s+href=["'][^"']+["'][^>]*>/i, `<link rel="canonical" href="${canonicalUrl}">`);
+  html = replaceMeta(html, "og:url", canonicalUrl);
+
+  if (values) {
+    const [title, description] = values;
+    html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(title)}</title>`);
+    html = html.replace(/<meta\s+name=["']description["']\s+content=["'][\s\S]*?["'][^>]*>/i, `<meta name="description" content="${escapeAttribute(description)}">`);
+    html = replaceMeta(html, "og:title", title);
+    html = replaceMeta(html, "og:description", description);
+    html = replaceMeta(html, "twitter:title", title);
+    html = replaceMeta(html, "twitter:description", description);
+  }
+
   await writeFile(file, html, "utf8");
 }
 
