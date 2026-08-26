@@ -25,6 +25,15 @@ for (const name of files) {
     if (software && software.isAccessibleForFree !== true) failures.push(`${name} -> SoftwareApplication isAccessibleForFree must be true`);
     if (software && software.offers?.price !== "0") failures.push(`${name} -> SoftwareApplication offer must be free`);
     if (software && software.operatingSystem !== "Web browser") failures.push(`${name} -> unexpected operating system`);
+
+    const allBlocks = [...html.matchAll(/<script type="application\\/ld\\+json"(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)];
+    const applicationSchemas = [];
+    for (const block of allBlocks) {
+      const parsed = JSON.parse(block[1]);
+      const items = Array.isArray(parsed?.["@graph"]) ? parsed["@graph"] : [parsed];
+      applicationSchemas.push(...items.filter((item) => item?.["@type"] === "SoftwareApplication" || item?.["@type"] === "WebApplication"));
+    }
+    if (applicationSchemas.length !== 1) failures.push(`${name} -> expected exactly one application schema across the page, found ${applicationSchemas.length}`);
   } catch {
     failures.push(`${name} -> invalid tool JSON-LD`);
   }
