@@ -55,8 +55,8 @@ ${MARKER_END}`;
       const mainOpenEnd = html.indexOf(">", html.search(/<main\b/i));
       if (mainOpenEnd !== -1) {
         const mainStart = mainOpenEnd + 1;
-        const articleMatch = html.slice(mainStart).match(/<article\\b/i);
-        const sectionMatch = html.slice(mainStart).match(/<section\\b/i);
+        const articleMatch = html.slice(mainStart).match(/<article\b/i);
+        const sectionMatch = html.slice(mainStart).match(/<section\b/i);
         if (articleMatch && (!sectionMatch || articleMatch.index < sectionMatch.index)) {
           const articleStart = mainStart + articleMatch.index;
           const articleEnd = html.indexOf("</article>", articleStart);
