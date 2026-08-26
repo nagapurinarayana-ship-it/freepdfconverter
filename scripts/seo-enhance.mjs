@@ -1,7 +1,9 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
-import path from "node:path";\nimport { pagePathname } from "./site-config.mjs";
+import path from "node:path";
+import { pagePathname } from "./site-config.mjs";
 
-const dist = path.join(process.cwd(), "dist");\nconst origin = (process.env.SITE_ORIGIN || "https://freepdfconverter-all-in-one.pages.dev").replace(/\\/$/, "");
+const dist = path.join(process.cwd(), "dist");
+const origin = (process.env.SITE_ORIGIN || "https://freepdfconverter-all-in-one.pages.dev").replace(/\/$/, "");
 
 // Keep SEO copy specific to the actual page intent. This changes only search-facing
 // metadata; PDF tools, page content, ads, and functionality are left untouched.
