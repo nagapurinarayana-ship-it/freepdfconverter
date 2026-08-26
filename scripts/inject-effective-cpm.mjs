@@ -18,6 +18,11 @@ for (const file of htmlFiles) {
   html = stripExisting(html);
 
 
+  // Isolate the synchronous third-party banner script so document.write cannot
+  // interrupt or replace the host page. The ad unit, size and DOM placement stay the same.
+  const bannerDocument = `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;display:flex;justify-content:center;overflow:hidden"><script>atOptions={key:'${BANNER_728_KEY}',format:'iframe',height:90,width:728,params:{}};</script><script src="${BANNER_728_SRC}"></script></body></html>`;
+  const bannerSrcdoc = bannerDocument.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+
   const pageAds = `
 ${MARKER_START}
 <section class="section freepdf-ad-section" aria-label="Advertisements">
@@ -25,16 +30,7 @@ ${MARKER_START}
     <div class="ad-container ad-banner-728-container" aria-label="Sponsored advertisement">
       <div class="ad-label">Advertisement · 728×90</div>
       <div class="ad-banner-728" style="max-width:100%;overflow:hidden;text-align:center">
-        <script>
-          atOptions = {
-            key: '${BANNER_728_KEY}',
-            format: 'iframe',
-            height: 90,
-            width: 728,
-            params: {}
-          };
-        </script>
-        <script src="${BANNER_728_SRC}"></script>
+        <iframe title="Advertisement" width="728" height="90" loading="lazy" scrolling="no" frameborder="0" style="display:block;max-width:100%;margin:0 auto;border:0" srcdoc="${bannerSrcdoc}"></iframe>
       </div>
     </div>
 
