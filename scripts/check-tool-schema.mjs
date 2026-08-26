@@ -26,7 +26,7 @@ for (const name of files) {
     if (software && software.offers?.price !== "0") failures.push(`${name} -> SoftwareApplication offer must be free`);
     if (software && software.operatingSystem !== "Web browser") failures.push(`${name} -> unexpected operating system`);
 
-    const allBlocks = [...html.matchAll(/<script type="application\\/ld\\+json"(?:\\s[^>]*)?>([\\s\\S]*?)<\\/script>/gi)];
+    const allBlocks = [...html.matchAll(/<script type="application\/ld\+json"(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)];
     const applicationSchemas = [];
     for (const block of allBlocks) {
       const parsed = JSON.parse(block[1]);
