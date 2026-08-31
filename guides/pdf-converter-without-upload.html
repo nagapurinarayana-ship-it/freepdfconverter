@@ -1,17 +1,34 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>How to Convert PDFs Without Uploading Files | FreePDF Tools</title>
-<meta name="description" content="Learn how browser-local PDF conversion works and which merge, split, rotate, image and text tools can process documents without uploading them to an application server."><link rel="canonical" href="https://freepdfconverter-all-in-one.pages.dev/guides/pdf-converter-without-upload.html">
-<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"><meta name="theme-color" content="#1f67ff">
+<meta name="description" content="Learn how browser-local PDF conversion works and which merge, split, rotate, image and text tools can process documents without uploading them to an application server."><meta name="theme-color" content="#1f67ff">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/css/styles.css">
 <script src="../assets/js/common.js" defer></script><script src="../assets/js/monetization-config.js" defer></script><script src="../assets/js/ads.js" defer></script>
+<link rel="canonical" href="https://freepdfconverter-all-in-one.pages.dev/guides/pdf-converter-without-upload">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="FreePDF Tools">
+<meta property="og:title" content="How to Convert PDFs Without Uploading Files | FreePDF Tools">
+<meta property="og:description" content="Learn how browser-local PDF conversion works and which merge, split, rotate, image and text tools can process documents without uploading them to an application server.">
+<meta property="og:url" content="https://freepdfconverter-all-in-one.pages.dev/guides/pdf-converter-without-upload">
+<meta property="og:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg">
+<meta property="og:image:alt" content="FreePDF Tools — private browser-based PDF utilities">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="How to Convert PDFs Without Uploading Files | FreePDF Tools">
+<meta name="twitter:description" content="Learn how browser-local PDF conversion works and which merge, split, rotate, image and text tools can process documents without uploading them to an application server.">
+<meta name="twitter:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg">
+<meta name="twitter:image:alt" content="FreePDF Tools — private browser-based PDF utilities">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"How to Convert PDFs Without Uploading Files | FreePDF Tools","description":"Learn how browser-local PDF conversion works and which merge, split, rotate, image and text tools can process documents without uploading them to an application server.","url":"https://freepdfconverter-all-in-one.pages.dev/guides/pdf-converter-without-upload","image":"https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg","isPartOf":{"@type":"WebSite","name":"FreePDF Tools","url":"https://freepdfconverter-all-in-one.pages.dev/"},"inLanguage":"en"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"How to Convert PDFs Without Uploading Files | FreePDF Tools","description":"Learn how browser-local PDF conversion works and which merge, split, rotate, image and text tools can process documents without uploading them to an application server.","url":"https://freepdfconverter-all-in-one.pages.dev/guides/pdf-converter-without-upload","mainEntityOfPage":{"@type":"WebPage","@id":"https://freepdfconverter-all-in-one.pages.dev/guides/pdf-converter-without-upload"},"author":{"@type":"Organization","name":"FreePDF Tools","url":"https://freepdfconverter-all-in-one.pages.dev/about"},"publisher":{"@type":"Organization","name":"FreePDF Tools","url":"https://freepdfconverter-all-in-one.pages.dev/about"},"image":"https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg","inLanguage":"en"}</script>
 </head><body>
-<a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="container header-inner"><a class="logo" href="../index.html"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav" aria-label="Main navigation"><a href="../index.html#tools">PDF tools</a><a href="index.html">Guides</a><a href="../privacy.html">Privacy</a><a href="../about.html">About</a></nav></div></header>
+<a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="container header-inner"><a class="logo" href="../"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav" aria-label="Main navigation"><a href="../#tools">PDF tools</a><a href="./">Guides</a><a href="../privacy">Privacy</a><a href="../about">About</a></nav></div></header>
 <main id="main"><article class="article container">
-<div class="breadcrumbs"><a href="../index.html">Home</a> / <a href="index.html">PDF Guides</a> / No-upload PDF conversion</div>
+<div class="breadcrumbs"><a href="../">Home</a> / <a href="./">PDF Guides</a> / No-upload PDF conversion</div>
 <span class="eyebrow">Private PDF workflow</span><h1>How to convert PDFs without uploading your files</h1>
 <p class="lead">A browser-local PDF converter can perform many everyday operations on your own device. This guide explains how to recognize that workflow and which FreePDF Tools operations support it.</p>
-<p class="updated">Updated August 12, 2026 · By <a href="../about.html">FreePDF Tools</a></p>
+<p class="updated">Updated August 12, 2026 · By <a href="../about">FreePDF Tools</a></p>
 
 <h2>What “without uploading” actually means</h2>
 <p>A no-upload PDF workflow means the selected document is read by your browser and processed by code running in the page instead of being sent to an application server for conversion. The result is created in browser memory and passed to the normal download flow.</p>
@@ -25,17 +42,17 @@
 <li><strong>Create the result.</strong> The page produces a new in-memory <code>Blob</code> or download stream for the resulting file.</li>
 <li><strong>Download your result.</strong> The browser saves the finished document using its ordinary download mechanism.</li>
 </ol>
-<p>FreePDF Tools documents this architecture in more detail on the <a href="../how-local-processing.html">technical local-processing page</a>, including which libraries are used and what the privacy model does not promise.</p>
+<p>FreePDF Tools documents this architecture in more detail on the <a href="../how-local-processing">technical local-processing page</a>, including which libraries are used and what the privacy model does not promise.</p>
 
 <h2>Which FreePDF Tools operations are local?</h2>
 <div class="table-wrap"><table class="comparison-table"><thead><tr><th>Task</th><th>Tool</th><th>Typical result</th></tr></thead><tbody>
-<tr><td>Combine documents</td><td><a href="../tools/merge-pdf.html">Merge PDF</a></td><td>One PDF containing the selected source pages in order</td></tr>
-<tr><td>Extract or split pages</td><td><a href="../tools/split-pdf.html">Split PDF</a></td><td>A selected page-range PDF or separate page files</td></tr>
-<tr><td>Correct orientation</td><td><a href="../tools/rotate-pdf.html">Rotate PDF</a></td><td>A new PDF with adjusted page rotation</td></tr>
-<tr><td>Create PDF from images</td><td><a href="../tools/jpg-to-pdf.html">JPG / PNG to PDF</a></td><td>A PDF built from the selected images</td></tr>
-<tr><td>Render pages as images</td><td><a href="../tools/pdf-to-image.html">PDF to JPG / PNG</a></td><td>JPG or PNG files for selected PDF pages</td></tr>
-<tr><td>Remove common metadata</td><td><a href="../tools/remove-pdf-metadata.html">Remove PDF metadata</a></td><td>A cleaned PDF copy with common document fields removed</td></tr>
-<tr><td>Extract selectable text</td><td><a href="../tools/extract-pdf-text.html">Extract PDF text</a></td><td>Previewed text or a TXT download</td></tr>
+<tr><td>Combine documents</td><td><a href="../tools/merge-pdf">Merge PDF</a></td><td>One PDF containing the selected source pages in order</td></tr>
+<tr><td>Extract or split pages</td><td><a href="../tools/split-pdf">Split PDF</a></td><td>A selected page-range PDF or separate page files</td></tr>
+<tr><td>Correct orientation</td><td><a href="../tools/rotate-pdf">Rotate PDF</a></td><td>A new PDF with adjusted page rotation</td></tr>
+<tr><td>Create PDF from images</td><td><a href="../tools/jpg-to-pdf">JPG / PNG to PDF</a></td><td>A PDF built from the selected images</td></tr>
+<tr><td>Render pages as images</td><td><a href="../tools/pdf-to-image">PDF to JPG / PNG</a></td><td>JPG or PNG files for selected PDF pages</td></tr>
+<tr><td>Remove common metadata</td><td><a href="../tools/remove-pdf-metadata">Remove PDF metadata</a></td><td>A cleaned PDF copy with common document fields removed</td></tr>
+<tr><td>Extract selectable text</td><td><a href="../tools/extract-pdf-text">Extract PDF text</a></td><td>Previewed text or a TXT download</td></tr>
 </tbody></table></div>
 
 <h2>Why local processing can be useful</h2>
@@ -58,9 +75,9 @@
 <h2>Keep your originals until the result is verified</h2>
 <p>A local workflow can prevent an upload, but it cannot prevent mistakes in the resulting PDF. Open the downloaded file and check page order, orientation, text, images, forms and other important document features before deleting the original.</p>
 
-<div class="tool-cta"><div><h2>Try a local PDF workflow</h2><p>Choose a supported operation and process the selected document directly in your browser.</p></div><a class="button" href="../index.html#tools">Open Free PDF Tools</a></div>
+<div class="tool-cta"><div><h2>Try a local PDF workflow</h2><p>Choose a supported operation and process the selected document directly in your browser.</p></div><a class="button" href="../#tools">Open Free PDF Tools</a></div>
 
-<div class="related-guides"><h2>Related guides</h2><ul><li><a href="are-online-pdf-converters-safe.html">Are online PDF converters safe? →</a></li><li><a href="../how-local-processing.html">How local PDF processing works →</a></li><li><a href="merge-pdf-safely.html">How to merge PDFs safely →</a></li></ul></div>
+<div class="related-guides"><h2>Related guides</h2><ul><li><a href="are-online-pdf-converters-safe">Are online PDF converters safe? →</a></li><li><a href="../how-local-processing">How local PDF processing works →</a></li><li><a href="merge-pdf-safely">How to merge PDFs safely →</a></li></ul></div>
 </article></main>
-<footer class="site-footer"><div class="container"><div class="footer-grid"><div><a class="logo" href="../index.html"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><p>Private browser-based PDF utilities and practical document guides.</p></div><div><h3>Tools</h3><ul class="footer-links"><li><a href="../tools/merge-pdf.html">Merge PDF</a></li><li><a href="../tools/split-pdf.html">Split PDF</a></li><li><a href="../tools/jpg-to-pdf.html">JPG / PNG to PDF</a></li><li><a href="../tools/pdf-to-image.html">PDF to JPG / PNG</a></li></ul></div><div><h3>Information</h3><ul class="footer-links"><li><a href="index.html">PDF guides</a></li><li><a href="../about.html">About</a></li><li><a href="../privacy.html">Privacy</a></li><li><a href="../contact.html">Contact</a></li></ul></div></div><div class="footer-bottom"><span>© <span data-current-year></span> FreePDF Tools</span><span>Browser-local PDF processing</span></div></div></footer>
+<footer class="site-footer"><div class="container"><div class="footer-grid"><div><a class="logo" href="../"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><p>Private browser-based PDF utilities and practical document guides.</p></div><div><h3>Tools</h3><ul class="footer-links"><li><a href="../tools/merge-pdf">Merge PDF</a></li><li><a href="../tools/split-pdf">Split PDF</a></li><li><a href="../tools/jpg-to-pdf">JPG / PNG to PDF</a></li><li><a href="../tools/pdf-to-image">PDF to JPG / PNG</a></li></ul></div><div><h3>Information</h3><ul class="footer-links"><li><a href="./">PDF guides</a></li><li><a href="../about">About</a></li><li><a href="../privacy">Privacy</a></li><li><a href="../contact">Contact</a></li></ul></div></div><div class="footer-bottom"><span>© <span data-current-year></span> FreePDF Tools</span><span>Browser-local PDF processing</span></div></div></footer>
 </body></html>
