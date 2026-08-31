@@ -47,24 +47,37 @@ function escapeHtml(value) {
   return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 }
 
-function removeMeta(html, attribute, key) {
+function metaPattern(attribute, key) {
   const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const pattern = new RegExp(`\\s*<meta\\b[^>]*\\b${attribute}=["']${escaped}["'][^>]*>`, 'gi');
-  return html.replace(pattern, '');
+  return new RegExp(`<meta\\b[^>]*\\b${attribute}=["']${escaped}["'][^>]*>`, 'gi');
+}
+
+function removeMeta(html, attribute, key) {
+  const pattern = metaPattern(attribute, key);
+  return html.replace(new RegExp(`\\s*${pattern.source}`, 'gi'), '');
 }
 
 function setMeta(html, attribute, key, content) {
+  const expected = escapeHtml(content);
+  const tags = html.match(metaPattern(attribute, key)) || [];
+  const existing = tags.length === 1 ? tags[0].match(/\bcontent=["']([^"']*)["']/i)?.[1] : null;
+  if (tags.length === 1 && existing === expected) return html;
   html = removeMeta(html, attribute, key);
-  return html.replace(/<\/head>/i, `<meta ${attribute}="${key}" content="${escapeHtml(content)}">\n</head>`);
+  return html.replace(/<\/head>/i, `<meta ${attribute}="${key}" content="${expected}">\n</head>`);
 }
 
 function setCanonical(html, canonical) {
+  const pattern = /<link\b[^>]*\brel=["']canonical["'][^>]*>/gi;
+  const tags = html.match(pattern) || [];
+  const existing = tags.length === 1 ? tags[0].match(/\bhref=["']([^"']*)["']/i)?.[1] : null;
+  if (tags.length === 1 && existing === canonical) return html;
   html = html.replace(/\s*<link\b[^>]*\brel=["']canonical["'][^>]*>/gi, '');
   return html.replace(/<\/head>/i, `<link rel="canonical" href="${canonical}">\n</head>`);
 }
 
 function rewriteInternalHtmlLinks(html) {
-  return html.replace(/href=(["'])([^"']*?)\.html([?#][^"']*)?\1/gi, (_match, quote, target, suffix = '') => {
+  return html.replace(/href=(["'])([^"']*?)\.html([?#][^"']*)?\1/gi, (match, quote, target, suffix = '') => {
+    if (/^(?:https?:|mailto:|tel:|javascript:|data:|#)/i.test(target)) return match;
     let clean = target;
     if (clean.endsWith('/index')) clean = clean.slice(0, -'index'.length);
     else if (clean === 'index') clean = './';
