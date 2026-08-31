@@ -114,6 +114,53 @@
     };
   }
 
+  function appendPopularSearches() {
+    if (document.querySelector("[data-popular-pdf-searches]")) return;
+    var path = window.location.pathname;
+    var groups = {
+      organize: [
+        ["/tools/merge-pdf", "merge PDF online free"],
+        ["/tools/split-pdf", "split PDF online"],
+        ["/tools/organize-pdf", "reorder or delete PDF pages"],
+        ["/tools/rotate-pdf", "rotate PDF pages"],
+        ["/tools/add-page-numbers", "add page numbers to PDF"]
+      ],
+      convert: [
+        ["/tools/jpg-to-pdf", "JPG to PDF converter"],
+        ["/tools/pdf-to-image", "PDF to JPG or PNG"],
+        ["/tools/extract-pdf-text", "extract text from PDF"],
+        ["/guides/pdf-to-jpg-vs-png", "PDF to JPG vs PNG"],
+        ["/guides/jpg-png-to-pdf", "convert images to PDF"]
+      ],
+      privacy: [
+        ["/tools/unlock-pdf", "unlock PDF with known password"],
+        ["/tools/remove-pdf-metadata", "remove PDF metadata"],
+        ["/guides/pdf-converter-without-upload", "PDF converter without upload"],
+        ["/guides/are-online-pdf-converters-safe", "are online PDF converters safe"],
+        ["/how-local-processing", "private browser PDF processing"]
+      ],
+      default: [
+        ["/tools/merge-pdf", "free merge PDF online"],
+        ["/tools/split-pdf", "free split PDF online"],
+        ["/tools/unlock-pdf", "unlock PDF online"],
+        ["/tools/jpg-to-pdf", "JPG to PDF converter"],
+        ["/tools/pdf-to-image", "PDF to JPG converter"],
+        ["/tools/organize-pdf", "organize PDF pages"],
+        ["/guides/reduce-pdf-file-size-for-email", "PDF too large for email"],
+        ["/guides/pdf-converter-without-upload", "PDF tools without upload"]
+      ]
+    };
+    var list = /merge|split|organize|rotate|page-numbers/.test(path) ? groups.organize : /jpg|image|extract-text/.test(path) ? groups.convert : /unlock|metadata|safe|without-upload|local-processing/.test(path) ? groups.privacy : groups.default;
+    var section = document.createElement("section");
+    section.dataset.popularPdfSearches = "1";
+    section.setAttribute("aria-labelledby", "popular-pdf-searches-title");
+    section.style.cssText = "max-width:1120px;margin:36px auto;padding:0 20px";
+    section.innerHTML = '<div style="border:1px solid #dfe6f2;border-radius:18px;background:#f8fbff;padding:22px"><span style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#1f67ff">Popular PDF searches</span><h2 id="popular-pdf-searches-title" style="margin:8px 0 8px;font-size:24px">Related free PDF tools and guides</h2><p style="margin:0 0 14px;color:#536174;line-height:1.6">Choose the exact task you need. FreePDF Tools focuses on browser-based workflows with no account and no document upload for supported operations.</p><nav aria-label="Popular PDF searches" style="display:flex;flex-wrap:wrap;gap:9px">' + list.map(function (item) { return '<a href="' + item[0] + '" style="display:inline-block;border:1px solid #d7e2f3;background:white;border-radius:999px;padding:8px 12px;color:#174fae;text-decoration:none;font-weight:700;font-size:14px">' + item[1] + '</a>'; }).join("") + '</nav></div>';
+    var footer = document.querySelector("footer");
+    if (footer && footer.parentNode) footer.parentNode.insertBefore(section, footer);
+    else document.body.appendChild(section);
+  }
+
   window.FreePDF = Object.freeze({
     MB: MB,
     formatBytes: formatBytes,
@@ -132,6 +179,9 @@
   document.querySelectorAll("[data-current-year]").forEach(function (node) {
     node.textContent = String(new Date().getFullYear());
   });
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", appendPopularSearches, { once: true });
+  else appendPopularSearches();
 
   if ("serviceWorker" in navigator && /^https?:$/.test(window.location.protocol)) {
     window.addEventListener("load", function () {
