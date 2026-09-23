@@ -6,7 +6,7 @@
   "scripts": {
     "generate:guide-images": "node scripts/generate-guide-images.mjs",
     "vendor:docjs": "node scripts/vendor-docjs.mjs",
-    "build": "node scripts/vendor-docjs.mjs && node scripts/build.mjs && node scripts/ensure-sitemap.mjs && node scripts/seo-enhance.mjs && node scripts/inject-effective-cpm.mjs && node scripts/inject-tool-schema.mjs && node scripts/inject-internal-links.mjs && node scripts/inject-guide-links.mjs && node scripts/seo-2026.mjs && node scripts/normalize-built-links.mjs",
+    "build": "node scripts/prepare-build.mjs && node scripts/vendor-docjs.mjs && node scripts/build.mjs && node scripts/ensure-sitemap.mjs && node scripts/seo-enhance.mjs && node scripts/inject-effective-cpm.mjs && node scripts/inject-tool-schema.mjs && node scripts/inject-internal-links.mjs && node scripts/inject-guide-links.mjs && node scripts/seo-2026.mjs && node scripts/normalize-built-links.mjs",
     "check": "node scripts/check.mjs",
     "test:pdf": "node scripts/test-pdf-operations.mjs && node scripts/test-unlock-pdf.mjs",
     "test:docs": "node scripts/test-document-operations.mjs",
