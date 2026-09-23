@@ -22,6 +22,8 @@ export const indexablePages = [
   "tools/remove-pdf-metadata.html",
   "tools/crop-pdf.html",
   "tools/extract-pdf-text.html",
+  "tools/pdf-to-word.html",
+  "tools/word-to-pdf.html",
   "guides/index.html",
   "guides/merge-pdf-safely.html",
   "guides/split-extract-pdf-pages.html",
@@ -63,6 +65,8 @@ pageDates["tools/organize-pdf.html"] = "2026-08-15";
 pageDates["guides/pdf-to-jpg-vs-png.html"] = "2026-08-15";
 pageDates["guides/are-online-pdf-converters-safe.html"] = "2026-08-12";
 pageDates["guides/pdf-converter-without-upload.html"] = "2026-08-12";
+pageDates["tools/pdf-to-word.html"] = "2026-09-23";
+pageDates["tools/word-to-pdf.html"] = "2026-09-23";
 
 export const articlePublishedDates = {
   "guides/merge-pdf-safely.html": "2026-08-09",
@@ -105,6 +109,8 @@ export const pageLabels = {
   "tools/remove-pdf-metadata.html": "Remove PDF Metadata",
   "tools/crop-pdf.html": "Crop PDF Pages",
   "tools/extract-pdf-text.html": "Extract PDF Text",
+  "tools/pdf-to-word.html": "PDF to Word",
+  "tools/word-to-pdf.html": "Word to PDF",
   "guides/index.html": "PDF Guides",
   "guides/merge-pdf-safely.html": "How to Merge PDFs Safely",
   "guides/split-extract-pdf-pages.html": "How to Split and Extract PDF Pages",
