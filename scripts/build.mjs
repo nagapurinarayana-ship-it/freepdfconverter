@@ -235,7 +235,10 @@ async function fingerprintAssets() {
   // breaks those nested imports in production (the exact failure seen in the live
   // Word 97-2003 converter). The vendor directory is still version-pinned by npm
   // and included in the service-worker precache.
-  const applicationTargets = (await walk(assetRoot)).filter((file) => /\.(?:css|js|mjs)$/i.test(file) && !file.startsWith(path.join(assetRoot, "vendor") + path.sep));
+  const docjsRoot = path.join(assetRoot, "vendor", "docjs") + path.sep;
+  const applicationTargets = (await walk(assetRoot)).filter((file) =>
+    /\.(?:css|js|mjs|wasm)$/i.test(file) && !file.startsWith(docjsRoot)
+  );
   return fingerprintGroup(applicationTargets);
 }
 
@@ -278,7 +281,8 @@ async function buildServiceWorker(mappings) {
     "/assets/images/freepdf-tools-social.jpg",
     ...indexablePages.filter((relative) => relative !== "index.html").map(pagePathname),
     ...mappings.map((mapping) => "/" + mapping.newPath),
-    "/assets/vendor/docjs/index.js"
+    ...(await walk(path.join(dist, "assets/vendor/docjs")))
+      .map((file) => "/" + path.relative(dist, file).split(path.sep).join("/"))
   ];
   const uniqueUrls = [...new Set(urls)];
   const version = createHash("sha256").update(JSON.stringify(uniqueUrls)).digest("hex").slice(0, 10);
