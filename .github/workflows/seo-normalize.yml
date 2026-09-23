@@ -26,6 +26,12 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install document parser dependency
+        run: npm install --ignore-scripts
+
+      - name: Validate Microsoft Word 97-2003 parser
+        run: npm run test:docs
+
       - name: Audit checked-in sitemap pages
         run: node scripts/seo-audit.mjs
 
