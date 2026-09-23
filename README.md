@@ -19,7 +19,7 @@ Free, privacy-first PDF utilities that run in the browser. Selected documents ar
 - Crop PDF pages
 - Extract selectable PDF text
 - PDF to Word (editable DOCX for text-based PDFs)
-- Word to PDF (modern DOCX text and simple tables)
+- Word / document to PDF: Microsoft Word 97-2003 `.doc`, DOCX/DOCM/DOT/DOTX/DOTM, plus ODT, RTF, TXT and HTML
 
 The site is static HTML, CSS and JavaScript. Word conversion currently targets modern `.docx` files; legacy binary `.doc` files are not supported. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js, JSZip and QPDF WebAssembly libraries. QPDF runs in a dedicated browser worker for the Unlock PDF workflow. A progressive web app service worker caches the public tool code for offline use; selected documents and passwords are never placed in that cache.
 
