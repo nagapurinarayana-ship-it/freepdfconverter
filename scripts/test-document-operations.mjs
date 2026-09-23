@@ -22,6 +22,9 @@ assert.match(wordPage, /modern Word documents/);
 const pdfToWordSource = await readFile(path.join(root, "assets/js/pdf-to-word.js"), "utf8");
 assert.match(pdfToWordSource, /\.docx/);
 assert.match(pdfToWordSource, /buildDocx/);
+assert.match(pdfToWordSource, /application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document/);
+assert.match(pdfToWordSource, /mimeType:\s*DOCX_MIME/);
+assert.match(pdfToWordSource, /new Blob\(\[blob\],\s*\{ type: DOCX_MIME \}\)/);
 
 const docjsDist = path.join(root, "node_modules", "@file-viewer", "doc", "dist");
 const docjsFiles = new Set();
@@ -82,4 +85,4 @@ const flattened = parsed.blocks.flatMap((block) => {
 }).join("\n");
 
 assert.match(flattened, /./, "Parsed MS-DOC content should contain readable text");
-console.log("Document format test passed: legacy .doc parser and modern .docx workflow checks passed.");
+console.log("Document format test passed: legacy .doc parser, modern .docx workflow, and DOCX MIME packaging checks passed.");
