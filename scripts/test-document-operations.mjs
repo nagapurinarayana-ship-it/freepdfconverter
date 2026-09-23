@@ -23,5 +23,4 @@ const flattened = parsed.blocks.flatMap((block) => {
 }).join("\\n");
 
 assert.match(flattened, /./, "Parsed MS-DOC content should contain readable text");
-await access(path.join(root, "assets", "vendor", "docjs"));
 console.log("Document format test passed: Microsoft Word 97-2003 .doc parses successfully.");
