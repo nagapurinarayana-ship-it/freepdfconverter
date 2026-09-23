@@ -15,6 +15,21 @@ for (const name of files) {
   const file = path.join(toolsDir, name);
   let html = await readFile(file, "utf8");
   html = html.replace(/\n?\s*<script type="application\/ld\+json" data-tool-schema>[\s\S]*?<\/script>/gi, "");
+  // Replace any older standalone application schema so every tool page has
+  // exactly one application entity: the canonical SoftwareApplication below.
+  html = html.replace(/\n?\s*<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi, (full, raw) => {
+    try {
+      const parsed = JSON.parse(raw);
+      const hasLegacyApplication = parsed?.["@type"] === "WebApplication" ||
+        parsed?.["@type"] === "SoftwareApplication" ||
+        (Array.isArray(parsed?.["@graph"]) && parsed["@graph"].some((item) =>
+          item?.["@type"] === "WebApplication" || item?.["@type"] === "SoftwareApplication"
+        ));
+      return hasLegacyApplication ? "" : full;
+    } catch {
+      return full;
+    }
+  });
 
   const title = decodeHtml(extract(html, /<title>([^<]+)<\/title>/i));
   const description = decodeHtml(extract(html, /<meta\s+name="description"\s+content="([^"]+)"/i));
