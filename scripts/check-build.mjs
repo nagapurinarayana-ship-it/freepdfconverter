@@ -42,9 +42,7 @@ for (const relative of indexablePages) {
   const adMarkerIndex = html.indexOf("<!-- freepdf-effectivecpm:start -->");
   const h1Index = html.search(/<h1\b/i);
   if (adMarkerIndex === -1) failures.push(relative + " -> missing managed advertisement block");
-  if (adMarkerIndex !== -1 && h1Index !== -1 && adMarkerIndex < h1Index) {
-    failures.push(relative + " -> advertisement block appears before primary H1 content");
-  }
+  if (adMarkerIndex !== -1 && h1Index !== -1 && adMarkerIndex < h1Index) failures.push(relative + " -> advertisement block appears before primary H1 content");
 
   for (const match of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
     try { JSON.parse(match[1]); } catch { failures.push(relative + " -> invalid JSON-LD"); }
@@ -62,9 +60,7 @@ for (const relative of indexablePages) {
 
   if (relative.startsWith("guides/") && relative !== "guides/index.html") {
     if (!html.includes("freepdf-guide-links:start")) failures.push(relative + " -> missing related guide links block");
-    if (guidesWithMatchingTools.has(relative) && !html.includes("freepdf-internal-links:start")) {
-      failures.push(relative + " -> missing matching tool link block");
-    }
+    if (guidesWithMatchingTools.has(relative) && !html.includes("freepdf-internal-links:start")) failures.push(relative + " -> missing matching tool link block");
   }
   if (relative.startsWith("tools/") && !html.includes("freepdf-internal-links:start")) failures.push(relative + " -> missing tool-guide link block");
 }
@@ -83,7 +79,6 @@ if (!/assets\/css\/styles\.[a-f0-9]{10}\.css/.test(home)) failures.push("build -
 if (!/assets\/js\/common\.[a-f0-9]{10}\.js/.test(home)) failures.push("build -> common script is not fingerprinted");
 if (/assets\/css\/styles\.css|assets\/js\/common\.js/.test(home)) failures.push("build -> unfingerprinted core asset reference remains");
 
-
 const wordPage = await readFile(path.join(dist, "tools/word-to-pdf.html"), "utf8");
 if (!wordPage.includes(".doc") || !wordPage.includes(".docx")) failures.push("Word converter -> both legacy .doc and modern .docx inputs are not advertised");
 if (!wordPage.includes("Microsoft Word 97–2003")) failures.push("Word converter -> legacy Word 97-2003 support is missing");
@@ -95,7 +90,8 @@ if (wordJsAsset) {
   const wordJsSource = await readFile(path.join(dist, "assets/js", wordJsAsset), "utf8");
   if (!wordJsSource.includes("getMsDocParser")) failures.push("Word converter -> legacy DOC parser loader is missing");
   if (!wordJsSource.includes(".doc") || !wordJsSource.includes(".docx")) failures.push("Word converter -> legacy and modern Word branches are missing");
-  if (!wordJsSource.includes("/assets/vendor/docjs/")) failures.push("Word converter -> self-hosted MS-DOC parser path is missing");
+  if (!wordJsSource.includes("/assets/vendor/docjs/index.js")) failures.push("Word converter -> stable self-hosted MS-DOC parser path is missing");
+  if (wordJsSource.includes("assets/vendor/docjs/index.")) failures.push("Word converter -> MS-DOC parser entry point was incorrectly fingerprinted");
 }
 const pdfWordJsAsset = jsAssets.find((file) => /^pdf-to-word\.[a-f0-9]{10}\.js$/.test(file));
 if (!pdfWordJsAsset) failures.push("PDF to Word -> fingerprinted converter script is missing");
@@ -116,10 +112,9 @@ const redirects = await readFile(path.join(dist, "_redirects"), "utf8");
 if (!redirects.split(/\r?\n/).includes("/rotate-pdf-pages /tools/rotate-pdf 301")) failures.push("_redirects -> missing legacy rotate-page redirect");
 
 const docjsFiles = await readdir(path.join(dist, "assets/vendor/docjs"));
-const docjsIndex = docjsFiles.find((file) => /^index\.[a-f0-9]{10}\.js$/.test(file));
-if (!docjsIndex) failures.push("build -> MS-DOC parser bundle is not fingerprinted");
+if (!docjsFiles.includes("index.js")) failures.push("build -> stable MS-DOC parser entry point is missing");
 if (!docjsFiles.includes("LICENSE.txt")) failures.push("build -> MS-DOC parser license is missing");
-if (!serviceWorker.includes("/assets/vendor/docjs/" + docjsIndex)) failures.push("service-worker.js -> fingerprinted MS-DOC parser bundle is not precached");
+if (!serviceWorker.includes("/assets/vendor/docjs/index.js")) failures.push("service-worker.js -> stable MS-DOC parser entry point is not precached");
 
 const qpdfFiles = await readdir(path.join(dist, "assets/vendor/qpdf"));
 const qpdfScript = qpdfFiles.find((file) => /^qpdf\.[a-f0-9]{10}\.js$/.test(file));
