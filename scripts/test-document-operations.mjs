@@ -23,6 +23,42 @@ const pdfToWordSource = await readFile(path.join(root, "assets/js/pdf-to-word.js
 assert.match(pdfToWordSource, /\.docx/);
 assert.match(pdfToWordSource, /buildDocx/);
 
+const docjsDist = path.join(root, "node_modules", "@file-viewer", "doc", "dist");
+const docjsFiles = new Set();
+async function collectDocjs(directory) {
+  const entries = await (await import("node:fs/promises")).readdir(directory, { withFileTypes: true });
+  for (const entry of entries) {
+    const full = path.join(directory, entry.name);
+    if (entry.isDirectory()) await collectDocjs(full);
+    else if (/\.(?:js|mjs)$/i.test(entry.name)) docjsFiles.add(full);
+  }
+}
+await collectDocjs(docjsDist);
+assert.ok(docjsFiles.size > 0, "MS-DOC package should contain browser module files");
+
+for (const file of docjsFiles) {
+  const source = await readFile(file, "utf8");
+  const relativeImports = [
+    ...source.matchAll(/(?:import(?:\s+[^"'()]*?\s+from\s*|\s*\()|export\s+[^"'()]*?from\s*)["']([^"']+)["']/g)
+  ]
+    .map((match) => match[1])
+    .filter((specifier) => specifier.startsWith("."));
+  for (const specifier of relativeImports) {
+    const resolved = path.resolve(path.dirname(file), specifier);
+    const candidates = [
+      resolved,
+      resolved + ".js",
+      resolved + ".mjs",
+      path.join(resolved, "index.js"),
+      path.join(resolved, "index.mjs")
+    ];
+    assert.ok(
+      candidates.some((candidate) => docjsFiles.has(candidate)),
+      "MS-DOC relative import must resolve inside the vendored module tree: " + path.relative(root, file) + " -> " + specifier
+    );
+  }
+}
+
 const fixtureUrl = "https://raw.githubusercontent.com/flyfish-dev/docjs/main/test/fixtures/github-34-wps-table.doc";
 const response = await fetch(fixtureUrl);
 if (!response.ok) throw new Error("Could not download MS-DOC fixture: HTTP " + response.status);
