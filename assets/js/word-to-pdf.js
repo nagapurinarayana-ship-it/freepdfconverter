@@ -30,15 +30,12 @@
 
   async function getMsDocParser() {
     if (!msDocParserPromise) {
-      msDocParserPromise = import("/assets/vendor/docjs/index.js").catch(function () {
-        // Deployment-safe fallback for environments that have not run the asset build yet.
-        return import("https://cdn.jsdelivr.net/npm/@file-viewer/doc@2.2.7/dist/index.js");
-      }).then(function (module) {
+      msDocParserPromise = import("/assets/vendor/docjs/index.js").then(function (module) {
         if (!module || typeof module.parseMsDoc !== "function") throw new Error("MS-DOC parser is unavailable.");
         return module.parseMsDoc;
       }).catch(function (error) {
         msDocParserPromise = null;
-        throw new Error("Microsoft Word 97-2003 support could not be loaded. Please refresh and try again. " + (error && error.message ? error.message : ""));
+        throw new Error("Microsoft Word 97-2003 support could not be loaded from the self-hosted parser. Please refresh and try again. " + (error && error.message ? error.message : ""));
       });
     }
     return msDocParserPromise;

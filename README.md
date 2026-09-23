@@ -18,8 +18,8 @@ Free, privacy-first PDF utilities that run in the browser. Selected documents ar
 - Remove common PDF metadata
 - Crop PDF pages
 - Extract selectable PDF text
-- PDF to Word (editable DOCX for text-based PDFs)
-- Word / document to PDF: Microsoft Word 97-2003 `.doc`, DOCX/DOCM/DOT/DOTX/DOTM, plus ODT, RTF, TXT and HTML
+- PDF to Word (editable modern `.docx` for text-based PDFs)
+- Word / document to PDF: Microsoft Word 97-2003 `.doc` **and** modern `.docx`/`.docm`/`.dotx`/`.dotm`, plus ODT, RTF, TXT and HTML
 
 The site is static HTML, CSS and JavaScript. Word conversion supports both modern Office Open XML documents and legacy Microsoft Word 97-2003 binary `.doc` documents through a browser-side MS-DOC parser. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js, JSZip and QPDF WebAssembly libraries. QPDF runs in a dedicated browser worker for the Unlock PDF workflow. A progressive web app service worker caches the public tool code for offline use; selected documents and passwords are never placed in that cache.
 
@@ -59,7 +59,7 @@ If you instead use the native Cloudflare Pages Git integration, keep the product
 
 ## Local checks
 
-Run `npm run verify` to validate local references, metadata, clean canonical URLs, JSON-LD and the generated sitemap. The document test validates a real Microsoft Word 97-2003 `.doc` fixture.
+Run `npm run verify` to validate local references, metadata, clean canonical URLs, JSON-LD and the generated sitemap. The document test validates a real Microsoft Word 97-2003 `.doc` fixture and checks that the modern `.docx` workflow remains enabled.
 
 ## Monetization
 

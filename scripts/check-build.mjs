@@ -6,6 +6,20 @@ const root = process.cwd();
 const dist = path.join(root, "dist");
 const origin = "https://freepdfconverter-all-in-one.pages.dev";
 const failures = [];
+const guidesWithMatchingTools = new Set([
+  "guides/merge-pdf-safely.html",
+  "guides/split-extract-pdf-pages.html",
+  "guides/unlock-password-protected-pdf.html",
+  "guides/rotate-pdf-pages.html",
+  "guides/jpg-png-to-pdf.html",
+  "guides/pdf-to-jpg-vs-png.html",
+  "guides/watermark-pdf-documents.html",
+  "guides/organize-pdf-pages.html",
+  "guides/add-page-numbers-to-pdf.html",
+  "guides/remove-pdf-metadata.html",
+  "guides/crop-pdf-pages.html",
+  "guides/extract-text-from-pdf.html"
+]);
 
 for (const relative of indexablePages) {
   const html = await readFile(path.join(dist, relative), "utf8");
@@ -48,7 +62,9 @@ for (const relative of indexablePages) {
 
   if (relative.startsWith("guides/") && relative !== "guides/index.html") {
     if (!html.includes("freepdf-guide-links:start")) failures.push(relative + " -> missing related guide links block");
-    if (!html.includes("freepdf-internal-links:start")) failures.push(relative + " -> missing matching tool link block");
+    if (guidesWithMatchingTools.has(relative) && !html.includes("freepdf-internal-links:start")) {
+      failures.push(relative + " -> missing matching tool link block");
+    }
   }
   if (relative.startsWith("tools/") && !html.includes("freepdf-internal-links:start")) failures.push(relative + " -> missing tool-guide link block");
 }
@@ -66,6 +82,28 @@ const home = await readFile(path.join(dist, "index.html"), "utf8");
 if (!/assets\/css\/styles\.[a-f0-9]{10}\.css/.test(home)) failures.push("build -> stylesheet is not fingerprinted");
 if (!/assets\/js\/common\.[a-f0-9]{10}\.js/.test(home)) failures.push("build -> common script is not fingerprinted");
 if (/assets\/css\/styles\.css|assets\/js\/common\.js/.test(home)) failures.push("build -> unfingerprinted core asset reference remains");
+
+
+const wordPage = await readFile(path.join(dist, "tools/word-to-pdf.html"), "utf8");
+if (!wordPage.includes(".doc") || !wordPage.includes(".docx")) failures.push("Word converter -> both legacy .doc and modern .docx inputs are not advertised");
+if (!wordPage.includes("Microsoft Word 97–2003")) failures.push("Word converter -> legacy Word 97-2003 support is missing");
+
+const jsAssets = await readdir(path.join(dist, "assets/js"));
+const wordJsAsset = jsAssets.find((file) => /^word-to-pdf\.[a-f0-9]{10}\.js$/.test(file));
+if (!wordJsAsset) failures.push("Word converter -> fingerprinted word-to-pdf script is missing");
+if (wordJsAsset) {
+  const wordJsSource = await readFile(path.join(dist, "assets/js", wordJsAsset), "utf8");
+  if (!wordJsSource.includes("getMsDocParser")) failures.push("Word converter -> legacy DOC parser loader is missing");
+  if (!wordJsSource.includes(".doc") || !wordJsSource.includes(".docx")) failures.push("Word converter -> legacy and modern Word branches are missing");
+  if (!wordJsSource.includes("/assets/vendor/docjs/")) failures.push("Word converter -> self-hosted MS-DOC parser path is missing");
+}
+const pdfWordJsAsset = jsAssets.find((file) => /^pdf-to-word\.[a-f0-9]{10}\.js$/.test(file));
+if (!pdfWordJsAsset) failures.push("PDF to Word -> fingerprinted converter script is missing");
+if (pdfWordJsAsset) {
+  const pdfWordSource = await readFile(path.join(dist, "assets/js", pdfWordJsAsset), "utf8");
+  if (!pdfWordSource.includes("buildDocx")) failures.push("PDF to Word -> DOCX builder is missing");
+  if (!pdfWordSource.includes(".docx")) failures.push("PDF to Word -> modern DOCX output is missing");
+}
 
 const serviceWorker = await readFile(path.join(dist, "service-worker.js"), "utf8");
 if (serviceWorker.includes("__CACHE_VERSION__") || serviceWorker.includes("__PRECACHE_URLS__")) failures.push("service-worker.js -> build placeholders remain");
