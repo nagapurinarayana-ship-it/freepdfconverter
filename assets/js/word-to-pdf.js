@@ -59,14 +59,14 @@
 
   function cleanText(value) {
     return String(value || "")
-      .replace(/\\u00a0/g, " ")
-      .replace(/[\\u2018\\u2019]/g, "'")
-      .replace(/[\\u201c\\u201d]/g, '"')
-      .replace(/[\\u2013\\u2014]/g, "-")
-      .replace(/\\u2026/g, "...")
-      .replace(/\\u2022/g, "*")
-      .replace(/\\u20b9/g, "Rs.")
-      .replace(/[^\\x20-\\x7E\\xA0-\\xFF\\n\\t]/g, "?");
+      .replace(/\u00a0/g, " ")
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/[\u201c\u201d]/g, '"')
+      .replace(/[\u2013\u2014]/g, "-")
+      .replace(/\u2026/g, "...")
+      .replace(/\u2022/g, "*")
+      .replace(/\u20b9/g, "Rs.")
+      .replace(/[^\x20-\x7E\xA0-\xFF\n\t]/g, "?");
   }
 
   async function parseDocx(next) {
@@ -84,7 +84,7 @@
     Array.from(body.children || []).forEach(function (child) {
       if (child.namespaceURI !== W) return;
       if (child.localName === "p") {
-        var text = cleanText(nodeText(child)).replace(/[ \\t]+\\n/g, "\\n").trimEnd();
+        var text = cleanText(nodeText(child)).replace(/[ \t]+\n/g, "\n").trimEnd();
         var style = paragraphStyle(child).toLowerCase();
         if (text || style) result.push({ text: text, style: style });
       } else if (child.localName === "tbl") {
@@ -93,7 +93,7 @@
           var cells = Array.from(row.children || []).filter(function (node) {
             return node.namespaceURI === W && node.localName === "tc";
           }).map(function (cell) {
-            return cleanText(nodeText(cell)).replace(/\\s+/g, " ").trim();
+            return cleanText(nodeText(cell)).replace(/\s+/g, " ").trim();
           });
           if (cells.some(Boolean)) result.push({ text: cells.join("  |  "), style: "table" });
         });
@@ -117,12 +117,12 @@
 
   function wrapText(text, font, size, maxWidth) {
     var lines = [];
-    String(text || "").split("\\n").forEach(function (logicalLine) {
+    String(text || "").split("\n").forEach(function (logicalLine) {
       if (!logicalLine) {
         lines.push("");
         return;
       }
-      var words = logicalLine.split(/\\s+/);
+      var words = logicalLine.split(/\s+/);
       var current = "";
       words.forEach(function (word) {
         var candidate = current ? current + " " + word : word;
