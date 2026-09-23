@@ -129,6 +129,8 @@
         ["/tools/jpg-to-pdf", "JPG to PDF converter"],
         ["/tools/pdf-to-image", "PDF to JPG or PNG"],
         ["/tools/extract-pdf-text", "extract text from PDF"],
+        ["/tools/pdf-to-word", "PDF to Word converter"],
+        ["/tools/word-to-pdf", "Word to PDF converter"],
         ["/guides/pdf-to-jpg-vs-png", "PDF to JPG vs PNG"],
         ["/guides/jpg-png-to-pdf", "convert images to PDF"]
       ],
@@ -145,6 +147,8 @@
         ["/tools/unlock-pdf", "unlock PDF online"],
         ["/tools/jpg-to-pdf", "JPG to PDF converter"],
         ["/tools/pdf-to-image", "PDF to JPG converter"],
+        ["/tools/pdf-to-word", "PDF to Word converter"],
+        ["/tools/word-to-pdf", "Word to PDF converter"],
         ["/tools/organize-pdf", "organize PDF pages"],
         ["/guides/reduce-pdf-file-size-for-email", "PDF too large for email"],
         ["/guides/pdf-converter-without-upload", "PDF tools without upload"]
