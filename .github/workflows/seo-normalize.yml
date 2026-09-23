@@ -29,20 +29,14 @@ jobs:
       - name: Install document parser dependency
         run: npm install --ignore-scripts
 
-      - name: Validate document converters and parser
-        run: npm run test:docs
-
-      - name: Audit npm dependencies
-        run: npm audit --audit-level=high
-
-      - name: Build production site
+      - name: Full production verification
         env:
           SITE_ORIGIN: https://freepdfconverter-all-in-one.pages.dev
           CF_PAGES_BRANCH: main
-        run: npm run build
+        run: npm run verify
 
-      - name: Verify production build
-        run: node scripts/check-build.mjs
+      - name: Audit npm dependencies
+        run: npm audit --audit-level=high
 
       - name: Audit checked-in sitemap pages
         run: node scripts/seo-audit.mjs
