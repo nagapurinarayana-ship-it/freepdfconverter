@@ -5,6 +5,7 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/vendor/pdfjs/pdf.worker.min.mj
 const U = window.FreePDF;
 const MAX_FILE = 60 * U.MB;
 const MAX_PAGES = 120;
+const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 const R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 const REL = "http://schemas.openxmlformats.org/package/2006/relationships";
@@ -58,7 +59,7 @@ function buildDocumentXml(pages) {
     "</w:document>";
 }
 
-function buildDocx(pages) {
+async function buildDocx(pages) {
   const zip = new window.JSZip();
   zip.file("[Content_Types].xml",
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
@@ -102,7 +103,16 @@ function buildDocx(pages) {
       "<Application>FreePDF Tools</Application><DocSecurity>0</DocSecurity><ScaleCrop>false</ScaleCrop>" +
     "</Properties>"
   );
-  return zip.generateAsync({ type: "blob", compression: "DEFLATE" });
+
+  // Explicitly set the OOXML Word MIME type. Without this, some mobile file
+  // managers/browser download handlers can identify the package only as a
+  // generic ZIP and expose [Content_Types].xml, document.xml, etc. as files.
+  const blob = await zip.generateAsync({
+    type: "blob",
+    compression: "DEFLATE",
+    mimeType: DOCX_MIME
+  });
+  return blob.type === DOCX_MIME ? blob : new Blob([blob], { type: DOCX_MIME });
 }
 
 function pageText(items) {
@@ -226,6 +236,7 @@ async function convert() {
 
     U.setStatus(el.status, "Building an editable DOCX file…", "info");
     const blob = await buildDocx(pages);
+    if (blob.type !== DOCX_MIME) throw new Error("DOCX MIME type was not preserved");
     const suffix = selected.from === 1 && selected.to === pdf.numPages ? "" : "-pages-" + selected.from + "-to-" + selected.to;
     const name = U.safeBaseName(file.name) + suffix + ".docx";
     U.downloadBlob(blob, name);
