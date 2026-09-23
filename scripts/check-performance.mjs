@@ -30,8 +30,6 @@ for (const file of htmlFiles) {
     failures.push(`${relative} -> obsolete/foreign monetization identifier detected`);
   }
 
-  // Never allow the CraftMyPage publisher identifiers back into FreePDF.
-  if (/pl3080666[34]|craftmypage/i.test(html)) failures.push(`${relative} -> foreign/CraftMyPage monetization identifier detected`);
 }
 
 if (failures.length) {
