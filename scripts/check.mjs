@@ -45,7 +45,7 @@ for (const file of await htmlFiles(root)) {
     if (/^(?:https?:|#|data:|mailto:)/.test(href)) continue;
     const clean = href.split("#")[0].split("?")[0];
     if (!clean) continue;
-    const target = path.resolve(path.dirname(file), clean);
+    const target = clean.startsWith("/") ? path.join(root, clean.slice(1)) : path.resolve(path.dirname(file), clean);
     if (!await localTargetExists(target)) broken.push(path.relative(root, file) + " -> " + href);
   }
   const relative = path.relative(root, file);
