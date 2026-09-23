@@ -229,11 +229,14 @@ function structuredData(relative, canonical, title, description) {
 
 async function fingerprintAssets() {
   const assetRoot = path.join(dist, "assets");
-  const vendorTargets = (await walk(path.join(assetRoot, "vendor"))).filter((file) => /\.(?:js|mjs|wasm)$/i.test(file));
-  const vendorMappings = await fingerprintGroup(vendorTargets);
+  // Application bundles are safe to fingerprint. The vendored MS-DOC package is
+  // deliberately kept at stable relative URLs because its ESM entry point loads
+  // additional files using relative imports. Fingerprinting only the entry file
+  // breaks those nested imports in production (the exact failure seen in the live
+  // Word 97-2003 converter). The vendor directory is still version-pinned by npm
+  // and included in the service-worker precache.
   const applicationTargets = (await walk(assetRoot)).filter((file) => /\.(?:css|js|mjs)$/i.test(file) && !file.startsWith(path.join(assetRoot, "vendor") + path.sep));
-  const applicationMappings = await fingerprintGroup(applicationTargets);
-  return [...vendorMappings, ...applicationMappings];
+  return fingerprintGroup(applicationTargets);
 }
 
 async function fingerprintGroup(targets) {
@@ -274,7 +277,8 @@ async function buildServiceWorker(mappings) {
     "/assets/icons/icon-512.png",
     "/assets/images/freepdf-tools-social.jpg",
     ...indexablePages.filter((relative) => relative !== "index.html").map(pagePathname),
-    ...mappings.map((mapping) => "/" + mapping.newPath)
+    ...mappings.map((mapping) => "/" + mapping.newPath),
+    "/assets/vendor/docjs/index.js"
   ];
   const uniqueUrls = [...new Set(urls)];
   const version = createHash("sha256").update(JSON.stringify(uniqueUrls)).digest("hex").slice(0, 10);
