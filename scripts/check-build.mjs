@@ -77,6 +77,12 @@ await access(path.join(dist, "favicon.ico"));
 const redirects = await readFile(path.join(dist, "_redirects"), "utf8");
 if (!redirects.split(/\r?\n/).includes("/rotate-pdf-pages /tools/rotate-pdf 301")) failures.push("_redirects -> missing legacy rotate-page redirect");
 
+const docjsFiles = await readdir(path.join(dist, "assets/vendor/docjs"));
+const docjsIndex = docjsFiles.find((file) => /^index\.[a-f0-9]{10}\.js$/.test(file));
+if (!docjsIndex) failures.push("build -> MS-DOC parser bundle is not fingerprinted");
+if (!docjsFiles.includes("LICENSE.txt")) failures.push("build -> MS-DOC parser license is missing");
+if (!serviceWorker.includes("/assets/vendor/docjs/" + docjsIndex)) failures.push("service-worker.js -> fingerprinted MS-DOC parser bundle is not precached");
+
 const qpdfFiles = await readdir(path.join(dist, "assets/vendor/qpdf"));
 const qpdfScript = qpdfFiles.find((file) => /^qpdf\.[a-f0-9]{10}\.js$/.test(file));
 const qpdfWasm = qpdfFiles.find((file) => /^qpdf\.[a-f0-9]{10}\.wasm$/.test(file));
