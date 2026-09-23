@@ -1,0 +1,49 @@
+name: One-time build fingerprinting fix
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch build asset rules
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('scripts/build.mjs')
+          s = p.read_text()
+          old = '''  const applicationTargets = (await walk(assetRoot)).filter((file) => /\\.(?:css|js|mjs)$/i.test(file) && !file.startsWith(path.join(assetRoot, "vendor") + path.sep));'''
+          new = '''  const docjsRoot = path.join(assetRoot, "vendor", "docjs") + path.sep;
+          const applicationTargets = (await walk(assetRoot)).filter((file) =>
+            /\\.(?:css|js|mjs|wasm)$/i.test(file) && !file.startsWith(docjsRoot)
+          );'''
+          if old not in s:
+            raise SystemExit('Expected fingerprint target rule was not found')
+          s = s.replace(old, new, 1)
+          old2 = '''    ...mappings.map((mapping) => "/" + mapping.newPath),
+    "/assets/vendor/docjs/index.js"
+  ];'''
+          new2 = '''    ...mappings.map((mapping) => "/" + mapping.newPath),
+    ...(await walk(path.join(dist, "assets/vendor/docjs")))
+      .map((file) => "/" + path.relative(dist, file).split(path.sep).join("/"))
+  ];'''
+          if old2 not in s:
+            raise SystemExit('Expected service-worker parser precache rule was not found')
+          s = s.replace(old2, new2, 1)
+          p.write_text(s)
+          PY
+      - name: Commit patch and remove one-time workflow
+        run: |
+          rm .github/workflows/one-time-fix-build-fingerprinting.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/build.mjs .github/workflows/one-time-fix-build-fingerprinting.yml
+          git commit -m 'fix: fingerprint qpdf runtime while preserving doc parser imports'
+          git push
