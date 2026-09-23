@@ -9,13 +9,13 @@ const required = [
   "tools/unlock-pdf.html",
   "tools/jpg-to-pdf.html", "tools/pdf-to-image.html", "tools/watermark-pdf.html",
   "tools/organize-pdf.html", "tools/add-page-numbers.html", "tools/remove-pdf-metadata.html",
-  "tools/crop-pdf.html", "tools/extract-pdf-text.html", "how-local-processing.html",
+  "tools/crop-pdf.html", "tools/extract-pdf-text.html", "tools/pdf-to-word.html", "tools/word-to-pdf.html", "how-local-processing.html",
   ...indexablePages.filter((relative) => relative.startsWith("guides/")),
   "assets/js/common.js", "assets/js/merge-pdf.js", "assets/js/split-pdf.js",
   "assets/js/rotate-pdf.js", "assets/js/jpg-to-pdf.js", "assets/js/pdf-to-image.js",
   "assets/js/watermark-pdf.js", "assets/css/styles.css"
   , "assets/js/organize-pdf.js", "assets/js/add-page-numbers.js", "assets/js/remove-pdf-metadata.js",
-  "assets/js/crop-pdf.js", "assets/js/extract-pdf-text.js", "assets/js/unlock-pdf.js", "assets/js/unlock-pdf-worker.js",
+  "assets/js/crop-pdf.js", "assets/js/extract-pdf-text.js", "assets/js/pdf-to-word.js", "assets/js/word-to-pdf.js", "assets/js/unlock-pdf.js", "assets/js/unlock-pdf-worker.js",
   "assets/vendor/pdf-lib/pdf-lib.min.js",
   "assets/vendor/jszip/jszip.min.js", "assets/vendor/pdfjs/pdf.min.mjs", "assets/vendor/pdfjs/pdf.worker.min.mjs",
   "assets/vendor/qpdf/qpdf.js", "assets/vendor/qpdf/qpdf.wasm", "assets/vendor/qpdf/LICENSE-QPDF-WASM.txt",
@@ -79,7 +79,9 @@ const toolScripts = {
   "tools/add-page-numbers.html": "assets/js/add-page-numbers.js",
   "tools/remove-pdf-metadata.html": "assets/js/remove-pdf-metadata.js",
   "tools/crop-pdf.html": "assets/js/crop-pdf.js",
-  "tools/extract-pdf-text.html": "assets/js/extract-pdf-text.js"
+  "tools/extract-pdf-text.html": "assets/js/extract-pdf-text.js",
+  "tools/pdf-to-word.html": "assets/js/pdf-to-word.js",
+  "tools/word-to-pdf.html": "assets/js/word-to-pdf.js"
 };
 for (const [htmlPath, scriptPath] of Object.entries(toolScripts)) {
   const html = await readFile(path.join(root, htmlPath), "utf8");
