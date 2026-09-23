@@ -48,14 +48,9 @@ Workers Builds does not inject the final public URL into the build. After the fi
 
 ### Cloudflare Pages
 
-The repository now also contains a GitHub Actions production deployment workflow. It builds `dist`, deploys the exact `main` commit to the `freepdfconverter-all-in-one` Pages project, and then fetches the live Word converter to verify the legacy `.doc` implementation is actually being served.
+Use the native Cloudflare Pages Git integration for production deployment. Keep the production branch as `main`, build command as `npm run build`, and output directory as `dist`. Cloudflare then rebuilds and deploys the site automatically when `main` changes. The repository's GitHub Actions workflow validates the exact production build, including the legacy Microsoft Word 97–2003 parser and modern Word/DOCX workflow, before the change is considered production-ready.
 
-The deployment workflow requires these two GitHub Actions secrets:
-
-- `CLOUDFLARE_API_TOKEN` — Cloudflare API token with permission to deploy the Pages project.
-- `CLOUDFLARE_ACCOUNT_ID` — Cloudflare account ID that owns the Pages project.
-
-If you instead use the native Cloudflare Pages Git integration, keep the production branch as `main`, build command as `npm run build`, and output directory as `dist`. Do not run both deployment systems against the same production project unless you intentionally want both.
+Do not configure a second secret-based Wrangler deployment against the same Pages project unless you intentionally replace the native Git integration.
 
 ## Local checks
 
