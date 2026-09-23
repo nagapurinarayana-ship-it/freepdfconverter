@@ -1,5 +1,3 @@
-import { parseMsDoc } from "/assets/vendor/docjs/index.js";
-
 (function () {
   "use strict";
 
@@ -10,6 +8,7 @@ import { parseMsDoc } from "/assets/vendor/docjs/index.js";
   var file = null;
   var busy = false;
   var sourceKind = "";
+  var msDocParserPromise = null;
 
   var SUPPORTED_EXTENSIONS = [
     ".doc", ".docx", ".docm", ".dot", ".dotx", ".dotm",
@@ -28,6 +27,22 @@ import { parseMsDoc } from "/assets/vendor/docjs/index.js";
     progress: document.getElementById("progressBar"),
     status: document.getElementById("toolStatus")
   };
+
+  async function getMsDocParser() {
+    if (!msDocParserPromise) {
+      msDocParserPromise = import("/assets/vendor/docjs/index.js").catch(function () {
+        // Deployment-safe fallback for environments that have not run the asset build yet.
+        return import("https://cdn.jsdelivr.net/npm/@file-viewer/doc@2.2.7/dist/index.js");
+      }).then(function (module) {
+        if (!module || typeof module.parseMsDoc !== "function") throw new Error("MS-DOC parser is unavailable.");
+        return module.parseMsDoc;
+      }).catch(function (error) {
+        msDocParserPromise = null;
+        throw new Error("Microsoft Word 97-2003 support could not be loaded. Please refresh and try again. " + (error && error.message ? error.message : ""));
+      });
+    }
+    return msDocParserPromise;
+  }
 
   function extension(name) {
     var match = /\.[^.]+$/.exec(String(name || "").toLowerCase());
@@ -106,23 +121,19 @@ import { parseMsDoc } from "/assets/vendor/docjs/index.js";
     var parsed = new DOMParser().parseFromString(await entry.async("text"), "application/xml");
     if (parsed.getElementsByTagName("parsererror").length) throw new Error("Invalid ODT XML");
     var result = [];
-
     Array.from(parsed.getElementsByTagName("*")).forEach(function (node) {
       if (!/^p$|^h$/.test(node.localName || "")) return;
       var text = cleanText(node.textContent || "");
       if (!text) return;
       result.push({ text: text, style: node.localName === "h" ? "heading" + (node.getAttribute("text:outline-level") || "1") : "" });
     });
-
     if (!result.length) throw new Error("No readable ODT text found");
     return result;
   }
 
   function parseRtf(value) {
     var text = String(value || "").replace(/\r\n/g, "\n");
-    text = text.replace(/\\'([0-9a-f]{2})/gi, function (_, hex) {
-      return String.fromCharCode(parseInt(hex, 16));
-    });
+    text = text.replace(/\\'([0-9a-f]{2})/gi, function (_, hex) { return String.fromCharCode(parseInt(hex, 16)); });
     text = text.replace(/\\([a-z]+)(-?\d+)? ?/gi, function (_, word) {
       if (word === "par" || word === "line") return "\n";
       if (word === "tab") return "\t";
@@ -131,12 +142,8 @@ import { parseMsDoc } from "/assets/vendor/docjs/index.js";
       if (word === "bullet") return "•";
       return "";
     });
-    text = text.replace(/\\[^a-z{}\\][ ]?/gi, "");
-    text = text.replace(/[{}]/g, "");
-    text = text.replace(/\n{3,}/g, "\n\n");
-    return text.split(/\n/).map(function (line) {
-      return { text: cleanText(line), style: "" };
-    }).filter(function (block) { return block.text; });
+    text = text.replace(/\\[^a-z{}\\][ ]?/gi, "").replace(/[{}]/g, "").replace(/\n{3,}/g, "\n\n");
+    return text.split(/\n/).map(function (line) { return { text: cleanText(line), style: "" }; }).filter(function (block) { return block.text; });
   }
 
   function parseHtml(value) {
@@ -153,20 +160,18 @@ import { parseMsDoc } from "/assets/vendor/docjs/index.js";
   }
 
   function parseTxt(value) {
-    return String(value || "").replace(/\r\n?/g, "\n").split("\n").map(function (line) {
-      return { text: line.trim(), style: "" };
-    }).filter(function (block) { return block.text; });
+    return String(value || "").replace(/\r\n?/g, "\n").split("\n").map(function (line) { return { text: line.trim(), style: "" }; }).filter(function (block) { return block.text; });
   }
 
   function flattenMsDoc(parsed) {
     var result = [];
-    parsed.blocks.forEach(function (block) {
+    (parsed.blocks || []).forEach(function (block) {
       if (block.type === "paragraph") {
         if (block.text && block.text.trim()) result.push({ text: block.text.trim(), style: (block.styleName || "").toLowerCase() });
       } else if (block.type === "table") {
-        block.rows.forEach(function (row) {
-          var cells = row.cells.map(function (cell) {
-            return cell.paragraphs.map(function (paragraph) { return paragraph.text.trim(); }).filter(Boolean).join(" ");
+        (block.rows || []).forEach(function (row) {
+          var cells = (row.cells || []).map(function (cell) {
+            return (cell.paragraphs || []).map(function (paragraph) { return String(paragraph.text || "").trim(); }).filter(Boolean).join(" ");
           }).filter(Boolean);
           if (cells.length) result.push({ text: cells.join("  |  "), style: "table" });
         });
@@ -180,24 +185,14 @@ import { parseMsDoc } from "/assets/vendor/docjs/index.js";
     var ext = extension(next.name);
     sourceKind = ext;
 
-    if (ext === ".doc") {
+    if (ext === ".doc" || ext === ".dot") {
+      var parseMsDoc = await getMsDocParser();
       var parsed = parseMsDoc(await next.arrayBuffer(), { maxPictureBytes: 8 * 1024 * 1024 });
-      if (parsed.meta && parsed.meta.fib && parsed.meta.fib.fEncrypted) {
-        throw new Error("Encrypted Microsoft Word 97-2003 documents are not supported.");
-      }
+      if (parsed.meta && parsed.meta.fib && parsed.meta.fib.fEncrypted) throw new Error("Encrypted Microsoft Word 97-2003 documents are not supported.");
       return flattenMsDoc(parsed);
     }
 
     if (ext === ".docx" || ext === ".docm" || ext === ".dotx" || ext === ".dotm") return parseOoxml(next);
-
-    if (ext === ".dot") {
-      try {
-        return flattenMsDoc(parseMsDoc(await next.arrayBuffer(), { maxPictureBytes: 8 * 1024 * 1024 }));
-      } catch (error) {
-        throw new Error("This legacy Word template could not be parsed. Save it as .docx and retry.");
-      }
-    }
-
     if (ext === ".odt") return parseOdt(next);
 
     var value = await next.text();
@@ -225,23 +220,14 @@ import { parseMsDoc } from "/assets/vendor/docjs/index.js";
       var current = "";
       words.forEach(function (word) {
         var candidate = current ? current + " " + word : word;
-        if (font.widthOfTextAtSize(candidate, size) <= maxWidth) {
-          current = candidate;
-          return;
-        }
+        if (font.widthOfTextAtSize(candidate, size) <= maxWidth) { current = candidate; return; }
         if (current) lines.push(current);
-        if (font.widthOfTextAtSize(word, size) <= maxWidth) {
-          current = word;
-          return;
-        }
+        if (font.widthOfTextAtSize(word, size) <= maxWidth) { current = word; return; }
         var chunk = "";
         Array.from(word).forEach(function (char) {
           var test = chunk + char;
           if (font.widthOfTextAtSize(test, size) <= maxWidth) chunk = test;
-          else {
-            if (chunk) lines.push(chunk);
-            chunk = char;
-          }
+          else { if (chunk) lines.push(chunk); chunk = char; }
         });
         current = chunk;
       });
@@ -253,41 +239,20 @@ import { parseMsDoc } from "/assets/vendor/docjs/index.js";
   async function createPdf() {
     if (!blocks.length) throw new Error("No document loaded");
     if (!window.PDFLib) throw new Error("PDF library unavailable");
-
-    var spec = pageSpec();
-    var margin = 54;
-    var contentWidth = spec.width - margin * 2;
+    var spec = pageSpec(), margin = 54, contentWidth = spec.width - margin * 2;
     var doc = await window.PDFLib.PDFDocument.create();
     var font = await doc.embedFont(window.PDFLib.StandardFonts.Helvetica);
-    var pages = 0;
-    var page = null;
-    var cursorY = 0;
+    var page = null, pages = 0, cursorY = 0;
 
-    function newPage() {
-      page = doc.addPage([spec.width, spec.height]);
-      cursorY = spec.height - margin;
-      pages += 1;
-    }
-
-    function ensureSpace(height) {
-      if (!page || cursorY - height < margin) newPage();
-    }
+    function newPage() { page = doc.addPage([spec.width, spec.height]); cursorY = spec.height - margin; pages += 1; }
+    function ensureSpace(height) { if (!page || cursorY - height < margin) newPage(); }
 
     newPage();
-
     blocks.forEach(function (block) {
       var size = Math.max(9, Math.min(24, fontSizeFor(block.style)));
       var lineHeight = Math.max(14, size * 1.35);
       var gap = /heading|title/.test(block.style) ? 8 : 4;
-      var lines = wrapText(block.text, font, size, contentWidth);
-
-      if (!lines.length) {
-        ensureSpace(lineHeight);
-        cursorY -= lineHeight;
-        return;
-      }
-
-      lines.forEach(function (line) {
+      wrapText(block.text, font, size, contentWidth).forEach(function (line) {
         ensureSpace(lineHeight);
         if (line) page.drawText(line, { x: margin, y: cursorY, size: size, font: font });
         cursorY -= lineHeight;
@@ -298,9 +263,7 @@ import { parseMsDoc } from "/assets/vendor/docjs/index.js";
     doc.setTitle(file.name.replace(/\.[^.]+$/i, ""));
     doc.setCreator("FreePDF Tools");
     doc.setProducer("FreePDF Tools using pdf-lib");
-    return doc.save({ useObjectStreams: true }).then(function (bytes) {
-      return { bytes: bytes, pages: pages };
-    });
+    return doc.save({ useObjectStreams: true }).then(function (bytes) { return { bytes: bytes, pages: pages }; });
   }
 
   function update() {
@@ -320,62 +283,36 @@ import { parseMsDoc } from "/assets/vendor/docjs/index.js";
     if (!supportedFile(next)) return U.setStatus(el.status, "Choose DOC, DOCX, DOCM, DOT, DOTX, DOTM, ODT, RTF, TXT or HTML.", "error");
     if (next.size > MAX_FILE) return U.setStatus(el.status, "Keep the document below 40 MB for browser stability.", "error");
 
-    busy = true;
-    update();
-    U.setProgress(el.progress, 4);
-    U.setStatus(el.status, "Reading the document locally…", "info");
-
+    busy = true; update(); U.setProgress(el.progress, 4); U.setStatus(el.status, "Reading the document locally…", "info");
     try {
       blocks = await parseDocument(next);
       file = next;
       el.filename.value = U.safeBaseName(next.name);
       U.setProgress(el.progress, 100);
-      var readableName = sourceKind === ".doc" ? "Microsoft Word 97-2003 document" : sourceKind.toUpperCase() + " document";
-      U.setStatus(el.status, readableName + " loaded. Ready to convert locally.", "success");
+      U.setStatus(el.status, (sourceKind === ".doc" ? "Microsoft Word 97-2003 document" : sourceKind.toUpperCase() + " document") + " loaded. Ready to convert locally.", "success");
     } catch (error) {
-      console.error(error);
-      blocks = [];
-      file = null;
-      U.setProgress(el.progress, 0);
+      console.error(error); blocks = []; file = null; U.setProgress(el.progress, 0);
       U.setStatus(el.status, error && error.message ? error.message : "Could not read this document.", "error");
-    } finally {
-      busy = false;
-      update();
-    }
+    } finally { busy = false; update(); }
   }
 
   async function convert() {
     if (busy || !blocks.length || !file) return;
-    busy = true;
-    update();
-    U.setProgress(el.progress, 3);
-    U.setStatus(el.status, "Rendering the document to PDF locally…", "info");
-
+    busy = true; update(); U.setProgress(el.progress, 3); U.setStatus(el.status, "Rendering the document to PDF locally…", "info");
     try {
       var result = await createPdf();
       var name = U.safeBaseName(el.filename.value || file.name) + ".pdf";
       U.downloadBlob(new Blob([result.bytes], { type: "application/pdf" }), name);
-      U.setProgress(el.progress, 100);
-      U.setStatus(el.status, "PDF created: " + name + " (" + result.pages + " pages). Download started.", "success");
+      U.setProgress(el.progress, 100); U.setStatus(el.status, "PDF created: " + name + " (" + result.pages + " pages). Download started.", "success");
     } catch (error) {
-      console.error(error);
-      U.setProgress(el.progress, 0);
-      U.setStatus(el.status, "Could not create the PDF. Try a simpler or smaller document.", "error");
-    } finally {
-      busy = false;
-      update();
-    }
+      console.error(error); U.setProgress(el.progress, 0); U.setStatus(el.status, "Could not create the PDF. Try a simpler or smaller document.", "error");
+    } finally { busy = false; update(); }
   }
 
   function clear() {
     if (busy) return;
-    blocks = [];
-    file = null;
-    sourceKind = "";
-    el.filename.value = "converted-document";
-    U.setProgress(el.progress, 0);
-    U.setStatus(el.status, "Choose a Word or document file.", "info");
-    update();
+    blocks = []; file = null; sourceKind = ""; el.filename.value = "converted-document";
+    U.setProgress(el.progress, 0); U.setStatus(el.status, "Choose a Word or document file.", "info"); update();
   }
 
   U.bindDropZone(el.zone, el.input, load);
