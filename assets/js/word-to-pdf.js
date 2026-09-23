@@ -23,8 +23,8 @@
 
   function isDocx(next) {
     return next instanceof File && (
-      /application\\/vnd\\.openxmlformats-officedocument\\.wordprocessingml\\.document/i.test(next.type) ||
-      /\\.docx$/i.test(next.name)
+      /application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document/i.test(next.type) ||
+      /\.docx$/i.test(next.name)
     );
   }
 
