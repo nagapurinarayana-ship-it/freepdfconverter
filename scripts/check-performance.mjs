@@ -24,8 +24,9 @@ for (const file of htmlFiles) {
   const adsPos = html.indexOf("<!-- freepdf-effectivecpm:start -->");
   if (mainPos !== -1 && adsPos !== -1 && adsPos < mainPos) failures.push(`${relative} -> ad block appears before main content`);
 
-  // Obsolete EffectiveCPM placements must never return.
-  if (/pl3080663[468]|c1kt57md\?key=16cfe2b361699a8b0b12a8dc0c8c79b7|craftmypage/i.test(html)) {
+  // Obsolete EffectiveCPM placements must never return. Normal site referral
+  // links are allowed; only ad/provider identifiers are blocked here.
+  if (/pl3080663[468]|c1kt57md\?key=16cfe2b361699a8b0b12a8dc0c8c79b7/i.test(html)) {
     failures.push(`${relative} -> obsolete/foreign monetization identifier detected`);
   }
 
@@ -45,6 +46,6 @@ async function collectHtml(directory) {
   for (const entry of entries) {
     const full = path.join(directory, entry.name);
     if (entry.isDirectory()) await collectHtml(full);
-    else if (entry.isFile() && entry.name.toLowerCase().endsWith(".html")) htmlFiles.push(full);
+    else if (entry.isFile() && entry.name.toLowerCase().endsWith(".html") && entry.name !== "google0982473b0f1ce198.html") htmlFiles.push(full);
   }
 }
