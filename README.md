@@ -21,15 +21,15 @@ Free, privacy-first PDF utilities that run in the browser. Selected documents ar
 - PDF to Word (editable DOCX for text-based PDFs)
 - Word / document to PDF: Microsoft Word 97-2003 `.doc`, DOCX/DOCM/DOT/DOTX/DOTM, plus ODT, RTF, TXT and HTML
 
-The site is static HTML, CSS and JavaScript. Word conversion currently targets modern `.docx` files; legacy binary `.doc` files are not supported. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js, JSZip and QPDF WebAssembly libraries. QPDF runs in a dedicated browser worker for the Unlock PDF workflow. A progressive web app service worker caches the public tool code for offline use; selected documents and passwords are never placed in that cache.
+The site is static HTML, CSS and JavaScript. Word conversion supports both modern Office Open XML documents and legacy Microsoft Word 97-2003 binary `.doc` documents through a browser-side MS-DOC parser. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js, JSZip and QPDF WebAssembly libraries. QPDF runs in a dedicated browser worker for the Unlock PDF workflow. A progressive web app service worker caches the public tool code for offline use; selected documents and passwords are never placed in that cache.
 
 ## Verify the privacy model
 
-The browser reads selected files through the File API and passes their bytes directly to the local PDF library. There is no application upload endpoint or server-side conversion job. See the live [technical explanation](https://freepdfconverter-all-in-one.pages.dev/how-local-processing) and inspect `assets/js/` to verify each workflow.
+The browser reads selected files through the File API and passes their bytes directly to the local PDF/document libraries. There is no application upload endpoint or server-side conversion job. See the live [technical explanation](https://freepdfconverter-all-in-one.pages.dev/how-local-processing) and inspect `assets/js/` to verify each workflow.
 
 ## Recommended free production hosting
 
-Use Cloudflare for the public, monetized site.
+Use Cloudflare for the public site.
 
 ### Cloudflare Workers Builds
 
@@ -48,20 +48,18 @@ Workers Builds does not inject the final public URL into the build. After the fi
 
 ### Cloudflare Pages
 
-If you create a Pages project instead:
+The repository now also contains a GitHub Actions production deployment workflow. It builds `dist`, deploys the exact `main` commit to the `freepdfconverter-all-in-one` Pages project, and then fetches the live Word converter to verify the legacy `.doc` implementation is actually being served.
 
-1. Go to Workers & Pages, then Create, Pages, and Import an existing Git repository.
-2. Connect this GitHub repository.
-3. Set the production branch to `main`.
-4. Set the build command to `npm run build`.
-5. Set the build output directory to `dist`.
-6. Deploy.
+The deployment workflow requires these two GitHub Actions secrets:
 
-Pages injects `CF_PAGES_URL`; the build uses it to create canonical URLs and `sitemap.xml`. If a custom domain is added later, set a production environment variable named `SITE_ORIGIN` to the full origin, for example `https://example.com`, and redeploy.
+- `CLOUDFLARE_API_TOKEN` — Cloudflare API token with permission to deploy the Pages project.
+- `CLOUDFLARE_ACCOUNT_ID` — Cloudflare account ID that owns the Pages project.
+
+If you instead use the native Cloudflare Pages Git integration, keep the production branch as `main`, build command as `npm run build`, and output directory as `dist`. Do not run both deployment systems against the same production project unless you intentionally want both.
 
 ## Local checks
 
-Run `npm run verify` to validate local references, metadata, clean canonical URLs, JSON-LD and the generated sitemap. No npm packages are required for these scripts.
+Run `npm run verify` to validate local references, metadata, clean canonical URLs, JSON-LD and the generated sitemap. The document test validates a real Microsoft Word 97-2003 `.doc` fixture.
 
 ## Monetization
 
