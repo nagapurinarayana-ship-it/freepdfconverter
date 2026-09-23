@@ -91,7 +91,7 @@ if (wordJsAsset) {
   if (!wordJsSource.includes("getMsDocParser")) failures.push("Word converter -> legacy DOC parser loader is missing");
   if (!wordJsSource.includes(".doc") || !wordJsSource.includes(".docx")) failures.push("Word converter -> legacy and modern Word branches are missing");
   if (!wordJsSource.includes("/assets/vendor/docjs/index.js")) failures.push("Word converter -> stable self-hosted MS-DOC parser path is missing");
-  if (wordJsSource.includes("assets/vendor/docjs/index.")) failures.push("Word converter -> MS-DOC parser entry point was incorrectly fingerprinted");
+  if (/assets\/vendor\/docjs\/index\.[a-f0-9]{10}\.js/.test(wordJsSource)) failures.push("Word converter -> MS-DOC parser entry point was incorrectly fingerprinted");
 }
 const pdfWordJsAsset = jsAssets.find((file) => /^pdf-to-word\.[a-f0-9]{10}\.js$/.test(file));
 if (!pdfWordJsAsset) failures.push("PDF to Word -> fingerprinted converter script is missing");
