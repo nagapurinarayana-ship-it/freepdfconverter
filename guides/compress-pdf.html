@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How to Compress a PDF — Reduce File Size Safely | FreePDF Tools</title>
+<meta name="description" content="Learn how to compress a PDF, what lossless compression can change, why image-heavy files may shrink less and when stronger image optimization is needed.">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/css/styles.css">
+<script src="../assets/js/common.js" defer></script><script src="../assets/js/monetization-config.js" defer></script><script src="../assets/js/ads.js" defer></script>
+<link rel="canonical" href="https://freepdfconverter-all-in-one.pages.dev/guides/compress-pdf">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta property="og:type" content="article"><meta property="og:site_name" content="FreePDF Tools">
+<meta property="og:title" content="How to Compress a PDF — Reduce File Size Safely | FreePDF Tools">
+<meta property="og:description" content="Learn how to compress a PDF, what lossless compression can change, why image-heavy files may shrink less and when stronger image optimization is needed.">
+<meta property="og:url" content="https://freepdfconverter-all-in-one.pages.dev/guides/compress-pdf">
+<meta property="og:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg">
+<meta property="og:image:alt" content="FreePDF Tools — PDF compression guide">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="How to Compress a PDF — Reduce File Size Safely | FreePDF Tools">
+<meta name="twitter:description" content="Learn how to compress a PDF, what lossless compression can change, why image-heavy files may shrink less and when stronger image optimization is needed.">
+<meta name="twitter:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"How to Compress a PDF — Reduce File Size Safely","description":"A practical guide to PDF compression, file-size reduction and the trade-off between lossless structure optimization and image recompression.","url":"https://freepdfconverter-all-in-one.pages.dev/guides/compress-pdf","author":{"@type":"Organization","name":"FreePDF Tools","url":"https://freepdfconverter-all-in-one.pages.dev/about"},"publisher":{"@type":"Organization","name":"FreePDF Tools","url":"https://freepdfconverter-all-in-one.pages.dev/about"},"image":"https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg","datePublished":"2026-09-28","dateModified":"2026-09-28","inLanguage":"en"}</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="container header-inner"><a class="logo" href="../"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav" aria-label="Main navigation"><a href="../#tools">PDF tools</a><a href="./">Guides</a><a href="../privacy">Privacy</a><a href="../about">About</a></nav></div></header>
+<main id="main"><article class="article container">
+<div class="breadcrumbs"><a href="../">Home</a> / <a href="./">PDF Guides</a> / Compress PDF</div>
+<span class="eyebrow">PDF compression · reduce file size · lossless · no upload</span>
+<h1>How to compress a PDF</h1>
+<p class="lead">PDF compression is not one technique. A file can shrink through lossless structural optimization, image recompression or removal of unnecessary content. The safest method depends on what is making the PDF large.</p>
+<p class="updated">Updated September 28, 2026 · Reviewed by <a href="../about">FreePDF Tools</a></p>
+<h2>What does “compress PDF” actually mean?</h2>
+<p>People searching for a <strong>compress PDF</strong> or <strong>PDF size reducer</strong> may have different goals. You may want a smaller email attachment, a faster upload, a smaller archive or a file that fits a portal's size limit. A smaller PDF can be produced in several ways, and not all of them preserve image quality.</p>
+<h2>How lossless PDF compression works</h2>
+<p>Lossless compression keeps the document's visual data intact while reducing structural overhead where possible. FreePDF Tools uses a browser-local qpdf pass that recompresses supported streams, recompresses existing Flate streams and generates compressed object streams.</p>
+<p>QPDF documents these options as mechanisms for reducing PDF size; object streams can compress PDF objects, while <code>--recompress-flate</code> lets the compressor recompress existing Flate data. citeturn866793search4turn866793search2</p>
+<h2>Try the free PDF compressor</h2>
+<p>Open the <a href="../tools/compress-pdf">Compress PDF tool</a>, choose your file and let the browser create a smaller copy. The tool reports the original size, output size and percentage reduction before downloading a <code>-compressed.pdf</code> copy.</p>
+<h2>Why a scanned PDF may not shrink much</h2>
+<p>Scanned documents are often dominated by page images. If those images are already JPEG-compressed, a lossless PDF-only pass may have little room left to reduce the file. A much smaller result may require image resampling or JPEG quality reduction, which can change visual quality.</p>
+<h2>When should you use stronger compression?</h2>
+<p>Use stronger, potentially lossy image compression when the PDF is mostly photographs or scans and your goal is the smallest possible file for email or upload. Review the result carefully when text readability, signatures, diagrams or image quality matter.</p>
+<h2>Best practices before replacing the original</h2>
+<ol><li>Keep the original PDF until you have checked the compressed copy.</li><li>Open the output and verify page count, links, forms and important visual content.</li><li>Check the final file size against the upload or email limit.</li><li>Do not assume a smaller PDF is automatically better if it loses information you need.</li></ol>
+<h2>Frequently asked questions</h2>
+<div class="faq">
+<details><summary>Is lossless PDF compression always smaller?</summary><p>No. If the source is already efficiently compressed, the lossless result can be nearly the same size or slightly larger. FreePDF Tools avoids downloading a larger replacement.</p></details>
+<details><summary>Does PDF compression reduce quality?</summary><p>The FreePDF Tools compressor uses a lossless structural pass and does not intentionally lower JPEG image quality. Stronger image recompression is a separate operation.</p></details>
+<details><summary>Can I reduce a PDF below an email attachment limit?</summary><p>Sometimes. The amount of reduction depends on the contents of the PDF. Image-heavy files may require image optimization for a larger reduction.</p></details>
+<details><summary>Can I compress a password-protected PDF?</summary><p>Unlock the document first when you know the password, then compress the unencrypted copy.</p></details>
+</div>
+</article></main>
+<footer class="site-footer"><div class="container"><div class="footer-bottom"><span>© <span data-current-year></span> FreePDF Tools</span><span>Lossless PDF size reduction in your browser</span></div></div></footer>
+</body></html>
