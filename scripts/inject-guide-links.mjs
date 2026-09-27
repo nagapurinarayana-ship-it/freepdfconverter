@@ -81,6 +81,11 @@ const related = {
     ["guides/extract-text-from-pdf.html", "Extract selectable PDF text"],
     ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading files"]
   ],
+  "guides/compress-pdf.html": [
+    ["guides/reduce-pdf-file-size-for-email.html", "Reduce PDF size for email"],
+    ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading files"],
+    ["guides/word-to-pdf-converter.html", "Convert Word documents to PDF"]
+  ],
   "guides/word-to-pdf-converter.html": [
     ["guides/pdf-to-word-converter.html", "Convert PDF files to Word"],
     ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading files"],
