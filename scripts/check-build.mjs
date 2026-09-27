@@ -118,6 +118,22 @@ if (pdfWordJsAsset) {
   if (!pdfWordSource.includes(".docx")) failures.push("PDF to Word -> modern DOCX output is missing");
 }
 
+const ocrPage = await readFile(path.join(dist, "tools/ocr-pdf.html"), "utf8");
+if (!ocrPage.includes("OCR PDF") || !ocrPage.includes("scanned")) failures.push("OCR PDF -> tool page is missing scanned-PDF OCR copy");
+if (!ocrPage.includes("/assets/vendor/tesseract/tesseract.min.js")) failures.push("OCR PDF -> local Tesseract runtime reference is missing");
+if (!/assets\/js\/ocr-pdf\.[a-f0-9]{10}\.js/.test(ocrPage)) failures.push("OCR PDF -> fingerprinted browser script reference is missing");
+const ocrJsAsset = jsAssets.find((file) => /^ocr-pdf\.[a-f0-9]{10}\.js$/.test(file));
+if (!ocrJsAsset) failures.push("OCR PDF -> fingerprinted browser script is missing");
+if (ocrJsAsset) {
+  const ocrJsSource = await readFile(path.join(dist, "assets/js", ocrJsAsset), "utf8");
+  if (!ocrJsSource.includes("/assets/vendor/tesseract/worker.min.js")) failures.push("OCR PDF -> local Tesseract worker path is missing");
+  if (!ocrJsSource.includes("/assets/vendor/tesseract/core")) failures.push("OCR PDF -> local Tesseract core path is missing");
+  if (!ocrJsSource.includes("/assets/vendor/tesseract/lang")) failures.push("OCR PDF -> local English language-data path is missing");
+  if (!ocrJsSource.includes("-ocr.docx")) failures.push("OCR PDF -> DOCX output filename is missing");
+}
+for (const file of ["tesseract.min.js","worker.min.js","core/tesseract-core.wasm.js","core/tesseract-core-simd.wasm.js","core/tesseract-core-lstm.wasm.js","core/tesseract-core-simd-lstm.wasm.js","core/tesseract-core-relaxedsimd.wasm.js","core/tesseract-core-relaxedsimd-lstm.wasm.js","lang/eng.traineddata.gz"]) await access(path.join(dist, "assets/vendor/tesseract", file));
+if (/assets\/vendor\/tesseract\/.*\.[a-f0-9]{10}\.(?:js|wasm)/.test(ocrPage)) failures.push("OCR PDF -> Tesseract vendor assets must stay at stable paths");
+
 const serviceWorker = await readFile(path.join(dist, "service-worker.js"), "utf8");
 if (serviceWorker.includes("__CACHE_VERSION__") || serviceWorker.includes("__PRECACHE_URLS__")) failures.push("service-worker.js -> build placeholders remain");
 if (!serviceWorker.includes('"/favicon.ico"')) failures.push("service-worker.js -> root favicon is not precached");
