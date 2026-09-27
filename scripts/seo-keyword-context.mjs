@@ -24,11 +24,11 @@ const blocks = {
   },
   "tools/pdf-to-word.html": {
     heading: "PDF to Word, DOCX and DOC conversion",
-    html: "Common searches include <strong>PDF to Word converter</strong>, <strong>convert PDF to Word</strong> and <strong>PDF to DOC</strong>. This free browser converter This tool is designed for selectable-text PDFs and creates an editable DOCX without uploading the source file."
+    html: "This free browser converter covers common searches such as <strong>PDF to Word converter</strong>, <strong>convert PDF to Word</strong> and <strong>PDF to DOC</strong>. It is designed for selectable-text PDFs and creates an editable DOCX without uploading the source file."
   },
   "tools/word-to-pdf.html": {
     heading: "Word, DOC and DOCX to PDF conversion",
-    html: "Common workflows include <strong>Word to PDF</strong>, <strong>DOC to PDF</strong> and <strong>DOCX to PDF</strong>. This free Word to PDF converter The converter also accepts Microsoft Word 97–2003 <strong>.doc</strong> files and processes supported documents locally."
+    html: "This free Word to PDF converter covers <strong>Word to PDF</strong>, <strong>DOC to PDF</strong> and <strong>DOCX to PDF</strong> workflows. It also accepts Microsoft Word 97–2003 <strong>.doc</strong> files and processes supported documents locally."
   },
   "tools/organize-pdf.html": {
     heading: "Organize or organise PDF pages",
