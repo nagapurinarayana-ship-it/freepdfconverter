@@ -38,6 +38,7 @@
 <p>Open the <a href="../tools/compress-pdf">Compress PDF tool</a>, choose your file and let the browser create a smaller copy. The tool reports the original size, output size and percentage reduction before downloading a <code>-compressed.pdf</code> copy.</p>
 <h2>Why a scanned PDF may not shrink much</h2>
 <p>Scanned documents are often dominated by page images. If those images are already JPEG-compressed, a lossless PDF-only pass may have little room left to reduce the file. A much smaller result may require image resampling or JPEG quality reduction, which can change visual quality.</p>
+<p><img src="../assets/images/guides/compress-pdf-quality.svg" alt="Comparison of lossless PDF structure compression with image recompression and the trade-off between file size and image quality." width="960" height="540"></p>
 <h2>When should you use stronger compression?</h2>
 <p>Use stronger, potentially lossy image compression when the PDF is mostly photographs or scans and your goal is the smallest possible file for email or upload. Review the result carefully when text readability, signatures, diagrams or image quality matter.</p>
 <h2>Best practices before replacing the original</h2>
