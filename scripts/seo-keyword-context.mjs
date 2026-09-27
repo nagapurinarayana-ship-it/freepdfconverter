@@ -30,6 +30,10 @@ const blocks = {
     heading: "Word, DOC and DOCX to PDF conversion",
     html: "This free Word to PDF converter covers <strong>Word to PDF</strong>, <strong>DOC to PDF</strong> and <strong>DOCX to PDF</strong> workflows. It also accepts Microsoft Word 97–2003 <strong>.doc</strong> files and processes supported documents locally."
   },
+  "tools/compress-pdf.html": {
+    heading: "Compress or reduce PDF file size",
+    html: "Use this free <strong>PDF compressor</strong> to <strong>compress PDF</strong> files and <strong>reduce PDF size</strong> with a lossless browser-local pass. Results vary by document contents, especially when a PDF is already dominated by compressed images."
+  },
   "tools/organize-pdf.html": {
     heading: "Organize or organise PDF pages",
     html: "Use this free <strong>PDF organizer</strong> for <strong>organize PDF</strong>, <strong>organise PDF</strong>, <strong>reorder PDF pages</strong>, <strong>arrange PDF pages</strong> and deleting unwanted pages. The spelling varies by region, but the workflow is the same."
