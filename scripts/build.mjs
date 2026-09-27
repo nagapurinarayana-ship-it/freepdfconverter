@@ -35,6 +35,7 @@ const pageKeywords = {
   "tools/crop-pdf.html": ["crop pdf", "crop pdf pages", "crop pdf online", "trim pdf pages", "pdf cropper"],
   "tools/extract-pdf-text.html": ["extract text from pdf", "pdf text extractor", "extract pdf text online", "copy text from pdf", "pdf to text"],
   "tools/compress-pdf.html": ["compress pdf", "pdf compressor", "reduce pdf size", "pdf size reducer", "compress pdf online"],
+  "tools/ocr-pdf.html": ["ocr pdf", "pdf ocr", "scanned pdf to text", "scanned pdf to word", "ocr pdf to word"],
   "guides/index.html": ["pdf guides", "pdf help", "how to use pdf tools", "pdf tutorials", "pdf tips"],
   "guides/merge-pdf-safely.html": ["how to merge pdfs", "merge pdf safely", "combine pdf files", "merge pdf without losing quality", "pdf merger guide"],
   "guides/split-extract-pdf-pages.html": ["how to split a pdf", "extract pages from pdf", "split pdf guide", "separate pdf pages", "pdf page extraction"],
@@ -50,7 +51,8 @@ const pageKeywords = {
   "guides/extract-text-from-pdf.html": ["how to extract text from a pdf", "pdf text extraction", "extract pdf text", "pdf to text guide", "copy text from pdf"],
   "guides/are-online-pdf-converters-safe.html": ["are online pdf converters safe", "pdf privacy", "safe online pdf converter", "secure pdf conversion", "pdf converter privacy"],
   "guides/pdf-converter-without-upload.html": ["pdf converter without upload", "convert pdf without uploading", "private pdf converter", "offline pdf converter", "local pdf processing"],
-  "guides/compress-pdf.html": ["compress pdf", "reduce pdf file size", "pdf compressor", "pdf size reducer", "compress pdf for email"]
+  "guides/compress-pdf.html": ["compress pdf", "reduce pdf file size", "pdf compressor", "pdf size reducer", "compress pdf for email"],
+  "guides/ocr-pdf-to-word.html": ["ocr pdf", "scanned pdf to word", "convert scanned pdf to word", "ocr pdf to text", "scan pdf to word"]
 };
 
 const appHead = [
@@ -238,8 +240,9 @@ async function fingerprintAssets() {
   // Word 97-2003 converter). The vendor directory is still version-pinned by npm
   // and included in the service-worker precache.
   const docjsRoot = path.join(assetRoot, "vendor", "docjs") + path.sep;
+  const tesseractRoot = path.join(assetRoot, "vendor", "tesseract") + path.sep;
   const applicationTargets = (await walk(assetRoot)).filter((file) =>
-    /\.(?:css|js|mjs|wasm)$/i.test(file) && !file.startsWith(docjsRoot)
+    /\.(?:css|js|mjs|wasm)$/i.test(file) && !file.startsWith(docjsRoot) && !file.startsWith(tesseractRoot)
   );
   return fingerprintGroup(applicationTargets);
 }
