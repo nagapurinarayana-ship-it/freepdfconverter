@@ -39,7 +39,9 @@ export const indexablePages = [
   "guides/crop-pdf-pages.html",
   "guides/extract-text-from-pdf.html",
   "guides/are-online-pdf-converters-safe.html",
-  "guides/pdf-converter-without-upload.html"
+  "guides/pdf-converter-without-upload.html",
+  "guides/pdf-to-word-converter.html",
+  "guides/word-to-pdf-converter.html"
 ];
 
 export const supplementalPages = ["privacy.html", "terms.html", "contact.html"];
@@ -57,7 +59,9 @@ export const articlePages = new Set([
   "guides/add-page-numbers-to-pdf.html",
   "guides/remove-pdf-metadata.html",
   "guides/crop-pdf-pages.html",
-  "guides/extract-text-from-pdf.html"
+  "guides/extract-text-from-pdf.html",
+  "guides/pdf-to-word-converter.html",
+  "guides/word-to-pdf-converter.html"
 ]);
 
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
@@ -72,6 +76,8 @@ pageDates["tools/pdf-to-word.html"] = "2026-09-27";
 pageDates["tools/word-to-pdf.html"] = "2026-09-27";
 pageDates["guides/are-online-pdf-converters-safe.html"] = "2026-08-12";
 pageDates["guides/pdf-converter-without-upload.html"] = "2026-08-12";
+pageDates["guides/pdf-to-word-converter.html"] = "2026-09-27";
+pageDates["guides/word-to-pdf-converter.html"] = "2026-09-27";
 
 export const articlePublishedDates = {
   "guides/reduce-pdf-file-size-for-email.html": "2026-08-31",
@@ -132,7 +138,9 @@ export const pageLabels = {
   "guides/crop-pdf-pages.html": "How to Crop PDF Pages",
   "guides/extract-text-from-pdf.html": "How to Extract Text from a PDF",
   "guides/are-online-pdf-converters-safe.html": "Are Online PDF Converters Safe?",
-  "guides/pdf-converter-without-upload.html": "How to Convert PDFs Without Uploading Files"
+  "guides/pdf-converter-without-upload.html": "How to Convert PDFs Without Uploading Files",
+  "guides/pdf-to-word-converter.html": "How to Convert PDF to Word",
+  "guides/word-to-pdf-converter.html": "How to Convert Word to PDF"
 };
 
 export function pagePathname(relative) {
