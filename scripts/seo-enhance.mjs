@@ -13,8 +13,8 @@ const seo = {
     "Free PDF converter and online PDF tools for merging, splitting, unlocking, organizing and converting PDFs. Process files privately in your browser with no uploads or account."
   ],
   "pdf-converter-online.html": [
-    "Free PDF Converter Online — Convert PDFs in Your Browser | FreePDF Tools",
-    "Convert and manage PDFs directly in your browser with FreePDF Tools. Merge, split, rotate, unlock, crop, organize and watermark files without uploading documents."
+    "Free PDF Converter Online — PDF, Word & Image Conversion | FreePDF Tools",
+    "Convert and manage PDFs directly in your browser. Merge, split, organize, convert PDF to Word, convert Word documents to PDF, and convert PDF pages to images without uploading documents."
   ],
   "about.html": ["About FreePDF Tools — Private Browser PDF Utilities", "Learn how FreePDF Tools works, why PDF processing happens in your browser, and how the service is designed around privacy and simple document workflows."],
   "how-local-processing.html": ["How Local PDF Processing Works — FreePDF Tools", "See how FreePDF Tools processes supported PDF files locally in your browser, what stays on your device, and what to expect from local document processing."],
@@ -32,13 +32,13 @@ const seo = {
   "tools/jpg-to-pdf.html": ["JPG to PDF Online Free — Convert Images to PDF | FreePDF Tools", "Convert JPG or PNG images into an ordered PDF with practical page-size options, processed in your browser."],
   "tools/pdf-to-image.html": ["PDF to JPG or PNG Online — Convert PDF Pages to Images | FreePDF Tools", "Render selected PDF pages as JPG or PNG images directly in your browser and download the results."],
   "tools/watermark-pdf.html": ["Watermark PDF Online Free — Add Text Watermarks | FreePDF Tools", "Add a customizable text watermark to PDF pages with adjustable size, opacity, color and angle in your browser."],
-  "tools/organize-pdf.html": ["Organize PDF Online — Reorder & Delete Pages | FreePDF Tools", "Organize PDF pages online free. Reorder, move, remove and arrange pages in your browser, then download a new PDF without uploading the original file."],
+  "tools/organize-pdf.html": ["Free PDF Organizer Online — Reorder, Arrange & Delete Pages | FreePDF Tools", "Organize PDF pages online free with a private PDF organizer. Reorder, rearrange, move and delete pages in your browser, then download a new PDF without uploading the original file."],
   "tools/add-page-numbers.html": ["Add Page Numbers to PDF Online | FreePDF Tools", "Add page numbers to all or selected PDF pages with flexible placement and styling directly in your browser."],
   "tools/remove-pdf-metadata.html": ["Remove PDF Metadata Online | FreePDF Tools", "Clear common PDF metadata fields including author, title, subject and keywords directly in your browser."],
   "tools/crop-pdf.html": ["Crop PDF Pages Online Free — Trim PDF Margins | FreePDF Tools", "Crop PDF pages with precise millimetre margins to remove unwanted borders and blank edges in your browser."],
   "tools/extract-pdf-text.html": ["Extract Text from PDF Online — Free PDF Text Extractor | FreePDF Tools", "Extract selectable text from a PDF in your browser so you can copy or download the text without uploading the document."],
   "tools/pdf-to-word.html": ["PDF to Word Converter Free — Private PDF to DOCX | FreePDF Tools", "Convert text-based PDF files to editable Word DOCX documents in your browser, with no document upload required."],
-  "tools/word-to-pdf.html": ["Word & Document to PDF Converter — DOC, DOCX, ODT | FreePDF Tools", "Convert Microsoft Word 97–2003 DOC, DOCX, DOCM, DOT, DOTX, DOTM and common ODT, RTF, TXT or HTML files to PDF locally in your browser."],
+  "tools/word-to-pdf.html": ["Word to PDF Converter Free — DOC, DOCX & Word 97–2003 | FreePDF Tools", "Convert Microsoft Word 97–2003 DOC, DOCX, DOCM, DOT, DOTX, DOTM and common ODT, RTF, TXT or HTML files to PDF locally in your browser."],
   "guides/index.html": ["PDF Guides — Merge, Split, Convert & Manage | FreePDF Tools", "Practical PDF guides covering merging, splitting, unlocking, rotation, image conversion, watermarking, page organization and privacy."],
   "guides/merge-pdf-safely.html": ["How to Merge PDFs Safely — Step-by-Step PDF Guide | FreePDF Tools", "Learn how to combine PDF files in the right order, avoid common mistakes and merge documents locally in your browser."],
   "guides/split-extract-pdf-pages.html": ["How to Split and Extract PDF Pages — Complete Guide | FreePDF Tools", "Learn practical ways to split a PDF, extract selected pages and create separate documents while keeping source files on your device."],
@@ -47,7 +47,7 @@ const seo = {
   "guides/jpg-png-to-pdf.html": ["How to Convert JPG or PNG to PDF — Practical Guide | FreePDF Tools", "Learn how to turn images into PDF documents, choose page sizes and arrange multiple images before creating the final file."],
   "guides/pdf-to-jpg-vs-png.html": ["PDF to JPG vs PNG — Quality, Size & Uses | FreePDF Tools", "PDF to JPG vs PNG explained: compare image quality, file size, text clarity, transparency, resolution and use cases to choose the right format for your PDF pages."],
   "guides/watermark-pdf-documents.html": ["How to Watermark PDF Documents — Practical Guide | FreePDF Tools", "Learn how to add readable text watermarks to PDFs, choose placement and opacity, and create the result in your browser."],
-  "guides/organize-pdf-pages.html": ["Delete or Rearrange PDF Pages Free | FreePDF Tools", "Learn how to reorder PDF pages, remove unwanted pages and save a clean document without uploading the source file."],
+  "guides/organize-pdf-pages.html": ["How to Organize PDF Pages — Reorder, Arrange & Delete | FreePDF Tools", "Learn how to organize PDF pages, reorder or rearrange them, remove unwanted pages and save a clean document without uploading the source file."],
   "guides/add-page-numbers-to-pdf.html": ["How to Add Page Numbers to a PDF — Step-by-Step Guide | FreePDF Tools", "Learn how to number PDF pages, choose placement and style, and create a numbered copy directly in your browser."],
   "guides/remove-pdf-metadata.html": ["How to Remove PDF Metadata — Privacy and Sharing Guide | FreePDF Tools", "Learn which common PDF metadata fields can be removed before sharing a document and how to clean them locally in your browser."],
   "guides/crop-pdf-pages.html": ["How to Crop PDF Pages — Remove Borders & Margins | FreePDF Tools", "Learn how to crop PDF pages with precise margins and avoid common mistakes when trimming document edges."],
