@@ -19,7 +19,9 @@ const clusters = [
   ["tools/add-page-numbers.html", "guides/add-page-numbers-to-pdf.html", "Add Page Numbers to PDF", "How to Add Page Numbers to a PDF"],
   ["tools/remove-pdf-metadata.html", "guides/remove-pdf-metadata.html", "Remove PDF Metadata", "How to Remove PDF Metadata"],
   ["tools/crop-pdf.html", "guides/crop-pdf-pages.html", "Crop PDF Pages", "How to Crop PDF Pages"],
-  ["tools/extract-pdf-text.html", "guides/extract-text-from-pdf.html", "Extract PDF Text", "How to Extract Text from a PDF"]
+  ["tools/extract-pdf-text.html", "guides/extract-text-from-pdf.html", "Extract PDF Text", "How to Extract Text from a PDF"],
+  ["tools/pdf-to-word.html", "guides/pdf-to-word-converter.html", "PDF to Word", "How to Convert PDF to Word"],
+  ["tools/word-to-pdf.html", "guides/word-to-pdf-converter.html", "Word to PDF", "How to Convert Word to PDF"]
 ];
 
 const files = [];
