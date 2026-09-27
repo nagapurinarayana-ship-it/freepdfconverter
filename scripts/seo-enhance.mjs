@@ -9,12 +9,12 @@ const origin = (process.env.SITE_ORIGIN || "https://freepdfconverter-all-in-one.
 // metadata; PDF tools, page content, ads, and functionality are left untouched.
 const seo = {
   "index.html": [
-    "Free PDF Converter — Merge, Split & Convert | FreePDF Tools",
-    "Free PDF converter and online PDF tools for merging, splitting, unlocking, organizing and converting PDFs. Process files privately in your browser with no uploads or account."
+    "Free PDF Converter Online — Free PDF Tools | FreePDF Tools",
+    "Free PDF converter online with tools to merge, split, organize, convert JPG to PDF, PDF to Word and Word to PDF. Supported document processing runs in your browser without uploads."
   ],
   "pdf-converter-online.html": [
-    "Free PDF Converter Online — PDF, Word & Image Conversion | FreePDF Tools",
-    "Convert and manage PDFs directly in your browser. Merge, split, organize, convert PDF to Word, convert Word documents to PDF, and convert PDF pages to images without uploading documents."
+    "Online PDF Converter — Free PDF Tools | FreePDF Tools",
+    "Online PDF converter for merge, split, organize, JPG to PDF, PDF to Word, Word to PDF and PDF-to-image tasks. Supported files are processed locally in your browser without document uploads."
   ],
   "about.html": ["About FreePDF Tools — Private Browser PDF Utilities", "Learn how FreePDF Tools works, why PDF processing happens in your browser, and how the service is designed around privacy and simple document workflows."],
   "how-local-processing.html": ["How Local PDF Processing Works — FreePDF Tools", "See how FreePDF Tools processes supported PDF files locally in your browser, what stays on your device, and what to expect from local document processing."],
@@ -25,22 +25,22 @@ const seo = {
   "rotate-pdf-online.html": ["Rotate PDF Online — Fix Sideways PDF Pages | FreePDF Tools", "Rotate PDF pages by 90, 180 or 270 degrees directly in your browser. Fix sideways or upside-down pages without uploading the document."],
   "crop-pdf-online.html": ["Crop PDF Online — Trim PDF Pages and Margins | FreePDF Tools", "Crop PDF pages with precise margins in your browser. Remove unwanted borders or blank edges and download the corrected PDF without uploading it."],
   "remove-pdf-metadata-online.html": ["Remove PDF Metadata Online — Clean Document Metadata | FreePDF Tools", "Remove common PDF metadata such as author, title, subject and keywords in your browser. Create a cleaner copy without uploading the original document."],
-  "tools/merge-pdf.html": ["Merge PDF Files Online Free — Combine PDFs | FreePDF Tools", "Combine multiple PDF files into one document, arrange their order and download the result directly in your browser."],
-  "tools/split-pdf.html": ["Split PDF Online Free — Extract PDF Pages | FreePDF Tools", "Split a PDF by page range or separate its pages into individual PDFs directly in your browser."],
+  "tools/merge-pdf.html": ["Merge PDF Online Free — Combine PDF Files | FreePDF Tools", "Merge PDF files online free, combine PDF documents, use a PDF combiner and arrange pages in your browser without uploading the source files."],
+  "tools/split-pdf.html": ["Split PDF Online Free — Extract Pages | FreePDF Tools", "Split PDF files online free, extract PDF pages or create separate PDFs in your browser without uploading the original document."],
   "tools/unlock-pdf.html": ["Unlock PDF Online Free — Remove a Known Password | FreePDF Tools", "Remove a known password from a PDF locally in your browser and download an unencrypted copy."],
   "tools/rotate-pdf.html": ["Rotate PDF Online Free — Rotate PDF Pages | FreePDF Tools", "Rotate PDF pages by 90, 180 or 270 degrees and save the corrected document in your browser."],
-  "tools/jpg-to-pdf.html": ["JPG to PDF Online Free — Convert Images to PDF | FreePDF Tools", "Convert JPG or PNG images into an ordered PDF with practical page-size options, processed in your browser."],
-  "tools/pdf-to-image.html": ["PDF to JPG or PNG Online — Convert PDF Pages to Images | FreePDF Tools", "Render selected PDF pages as JPG or PNG images directly in your browser and download the results."],
+  "tools/jpg-to-pdf.html": ["JPG to PDF Converter Online Free | FreePDF Tools", "Convert JPG to PDF, PNG to PDF or images to PDF online free. Arrange images and choose practical page sizes while processing stays in your browser."],
+  "tools/pdf-to-image.html": ["PDF to JPG & PNG Converter Online | FreePDF Tools", "Convert PDF pages to JPG or PNG images online in your browser. Render selected pages locally and download the image files without uploading the PDF."],
   "tools/watermark-pdf.html": ["Watermark PDF Online Free — Add Text Watermarks | FreePDF Tools", "Add a customizable text watermark to PDF pages with adjustable size, opacity, color and angle in your browser."],
-  "tools/organize-pdf.html": ["Free PDF Organizer Online — Reorder, Arrange & Delete Pages | FreePDF Tools", "Organize PDF pages online free with a private PDF organizer. Reorder, rearrange, move and delete pages in your browser, then download a new PDF without uploading the original file."],
+  "tools/organize-pdf.html": ["Organize PDF Online Free — Reorder & Arrange Pages | FreePDF Tools", "Organize PDF pages online free with a PDF organizer. Reorder, rearrange, arrange or delete pages in your browser and download a new PDF without uploading the original."],
   "tools/add-page-numbers.html": ["Add Page Numbers to PDF Online | FreePDF Tools", "Add page numbers to all or selected PDF pages with flexible placement and styling directly in your browser."],
   "tools/remove-pdf-metadata.html": ["Remove PDF Metadata Online | FreePDF Tools", "Clear common PDF metadata fields including author, title, subject and keywords directly in your browser."],
   "tools/crop-pdf.html": ["Crop PDF Pages Online Free — Trim PDF Margins | FreePDF Tools", "Crop PDF pages with precise millimetre margins to remove unwanted borders and blank edges in your browser."],
   "tools/extract-pdf-text.html": ["Extract Text from PDF Online — Free PDF Text Extractor | FreePDF Tools", "Extract selectable text from a PDF in your browser so you can copy or download the text without uploading the document."],
-  "tools/pdf-to-word.html": ["PDF to Word Converter Free — Private PDF to DOCX | FreePDF Tools", "Convert text-based PDF files to editable Word DOCX documents in your browser, with no document upload required."],
-  "tools/word-to-pdf.html": ["Word to PDF Converter Free — DOC, DOCX & Word 97–2003 | FreePDF Tools", "Convert Microsoft Word 97–2003 DOC, DOCX, DOCM, DOT, DOTX, DOTM and common ODT, RTF, TXT or HTML files to PDF locally in your browser."],
+  "tools/pdf-to-word.html": ["PDF to Word Converter Free — PDF to DOCX | FreePDF Tools", "Convert PDF to Word or PDF to DOCX online for free. Extract selectable text into an editable Word document in your browser without uploading the PDF."],
+  "tools/word-to-pdf.html": ["Word to PDF Converter Free — DOC & DOCX | FreePDF Tools", "Convert Word to PDF, DOC to PDF or DOCX to PDF online for free, including Microsoft Word 97–2003 DOC files. Supported documents are processed locally in your browser."],
   "guides/index.html": ["PDF Guides — Merge, Split, Convert & Manage | FreePDF Tools", "Practical PDF guides covering merging, splitting, unlocking, rotation, image conversion, watermarking, page organization and privacy."],
-  "guides/reduce-pdf-file-size-for-email.html": ["Reduce PDF File Size for Email — Safe Options | FreePDF Tools", "Learn practical ways to reduce PDF file size for email by extracting needed pages, removing unnecessary content and understanding true compression limits."],
+  "guides/reduce-pdf-file-size-for-email.html": ["Compress PDF for Email — Reduce PDF Size Safely | FreePDF Tools", "Learn how to compress or reduce PDF file size for email, when page extraction helps, what a PDF size reducer can actually change, and when true compression is required."],
   "guides/merge-pdf-safely.html": ["How to Merge PDFs Safely — Step-by-Step PDF Guide | FreePDF Tools", "Learn how to combine PDF files in the right order, avoid common mistakes and merge documents locally in your browser."],
   "guides/split-extract-pdf-pages.html": ["How to Split and Extract PDF Pages — Complete Guide | FreePDF Tools", "Learn practical ways to split a PDF, extract selected pages and create separate documents while keeping source files on your device."],
   "guides/unlock-password-protected-pdf.html": ["How to Unlock a Password-Protected PDF Safely | FreePDF Tools", "Learn how to unlock a PDF when you know its password, what limitations apply and how local browser processing protects the source file."],
