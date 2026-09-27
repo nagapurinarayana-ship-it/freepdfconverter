@@ -25,6 +25,7 @@ export const indexablePages = [
   "tools/pdf-to-word.html",
   "tools/word-to-pdf.html",
   "tools/compress-pdf.html",
+  "tools/ocr-pdf.html",
   "guides/index.html",
   "guides/reduce-pdf-file-size-for-email.html",
   "guides/compress-pdf.html",
@@ -43,7 +44,8 @@ export const indexablePages = [
   "guides/are-online-pdf-converters-safe.html",
   "guides/pdf-converter-without-upload.html",
   "guides/pdf-to-word-converter.html",
-  "guides/word-to-pdf-converter.html"
+  "guides/word-to-pdf-converter.html",
+  "guides/ocr-pdf-to-word.html"
 ];
 
 export const supplementalPages = ["privacy.html", "terms.html", "contact.html"];
@@ -64,7 +66,8 @@ export const articlePages = new Set([
   "guides/extract-text-from-pdf.html",
   "guides/pdf-to-word-converter.html",
   "guides/word-to-pdf-converter.html",
-  "guides/compress-pdf.html"
+  "guides/compress-pdf.html",
+  "guides/ocr-pdf-to-word.html"
 ]);
 
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
@@ -84,6 +87,8 @@ pageDates["guides/pdf-to-word-converter.html"] = "2026-09-27";
 pageDates["guides/word-to-pdf-converter.html"] = "2026-09-27";
 pageDates["tools/compress-pdf.html"] = "2026-09-28";
 pageDates["guides/compress-pdf.html"] = "2026-09-28";
+pageDates["tools/ocr-pdf.html"] = "2026-09-28";
+pageDates["guides/ocr-pdf-to-word.html"] = "2026-09-28";
 
 export const articlePublishedDates = {
   "guides/reduce-pdf-file-size-for-email.html": "2026-08-31",
@@ -101,7 +106,8 @@ export const articlePublishedDates = {
   "guides/extract-text-from-pdf.html": "2026-08-11",
   "guides/pdf-to-word-converter.html": "2026-09-27",
   "guides/word-to-pdf-converter.html": "2026-09-27",
-  "guides/compress-pdf.html": "2026-09-28"
+  "guides/compress-pdf.html": "2026-09-28",
+  "guides/ocr-pdf-to-word.html": "2026-09-28"
 };
 
 export const pageLabels = {
@@ -133,6 +139,7 @@ export const pageLabels = {
   "tools/pdf-to-word.html": "PDF to Word",
   "tools/word-to-pdf.html": "Word to PDF",
   "tools/compress-pdf.html": "Compress PDF",
+  "tools/ocr-pdf.html": "OCR PDF",
   "guides/index.html": "PDF Guides",
   "guides/reduce-pdf-file-size-for-email.html": "Reduce PDF File Size for Email",
   "guides/merge-pdf-safely.html": "How to Merge PDFs Safely",
@@ -151,7 +158,8 @@ export const pageLabels = {
   "guides/pdf-converter-without-upload.html": "How to Convert PDFs Without Uploading Files",
   "guides/pdf-to-word-converter.html": "How to Convert PDF to Word",
   "guides/word-to-pdf-converter.html": "How to Convert Word to PDF",
-  "guides/compress-pdf.html": "How to Compress a PDF"
+  "guides/compress-pdf.html": "How to Compress a PDF",
+  "guides/ocr-pdf-to-word.html": "How to OCR a Scanned PDF into Word"
 };
 
 export function pagePathname(relative) {
