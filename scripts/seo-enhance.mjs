@@ -40,6 +40,7 @@ const seo = {
   "tools/pdf-to-word.html": ["PDF to Word Converter Free — PDF to DOCX | FreePDF Tools", "Convert PDF to Word or PDF to DOCX online for free. Extract selectable text into an editable Word document in your browser without uploading the PDF."],
   "tools/word-to-pdf.html": ["Word to PDF Converter Free — DOC & DOCX | FreePDF Tools", "Convert Word to PDF, DOC to PDF or DOCX to PDF online for free, including Microsoft Word 97–2003 DOC files. Supported documents are processed locally in your browser."],
   "tools/compress-pdf.html": ["Compress PDF Online Free — Reduce PDF Size | FreePDF Tools", "Compress PDF files online free in your browser. Reduce PDF file size with a lossless local pass and download a smaller copy without uploading the original document."],
+  "tools/ocr-pdf.html": ["OCR PDF Online Free — Convert Scanned PDF to Word & Text | FreePDF Tools", "OCR scanned PDF files online free in your browser. Recognize text from image-only PDF pages and download editable Word DOCX or plain text without uploading the source document."],
   "guides/index.html": ["PDF Guides — Merge, Split, Convert & Manage | FreePDF Tools", "Practical PDF guides covering merging, splitting, unlocking, rotation, image conversion, watermarking, page organization and privacy."],
   "guides/reduce-pdf-file-size-for-email.html": ["Compress PDF for Email — Reduce PDF Size Safely | FreePDF Tools", "Learn how to compress or reduce PDF file size for email, when page extraction helps, what a PDF size reducer can actually change, and when true compression is required."],
   "guides/merge-pdf-safely.html": ["How to Merge PDFs Safely — Step-by-Step PDF Guide | FreePDF Tools", "Learn how to combine PDF files in the right order, avoid common mistakes and merge documents locally in your browser."],
@@ -58,7 +59,8 @@ const seo = {
   "guides/pdf-converter-without-upload.html": ["How to Convert PDFs Without Uploading Files | FreePDF Tools", "Learn how browser-based PDF processing works, why files can stay on your device, and when local conversion is useful."],
   "guides/pdf-to-word-converter.html": ["How to Convert PDF to Word — Editable DOCX Guide | FreePDF Tools", "Learn how to convert text-based PDFs to editable Word DOCX files, what happens to tables and layout, and why scanned PDFs may need OCR."],
   "guides/word-to-pdf-converter.html": ["How to Convert Word to PDF — DOC & DOCX | FreePDF Tools", "Learn how to convert DOC, DOCX and Word 97–2003 files to PDF in your browser, including layout limitations and final quality checks."],
-  "guides/compress-pdf.html": ["How to Compress a PDF — Reduce File Size Safely | FreePDF Tools", "Learn how to compress a PDF, what lossless compression can change, why image-heavy files may shrink less and when stronger image optimization is needed."]
+  "guides/compress-pdf.html": ["How to Compress a PDF — Reduce File Size Safely | FreePDF Tools", "Learn how to compress a PDF, what lossless compression can change, why image-heavy files may shrink less and when stronger image optimization is needed."],
+  "guides/ocr-pdf-to-word.html": ["How to OCR a Scanned PDF into Word — Complete Guide | FreePDF Tools", "Learn how OCR turns scanned PDF page images into selectable text and an editable Word document, what affects accuracy and how to review the result."]
 };
 
 const htmlFiles = [];
