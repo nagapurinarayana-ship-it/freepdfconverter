@@ -30,6 +30,10 @@ const blocks = {
     heading: "Word, DOC and DOCX to PDF conversion",
     html: "This free Word to PDF converter covers <strong>Word to PDF</strong>, <strong>DOC to PDF</strong> and <strong>DOCX to PDF</strong> workflows. It also accepts Microsoft Word 97–2003 <strong>.doc</strong> files and processes supported documents locally."
   },
+  "tools/ocr-pdf.html": {
+    heading: "OCR scanned PDFs into text and Word",
+    html: "Use this browser-based <strong>OCR PDF</strong> tool to turn scanned or image-only PDF pages into selectable text. For a <strong>scanned PDF to Word</strong> workflow, OCR each page locally and download an editable DOCX or plain-text copy for review."
+  },
   "tools/compress-pdf.html": {
     heading: "Compress or reduce PDF file size",
     html: "Use this free <strong>PDF compressor</strong> to <strong>compress PDF</strong> files and <strong>reduce PDF size</strong> with a lossless browser-local pass. Results vary by document contents, especially when a PDF is already dominated by compressed images."
