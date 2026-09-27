@@ -68,6 +68,7 @@ export const pageDates = Object.fromEntries(indexablePages.map((relative) => [re
 pageDates["index.html"] = "2026-09-27";
 pageDates["pdf-converter-online.html"] = "2026-09-27";
 pageDates["about.html"] = "2026-09-27";
+pageDates["guides/index.html"] = "2026-09-27";
 pageDates["guides/reduce-pdf-file-size-for-email.html"] = "2026-08-31";
 pageDates["tools/organize-pdf.html"] = "2026-09-27";
 pageDates["guides/organize-pdf-pages.html"] = "2026-09-27";
@@ -92,7 +93,9 @@ export const articlePublishedDates = {
   "guides/add-page-numbers-to-pdf.html": "2026-08-11",
   "guides/remove-pdf-metadata.html": "2026-08-11",
   "guides/crop-pdf-pages.html": "2026-08-11",
-  "guides/extract-text-from-pdf.html": "2026-08-11"
+  "guides/extract-text-from-pdf.html": "2026-08-11",
+  "guides/pdf-to-word-converter.html": "2026-09-27",
+  "guides/word-to-pdf-converter.html": "2026-09-27"
 };
 
 export const pageLabels = {
