@@ -93,6 +93,21 @@ if (wordJsAsset) {
   if (!wordJsSource.includes("/assets/vendor/docjs/index.js")) failures.push("Word converter -> stable self-hosted MS-DOC parser path is missing");
   if (/assets\/vendor\/docjs\/index\.[a-f0-9]{10}\.js/.test(wordJsSource)) failures.push("Word converter -> MS-DOC parser entry point was incorrectly fingerprinted");
 }
+\nconst compressPage = await readFile(path.join(dist, "tools/compress-pdf.html"), "utf8");
+if (!compressPage.includes("Compress PDF") || !compressPage.includes("lossless")) failures.push("Compress PDF -> tool page is missing core compression copy");
+if (!compressPage.includes("/assets/js/compress-pdf.js")) failures.push("Compress PDF -> source script reference is missing");
+const compressJsAsset = jsAssets.find((file) => /^compress-pdf\.[a-f0-9]{10}\.js$/.test(file));
+if (!compressJsAsset) failures.push("Compress PDF -> fingerprinted browser script is missing");
+if (compressJsAsset) {
+  const compressJsSource = await readFile(path.join(dist, "assets/js", compressJsAsset), "utf8");
+  if (!compressJsSource.includes("/assets/js/compress-pdf-worker.js")) failures.push("Compress PDF -> worker reference is missing");
+  if (!compressJsSource.includes("compressed.pdf")) failures.push("Compress PDF -> compressed output filename is missing");
+}
+const compressWorkerPath = path.join(dist, "assets/js/compress-pdf-worker.js");
+await access(compressWorkerPath);
+const compressWorker = await readFile(compressWorkerPath, "utf8");
+if (!compressWorker.includes("--recompress-flate") || !compressWorker.includes("--object-streams=generate") || !compressWorker.includes("--compression-level=9")) failures.push("Compress PDF -> qpdf lossless compression options are missing");
+
 const pdfWordJsAsset = jsAssets.find((file) => /^pdf-to-word\.[a-f0-9]{10}\.js$/.test(file));
 if (!pdfWordJsAsset) failures.push("PDF to Word -> fingerprinted converter script is missing");
 if (pdfWordJsAsset) {
