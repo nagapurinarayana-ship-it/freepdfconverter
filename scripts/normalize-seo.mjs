@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const root = process.cwd();
+const root = fs.existsSync(path.join(process.cwd(), 'dist')) ? path.join(process.cwd(), 'dist') : process.cwd();
 const site = 'https://freepdfconverter-all-in-one.pages.dev';
 const socialImage = `${site}/assets/images/freepdf-tools-social.jpg`;
 const skip = new Set(['404.html', 'google0982473b0f1ce198.html']);
