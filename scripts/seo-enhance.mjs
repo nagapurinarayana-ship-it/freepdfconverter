@@ -10,11 +10,11 @@ const origin = (process.env.SITE_ORIGIN || "https://freepdfconverter-all-in-one.
 const seo = {
   "index.html": [
     "Free PDF Converter Online — Free PDF Tools | FreePDF Tools",
-    "Free PDF converter online with tools to merge, split, organize, convert JPG to PDF, PDF to Word and Word to PDF. Supported document processing runs in your browser without uploads."
+    "Free PDF converter online with tools to merge, split, compress, organize, convert JPG to PDF, PDF to Word and Word to PDF. Supported document processing runs in your browser without uploads."
   ],
   "pdf-converter-online.html": [
     "Online PDF Converter — Free PDF Tools | FreePDF Tools",
-    "Online PDF converter for merge, split, organize, JPG to PDF, PDF to Word, Word to PDF and PDF-to-image tasks. Supported files are processed locally in your browser without document uploads."
+    "Online PDF converter for merge, split, compress, organize, JPG to PDF, PDF to Word, Word to PDF and PDF-to-image tasks. Supported files are processed locally in your browser without document uploads."
   ],
   "about.html": ["About FreePDF Tools — Private Browser PDF Utilities", "Learn how FreePDF Tools works, why PDF processing happens in your browser, and how the service is designed around privacy and simple document workflows."],
   "how-local-processing.html": ["How Local PDF Processing Works — FreePDF Tools", "See how FreePDF Tools processes supported PDF files locally in your browser, what stays on your device, and what to expect from local document processing."],
