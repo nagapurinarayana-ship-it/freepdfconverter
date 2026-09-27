@@ -21,7 +21,8 @@ const clusters = [
   ["tools/crop-pdf.html", "guides/crop-pdf-pages.html", "Crop PDF Pages", "How to Crop PDF Pages"],
   ["tools/extract-pdf-text.html", "guides/extract-text-from-pdf.html", "Extract PDF Text", "How to Extract Text from a PDF"],
   ["tools/pdf-to-word.html", "guides/pdf-to-word-converter.html", "PDF to Word", "How to Convert PDF to Word"],
-  ["tools/word-to-pdf.html", "guides/word-to-pdf-converter.html", "Word to PDF", "How to Convert Word to PDF"]
+  ["tools/word-to-pdf.html", "guides/word-to-pdf-converter.html", "Word to PDF", "How to Convert Word to PDF"],
+  ["tools/compress-pdf.html", "guides/compress-pdf.html", "Compress PDF", "How to Compress a PDF"]
 ];
 
 const files = [];
