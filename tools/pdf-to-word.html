@@ -42,7 +42,7 @@
 <div class="action-row"><button class="button" id="convertButton" type="button" disabled>Convert to Word</button><button class="button danger" id="clearButton" type="button" disabled>Clear</button></div>
 <div class="progress"><span id="progressBar"></span></div><p class="status" id="toolStatus" role="status" aria-live="polite"></p>
 </section>
-<aside class="tool-side"><div class="side-card"><h3>What is preserved?</h3><p>Selectable text and page order are carried into an editable DOCX. PDF page geometry, fonts, images and complex tables are not recreated exactly.</p></div><div class="side-card"><h3>Scanned PDFs</h3><p>This tool does not perform OCR. A scanned image-only PDF may produce little or no editable text.</p></div></aside>
+<aside class="tool-side"><div class="side-card"><h3>What is preserved?</h3><p>Selectable text and page order are carried into an editable DOCX. PDF page geometry, fonts, images and complex tables are not recreated exactly.</p></div><div class="side-card"><h3>Scanned PDFs</h3><p>This tool reads selectable PDF text. For image-only scans, use <a href="ocr-pdf">OCR PDF</a> to recognize the page images and create editable output.</p></div></aside>
 </div>
 <section class="content-section"><div class="container content-narrow">
 <h2>PDF to Word conversion in your browser</h2>
@@ -54,7 +54,7 @@
 <div class="section related-content" aria-labelledby="related-pdf-content"><div class="section-heading"><h2 id="related-pdf-content">Related privacy guidance</h2><p>Learn how local browser PDF processing works before converting sensitive documents.</p><p><a class="button secondary" href="../guides/pdf-converter-without-upload">PDF conversion without upload →</a></p></div></div>
 <!-- freepdf-internal-links:end -->
 <h2>Frequently asked questions</h2><div class="faq">
-<details><summary>Can I convert scanned PDFs?</summary><p>Not reliably. Image-only scans need OCR, which is not included in this local converter.</p></details>
+<details><summary>Can I convert scanned PDFs?</summary><p>Use the dedicated <a href="ocr-pdf">OCR PDF tool</a> for image-only scans. It renders each page locally and runs OCR before building DOCX or TXT output.</p></details>
 <details><summary>Will the Word file look exactly like the PDF?</summary><p>No. The output focuses on editable text and page order. Complex positioning, images, forms and tables can change.</p></details>
 <details><summary>Does the conversion upload my PDF?</summary><p>No. PDF.js reads the selected file inside the browser and the DOCX is generated locally.</p></details>
 </div>
