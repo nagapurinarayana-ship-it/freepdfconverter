@@ -93,7 +93,7 @@ if (wordJsAsset) {
   if (!wordJsSource.includes("/assets/vendor/docjs/index.js")) failures.push("Word converter -> stable self-hosted MS-DOC parser path is missing");
   if (/assets\/vendor\/docjs\/index\.[a-f0-9]{10}\.js/.test(wordJsSource)) failures.push("Word converter -> MS-DOC parser entry point was incorrectly fingerprinted");
 }
-\nconst compressPage = await readFile(path.join(dist, "tools/compress-pdf.html"), "utf8");
+const compressPage = await readFile(path.join(dist, "tools/compress-pdf.html"), "utf8");
 if (!compressPage.includes("Compress PDF") || !compressPage.includes("lossless")) failures.push("Compress PDF -> tool page is missing core compression copy");
 if (!/assets\/js\/compress-pdf\.[a-f0-9]{10}\.js/.test(compressPage)) failures.push("Compress PDF -> fingerprinted browser script reference is missing");
 const compressJsAsset = jsAssets.find((file) => /^compress-pdf\.[a-f0-9]{10}\.js$/.test(file));
