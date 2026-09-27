@@ -25,6 +25,7 @@ export const indexablePages = [
   "tools/pdf-to-word.html",
   "tools/word-to-pdf.html",
   "guides/index.html",
+  "guides/reduce-pdf-file-size-for-email.html",
   "guides/merge-pdf-safely.html",
   "guides/split-extract-pdf-pages.html",
   "guides/unlock-password-protected-pdf.html",
@@ -44,6 +45,7 @@ export const indexablePages = [
 export const supplementalPages = ["privacy.html", "terms.html", "contact.html"];
 
 export const articlePages = new Set([
+  "guides/reduce-pdf-file-size-for-email.html",
   "guides/merge-pdf-safely.html",
   "guides/split-extract-pdf-pages.html",
   "guides/unlock-password-protected-pdf.html",
@@ -58,17 +60,21 @@ export const articlePages = new Set([
   "guides/extract-text-from-pdf.html"
 ]);
 
-// Keep sitemap lastmod aligned with substantive page updates. This is the
-// modification date, not the original publication date.
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
-pageDates["tools/organize-pdf.html"] = "2026-08-15";
-pageDates["guides/pdf-to-jpg-vs-png.html"] = "2026-08-15";
+pageDates["index.html"] = "2026-09-27";
+pageDates["pdf-converter-online.html"] = "2026-09-27";
+pageDates["about.html"] = "2026-09-27";
+pageDates["guides/reduce-pdf-file-size-for-email.html"] = "2026-08-31";
+pageDates["tools/organize-pdf.html"] = "2026-09-27";
+pageDates["guides/organize-pdf-pages.html"] = "2026-09-27";
+pageDates["guides/pdf-to-jpg-vs-png.html"] = "2026-09-27";
+pageDates["tools/pdf-to-word.html"] = "2026-09-27";
+pageDates["tools/word-to-pdf.html"] = "2026-09-27";
 pageDates["guides/are-online-pdf-converters-safe.html"] = "2026-08-12";
 pageDates["guides/pdf-converter-without-upload.html"] = "2026-08-12";
-pageDates["tools/pdf-to-word.html"] = "2026-09-23";
-pageDates["tools/word-to-pdf.html"] = "2026-09-23";
 
 export const articlePublishedDates = {
+  "guides/reduce-pdf-file-size-for-email.html": "2026-08-31",
   "guides/merge-pdf-safely.html": "2026-08-09",
   "guides/split-extract-pdf-pages.html": "2026-08-09",
   "guides/unlock-password-protected-pdf.html": "2026-08-11",
@@ -112,6 +118,7 @@ export const pageLabels = {
   "tools/pdf-to-word.html": "PDF to Word",
   "tools/word-to-pdf.html": "Word to PDF",
   "guides/index.html": "PDF Guides",
+  "guides/reduce-pdf-file-size-for-email.html": "Reduce PDF File Size for Email",
   "guides/merge-pdf-safely.html": "How to Merge PDFs Safely",
   "guides/split-extract-pdf-pages.html": "How to Split and Extract PDF Pages",
   "guides/unlock-password-protected-pdf.html": "How to Unlock a Password-Protected PDF Safely",
