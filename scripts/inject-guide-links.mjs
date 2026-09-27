@@ -86,6 +86,11 @@ const related = {
     ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading files"],
     ["guides/word-to-pdf-converter.html", "Convert Word documents to PDF"]
   ],
+  "guides/ocr-pdf-to-word.html": [
+    ["guides/pdf-to-word-converter.html", "Convert text-based PDFs to Word"],
+    ["guides/extract-text-from-pdf.html", "Extract selectable PDF text"],
+    ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading files"]
+  ],
   "guides/word-to-pdf-converter.html": [
     ["guides/pdf-to-word-converter.html", "Convert PDF files to Word"],
     ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading files"],
