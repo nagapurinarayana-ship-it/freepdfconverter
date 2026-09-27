@@ -75,6 +75,16 @@ const related = {
     ["guides/are-online-pdf-converters-safe.html", "Are online PDF converters safe?"],
     ["guides/merge-pdf-safely.html", "Merge PDFs safely"],
     ["guides/jpg-png-to-pdf.html", "Convert JPG or PNG to PDF"]
+  ],
+  "guides/pdf-to-word-converter.html": [
+    ["guides/word-to-pdf-converter.html", "Convert Word documents to PDF"],
+    ["guides/extract-text-from-pdf.html", "Extract selectable PDF text"],
+    ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading files"]
+  ],
+  "guides/word-to-pdf-converter.html": [
+    ["guides/pdf-to-word-converter.html", "Convert PDF files to Word"],
+    ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading files"],
+    ["guides/are-online-pdf-converters-safe.html", "Are online PDF converters safe?"]
   ]
 };
 
