@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+<title id="title">OCR quality checklist</title>
+<desc id="desc">OCR accuracy improves with sharp, upright, high-contrast scans and careful review of complex documents.</desc>
+<rect width="1200" height="520" rx="32" fill="#f6f8fc"/>
+<g font-family="Arial, Helvetica, sans-serif" fill="#172033">
+<text x="60" y="76" font-size="34" font-weight="700">Better scans usually produce better OCR</text>
+<text x="60" y="116" font-size="18" fill="#526079">Improve the source before blaming the recognition step.</text>
+<g transform="translate(70 170)"><circle cx="34" cy="34" r="28" fill="#e6edf9"/><path d="m22 34 9 9 18-20" fill="none" stroke="#365f9f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><text x="84" y="44" font-size="25" font-weight="700">Sharp text</text><text x="84" y="78" font-size="18" fill="#526079">Use the clearest scan available.</text></g>
+<g transform="translate(70 270)"><circle cx="34" cy="34" r="28" fill="#e6edf9"/><path d="m22 34 9 9 18-20" fill="none" stroke="#365f9f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><text x="84" y="44" font-size="25" font-weight="700">Straight pages</text><text x="84" y="78" font-size="18" fill="#526079">Rotate or straighten skewed scans first.</text></g>
+<g transform="translate(70 370)"><circle cx="34" cy="34" r="28" fill="#e6edf9"/><path d="m22 34 9 9 18-20" fill="none" stroke="#365f9f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><text x="84" y="44" font-size="25" font-weight="700">High contrast</text><text x="84" y="78" font-size="18" fill="#526079">Avoid shadows, faint ink and dirty backgrounds.</text></g>
+<g transform="translate(670 180)"><rect width="430" height="270" rx="24" fill="#fff" stroke="#d5dbea"/><text x="34" y="48" font-size="23" font-weight="700">Always verify</text><text x="34" y="96" font-size="18" fill="#526079">Names and numbers</text><text x="34" y="136" font-size="18" fill="#526079">Dates and totals</text><text x="34" y="176" font-size="18" fill="#526079">Tables and columns</text><text x="34" y="216" font-size="18" fill="#526079">Critical wording</text></g>
+</g></svg>
