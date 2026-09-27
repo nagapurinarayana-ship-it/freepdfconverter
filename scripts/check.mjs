@@ -9,17 +9,22 @@ const required = [
   "tools/unlock-pdf.html",
   "tools/jpg-to-pdf.html", "tools/pdf-to-image.html", "tools/watermark-pdf.html",
   "tools/organize-pdf.html", "tools/add-page-numbers.html", "tools/remove-pdf-metadata.html",
-  "tools/crop-pdf.html", "tools/extract-pdf-text.html", "tools/pdf-to-word.html", "tools/word-to-pdf.html", "how-local-processing.html",
+  "tools/crop-pdf.html", "tools/extract-pdf-text.html", "tools/pdf-to-word.html", "tools/word-to-pdf.html", "tools/ocr-pdf.html", "how-local-processing.html",
   ...indexablePages.filter((relative) => relative.startsWith("guides/")),
   "assets/js/common.js", "assets/js/merge-pdf.js", "assets/js/split-pdf.js",
   "assets/js/rotate-pdf.js", "assets/js/jpg-to-pdf.js", "assets/js/pdf-to-image.js",
   "assets/js/watermark-pdf.js", "assets/css/styles.css"
   , "assets/js/organize-pdf.js", "assets/js/add-page-numbers.js", "assets/js/remove-pdf-metadata.js",
-  "assets/js/crop-pdf.js", "assets/js/extract-pdf-text.js", "assets/js/pdf-to-word.js", "assets/js/word-to-pdf.js", "assets/js/unlock-pdf.js", "assets/js/unlock-pdf-worker.js",
+  "assets/js/crop-pdf.js", "assets/js/extract-pdf-text.js", "assets/js/pdf-to-word.js", "assets/js/word-to-pdf.js", "assets/js/ocr-pdf.js", "assets/js/unlock-pdf.js", "assets/js/unlock-pdf-worker.js",
   "assets/vendor/pdf-lib/pdf-lib.min.js",
   "assets/vendor/jszip/jszip.min.js", "assets/vendor/pdfjs/pdf.min.mjs", "assets/vendor/pdfjs/pdf.worker.min.mjs",
   "assets/vendor/qpdf/qpdf.js", "assets/vendor/qpdf/qpdf.wasm", "assets/vendor/qpdf/LICENSE-QPDF-WASM.txt",
   "assets/vendor/qpdf/LICENSE-QPDF.txt", "assets/vendor/qpdf/NOTICE-QPDF.md", "assets/vendor/qpdf/README.md",
+  "assets/vendor/tesseract/tesseract.min.js", "assets/vendor/tesseract/worker.min.js",
+  "assets/vendor/tesseract/core/tesseract-core.wasm.js", "assets/vendor/tesseract/core/tesseract-core-simd.wasm.js",
+  "assets/vendor/tesseract/core/tesseract-core-lstm.wasm.js", "assets/vendor/tesseract/core/tesseract-core-simd-lstm.wasm.js",
+  "assets/vendor/tesseract/core/tesseract-core-relaxedsimd.wasm.js", "assets/vendor/tesseract/core/tesseract-core-relaxedsimd-lstm.wasm.js",
+  "assets/vendor/tesseract/lang/eng.traineddata.gz",
   "assets/images/freepdf-tools-social.jpg", "favicon.ico", "manifest.webmanifest", "service-worker.js", "offline.html", "_redirects"
 ];
 for (const relative of required) await access(path.join(root, relative));
