@@ -12,27 +12,27 @@ const blocks = {
   },
   "tools/split-pdf.html": {
     heading: "Split or extract PDF pages",
-    html: "This browser tool covers the common <strong>split PDF</strong> and <strong>extract PDF pages</strong> workflows: keep a page range, create separate page files, or make a smaller PDF from a larger document."
+    html: "This free browser tool covers the common <strong>split PDF</strong> and <strong>extract PDF pages</strong> workflows: keep a page range, create separate page files, or make a smaller PDF from a larger document."
   },
   "tools/jpg-to-pdf.html": {
     heading: "JPG, PNG and image-to-PDF conversion",
-    html: "This is a <strong>JPG to PDF converter</strong>, <strong>PNG to PDF converter</strong> and general <strong>image to PDF</strong> workflow in one browser tool. Arrange your images first, then create the PDF locally."
+    html: "This is a free <strong>JPG to PDF converter</strong>, <strong>PNG to PDF converter</strong> and general <strong>image to PDF</strong> workflow in one browser tool. Arrange your images first, then create the PDF locally."
   },
   "tools/pdf-to-image.html": {
     heading: "Convert PDF pages to JPG or PNG",
-    html: "A <strong>PDF to JPG converter</strong> and <strong>PDF to PNG converter</strong> are useful when a page needs to be shared as an image. Select the pages you need and render them locally in your browser."
+    html: "This free <strong>PDF to JPG converter</strong> and <strong>PDF to PNG converter</strong> are useful when a page needs to be shared as an image. Select the pages you need and render them locally in your browser."
   },
   "tools/pdf-to-word.html": {
     heading: "PDF to Word, DOCX and DOC conversion",
-    html: "Common searches include <strong>PDF to Word converter</strong>, <strong>convert PDF to Word</strong> and <strong>PDF to DOC</strong>. This tool is designed for selectable-text PDFs and creates an editable DOCX without uploading the source file."
+    html: "Common searches include <strong>PDF to Word converter</strong>, <strong>convert PDF to Word</strong> and <strong>PDF to DOC</strong>. This free browser converter This tool is designed for selectable-text PDFs and creates an editable DOCX without uploading the source file."
   },
   "tools/word-to-pdf.html": {
     heading: "Word, DOC and DOCX to PDF conversion",
-    html: "Common workflows include <strong>Word to PDF</strong>, <strong>DOC to PDF</strong> and <strong>DOCX to PDF</strong>. The converter also accepts Microsoft Word 97–2003 <strong>.doc</strong> files and processes supported documents locally."
+    html: "Common workflows include <strong>Word to PDF</strong>, <strong>DOC to PDF</strong> and <strong>DOCX to PDF</strong>. This free Word to PDF converter The converter also accepts Microsoft Word 97–2003 <strong>.doc</strong> files and processes supported documents locally."
   },
   "tools/organize-pdf.html": {
     heading: "Organize or organise PDF pages",
-    html: "This covers <strong>organize PDF</strong>, <strong>organise PDF</strong>, <strong>reorder PDF pages</strong>, <strong>arrange PDF pages</strong> and deleting unwanted pages. The spelling varies by region, but the workflow is the same."
+    html: "Use this free <strong>PDF organizer</strong> for <strong>organize PDF</strong>, <strong>organise PDF</strong>, <strong>reorder PDF pages</strong>, <strong>arrange PDF pages</strong> and deleting unwanted pages. The spelling varies by region, but the workflow is the same."
   }
 };
 
