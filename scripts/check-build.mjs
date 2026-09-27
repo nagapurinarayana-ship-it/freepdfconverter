@@ -95,18 +95,20 @@ if (wordJsAsset) {
 }
 \nconst compressPage = await readFile(path.join(dist, "tools/compress-pdf.html"), "utf8");
 if (!compressPage.includes("Compress PDF") || !compressPage.includes("lossless")) failures.push("Compress PDF -> tool page is missing core compression copy");
-if (!compressPage.includes("/assets/js/compress-pdf.js")) failures.push("Compress PDF -> source script reference is missing");
+if (!/assets\/js\/compress-pdf\.[a-f0-9]{10}\.js/.test(compressPage)) failures.push("Compress PDF -> fingerprinted browser script reference is missing");
 const compressJsAsset = jsAssets.find((file) => /^compress-pdf\.[a-f0-9]{10}\.js$/.test(file));
 if (!compressJsAsset) failures.push("Compress PDF -> fingerprinted browser script is missing");
 if (compressJsAsset) {
   const compressJsSource = await readFile(path.join(dist, "assets/js", compressJsAsset), "utf8");
-  if (!compressJsSource.includes("/assets/js/compress-pdf-worker.js")) failures.push("Compress PDF -> worker reference is missing");
+  if (!/\/assets\/js\/compress-pdf-worker\.[a-f0-9]{10}\.js/.test(compressJsSource)) failures.push("Compress PDF -> fingerprinted worker reference is missing");
   if (!compressJsSource.includes("compressed.pdf")) failures.push("Compress PDF -> compressed output filename is missing");
 }
-const compressWorkerPath = path.join(dist, "assets/js/compress-pdf-worker.js");
-await access(compressWorkerPath);
-const compressWorker = await readFile(compressWorkerPath, "utf8");
-if (!compressWorker.includes("--recompress-flate") || !compressWorker.includes("--object-streams=generate") || !compressWorker.includes("--compression-level=9")) failures.push("Compress PDF -> qpdf lossless compression options are missing");
+const compressWorkerAsset = jsAssets.find((file) => /^compress-pdf-worker\.[a-f0-9]{10}\.js$/.test(file));
+if (!compressWorkerAsset) failures.push("Compress PDF -> fingerprinted worker asset is missing");
+if (compressWorkerAsset) {
+  const compressWorker = await readFile(path.join(dist, "assets/js", compressWorkerAsset), "utf8");
+  if (!compressWorker.includes("--recompress-flate") || !compressWorker.includes("--object-streams=generate") || !compressWorker.includes("--compression-level=9")) failures.push("Compress PDF -> qpdf lossless compression options are missing");
+}
 
 const pdfWordJsAsset = jsAssets.find((file) => /^pdf-to-word\.[a-f0-9]{10}\.js$/.test(file));
 if (!pdfWordJsAsset) failures.push("PDF to Word -> fingerprinted converter script is missing");
