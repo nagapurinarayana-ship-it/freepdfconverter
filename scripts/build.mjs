@@ -48,7 +48,8 @@ const pageKeywords = {
   "guides/crop-pdf-pages.html": ["how to crop pdf pages", "crop pdf guide", "remove pdf margins", "trim pdf pages", "pdf crop guide"],
   "guides/extract-text-from-pdf.html": ["how to extract text from a pdf", "pdf text extraction", "extract pdf text", "pdf to text guide", "copy text from pdf"],
   "guides/are-online-pdf-converters-safe.html": ["are online pdf converters safe", "pdf privacy", "safe online pdf converter", "secure pdf conversion", "pdf converter privacy"],
-  "guides/pdf-converter-without-upload.html": ["pdf converter without upload", "convert pdf without uploading", "private pdf converter", "offline pdf converter", "local pdf processing"]
+  "guides/pdf-converter-without-upload.html": ["pdf converter without upload", "convert pdf without uploading", "private pdf converter", "offline pdf converter", "local pdf processing"],
+  "guides/compress-pdf.html": ["compress pdf", "reduce pdf file size", "pdf compressor", "pdf size reducer", "compress pdf for email"]
 };
 
 const appHead = [
