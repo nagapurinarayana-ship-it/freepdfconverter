@@ -12,6 +12,7 @@ Free, privacy-first PDF utilities that run in the browser. Selected documents ar
 - Rotate PDF pages
 - JPG / PNG to PDF
 - PDF to JPG / PNG
+- Compress PDF (lossless browser-local size reduction)
 - Text watermark PDF
 - Organize, reorder and delete PDF pages
 - Add page numbers to PDF
