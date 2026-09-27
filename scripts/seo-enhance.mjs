@@ -54,7 +54,9 @@ const seo = {
   "guides/crop-pdf-pages.html": ["How to Crop PDF Pages — Remove Borders & Margins | FreePDF Tools", "Learn how to crop PDF pages with precise margins and avoid common mistakes when trimming document edges."],
   "guides/extract-text-from-pdf.html": ["How to Extract Text from a PDF — Step-by-Step Guide | FreePDF Tools", "Learn how to extract selectable PDF text, understand browser limitations and save or copy the resulting text."],
   "guides/are-online-pdf-converters-safe.html": ["Are Online PDF Converters Safe? Privacy Guide | FreePDF Tools", "Understand the privacy tradeoffs of online PDF converters, what file uploads mean, and when local browser processing can help."],
-  "guides/pdf-converter-without-upload.html": ["How to Convert PDFs Without Uploading Files | FreePDF Tools", "Learn how browser-based PDF processing works, why files can stay on your device, and when local conversion is useful."]
+  "guides/pdf-converter-without-upload.html": ["How to Convert PDFs Without Uploading Files | FreePDF Tools", "Learn how browser-based PDF processing works, why files can stay on your device, and when local conversion is useful."],
+  "guides/pdf-to-word-converter.html": ["How to Convert PDF to Word — Editable DOCX Guide | FreePDF Tools", "Learn how to convert text-based PDFs to editable Word DOCX files, what happens to tables and layout, and why scanned PDFs may need OCR."],
+  "guides/word-to-pdf-converter.html": ["How to Convert Word to PDF — DOC, DOCX & 97–2003 Guide | FreePDF Tools", "Learn how to convert DOC, DOCX and Word 97–2003 files to PDF in your browser, including layout limitations and final quality checks."]
 };
 
 const htmlFiles = [];
