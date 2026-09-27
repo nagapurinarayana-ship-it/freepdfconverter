@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Compress PDF Online Free — Reduce PDF Size | FreePDF Tools</title>
+<meta name="description" content="Compress PDF files online free in your browser. Reduce PDF file size with a lossless local pass and download a smaller copy without uploading the original document.">
+<meta name="theme-color" content="#1f67ff">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/styles.css">
+<script src="../assets/js/common.js" defer></script>
+<script src="../assets/js/compress-pdf.js" defer></script>
+<script src="../assets/js/monetization-config.js" defer></script>
+<script src="../assets/js/ads.js" defer></script>
+<link rel="canonical" href="https://freepdfconverter-all-in-one.pages.dev/tools/compress-pdf">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta property="og:type" content="website"><meta property="og:site_name" content="FreePDF Tools">
+<meta property="og:title" content="Compress PDF Online Free — Reduce PDF Size | FreePDF Tools">
+<meta property="og:description" content="Compress PDF files online free in your browser. Reduce PDF file size with a lossless local pass and download a smaller copy without uploading the original document.">
+<meta property="og:url" content="https://freepdfconverter-all-in-one.pages.dev/tools/compress-pdf">
+<meta property="og:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg">
+<meta property="og:image:alt" content="FreePDF Tools — browser-based PDF compression">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Compress PDF Online Free — Reduce PDF Size | FreePDF Tools">
+<meta name="twitter:description" content="Compress PDF files online free in your browser. Reduce PDF file size with a lossless local pass and download a smaller copy without uploading the original document.">
+<meta name="twitter:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="container header-inner">
+<a class="logo" href="../"><span class="logo-mark" aria-hidden="true">PDF</span><span>FreePDF Tools</span></a>
+<nav class="main-nav" aria-label="Main navigation"><a href="../#tools">PDF tools</a><a href="../guides/">Guides</a><a href="../privacy">Privacy</a><a href="../about">About</a></nav>
+</div></header>
+<main id="main">
+<section class="tool-hero"><div class="container"><div class="breadcrumbs"><a href="../">Home</a> / Compress PDF</div>
+<span class="eyebrow">Free · lossless pass · no upload</span>
+<h1>Compress PDF online free</h1>
+<p class="lead">Reduce PDF file size directly in your browser. This tool uses a lossless qpdf-based pass to recompress supported PDF streams and generate a smaller copy when the structure allows it, without intentionally degrading embedded images.</p>
+</div></section>
+<div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>
+<div class="container tool-shell">
+<section class="tool-panel" aria-labelledby="compress-title"><h2 id="compress-title">Choose a PDF to compress</h2>
+<div class="drop-zone" id="dropZone"><div><strong>Drop one PDF here</strong><p>Up to 120 MB · browser-local processing</p><label class="file-picker" for="pdfFile">Choose PDF</label><input class="file-input" id="pdfFile" type="file" accept="application/pdf,.pdf"></div></div>
+<p id="fileSummary" class="selected-file" aria-live="polite">No PDF selected</p>
+<div class="card-grid">
+<div class="side-card"><h3>Original size</h3><p id="originalSize">—</p></div>
+<div class="side-card"><h3>Compressed size</h3><p id="outputSize">—</p></div>
+<div class="side-card"><h3>Reduction</h3><p id="savings">—</p></div>
+</div>
+<div class="action-row"><button class="button" id="compressButton" type="button" disabled>Compress PDF</button><button class="button danger" id="clearButton" type="button" disabled>Clear</button></div>
+<div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+<p class="status" id="toolStatus" role="status" aria-live="polite"></p>
+</section>
+<aside class="tool-side">
+<div class="side-card"><h3>What this compression does</h3><p>It focuses on lossless PDF structure: stream compression, recompression of supported Flate streams and compressed object streams.</p></div>
+<div class="side-card"><h3>What it does not do</h3><p>It does not intentionally lower JPEG or image quality. Image-heavy PDFs may therefore see only a small size reduction.</p></div>
+<div class="side-card"><h3>Encrypted PDFs</h3><p>Password-protected PDFs need to be unlocked first. Use the <a href="unlock-pdf">Unlock PDF</a> tool when you know the password.</p></div>
+</aside>
+</div>
+<section class="content-section"><div class="container content-narrow">
+<h2>Compress PDF files without uploading them</h2>
+<p>This free PDF compressor runs in your browser. Your selected document is read locally, processed by a qpdf WebAssembly engine and used to create the output on your device. There is no document upload queue or server-side conversion job for this workflow.</p>
+<h2>How PDF compression works here</h2>
+<ol>
+<li><strong>Select your PDF.</strong> The browser reads the file locally.</li>
+<li><strong>Recompress supported streams.</strong> The local engine applies lossless stream and object-stream compression.</li>
+<li><strong>Compare the result.</strong> The tool reports the original size, compressed size and percentage reduction.</li>
+<li><strong>Download the smaller copy.</strong> A new <code>-compressed.pdf</code> file is created without replacing your source PDF.</li>
+</ol>
+<h2>Why some PDFs barely shrink</h2>
+<p>Compression results depend heavily on what is already inside the PDF. Text, vector graphics and other structural data can benefit from lossless recompression. A PDF made mostly of already-compressed JPEG photographs may have little left to remove without changing image quality.</p>
+<h2>Lossless PDF compression vs. image compression</h2>
+<p>These are different tasks. Lossless structural compression aims to reduce redundant PDF encoding without intentionally changing the visual quality of the pages. Image compression can reduce a PDF much more when it contains large photographs, but it usually involves changing image encoding or quality. This first FreePDF Tools compressor deliberately uses the safer lossless path.</p>
+<h2>Frequently asked questions</h2>
+<div class="faq">
+<details><summary>Is this PDF compressor free?</summary><p>Yes. The compression tool runs in your browser without an account or paid subscription.</p></details>
+<details><summary>Are my PDF files uploaded?</summary><p>No. The selected PDF is processed locally in your browser by the compression engine.</p></details>
+<details><summary>Will compression reduce image quality?</summary><p>This workflow is lossless with respect to the supported PDF stream transformations. It does not intentionally recompress JPEG images to a lower visual quality.</p></details>
+<details><summary>Why did my PDF get almost no smaller?</summary><p>The source may already be efficiently compressed, or it may be dominated by already-compressed images. Stronger size reduction would require image optimization, which is a different, potentially lossy operation.</p></details>
+<details><summary>Can I compress a password-protected PDF?</summary><p>Unlock the PDF first when you know the password, then compress the unencrypted copy.</p></details>
+</div>
+</div></section>
+</main>
+<footer class="site-footer"><div class="container"><div class="footer-grid">
+<div><a class="logo" href="../"><span class="logo-mark">PDF</span><span>Private browser-based PDF utilities.</span></a></div>
+<div><h3>Popular tools</h3><ul class="footer-links"><li><a href="merge-pdf">Merge PDF</a></li><li><a href="split-pdf">Split PDF</a></li><li><a href="compress-pdf">Compress PDF</a></li><li><a href="pdf-to-word">PDF to Word</a></li><li><a href="word-to-pdf">Word to PDF</a></li></ul></div>
+<div><h3>Information</h3><ul class="footer-links"><li><a href="../guides/">PDF guides</a></li><li><a href="../privacy">Privacy</a></li><li><a href="../about">About</a></li></ul></div>
+</div><div class="footer-bottom"><span>© <span data-current-year></span> FreePDF Tools</span><span>No document upload for compression</span></div></div></footer>
+</body></html>
