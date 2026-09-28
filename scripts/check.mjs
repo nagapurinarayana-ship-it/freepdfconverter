@@ -51,10 +51,10 @@ for (const file of await htmlFiles(root)) {
     if (/^(?:https?:|#|data:|mailto:)/.test(href)) continue;
     const clean = href.split("#")[0].split("?")[0];
     if (!clean) continue;
-    const normalizedRoute = clean.replace(/^\\//, "").replace(/\\/$/, "");
+    const normalizedRoute = clean.replace(/^\//, "").replace(/\/$/, "");
     const generatedMatch = [...generatedRoutes].some((relative) => {
-      const cleanRelative = relative.replace(/\\.html$/, "").replace(/\\/index$/, "");
-      return normalizedRoute === cleanRelative || normalizedRoute === relative.replace(/\\.html$/, "") || normalizedRoute === relative;
+      const cleanRelative = relative.replace(/\.html$/, "").replace(/\/index$/, "");
+      return normalizedRoute === cleanRelative || normalizedRoute === relative.replace(/\.html$/, "") || normalizedRoute === relative;
     });
     if (generatedMatch) continue;
     const target = clean.startsWith("/") ? path.join(root, clean.slice(1)) : path.resolve(path.dirname(file), clean);
