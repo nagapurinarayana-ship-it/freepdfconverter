@@ -45,7 +45,26 @@ export const indexablePages = [
   "guides/pdf-converter-without-upload.html",
   "guides/pdf-to-word-converter.html",
   "guides/word-to-pdf-converter.html",
-  "guides/ocr-pdf-to-word.html"
+  "guides/ocr-pdf-to-word.html",
+  ...[
+    "topics/index.html",
+    "topics/pdf-to-word-without-upload.html",
+    "topics/scanned-pdf-to-word.html",
+    "topics/pdf-to-word-formatting.html",
+    "topics/pdf-to-word-tables.html",
+    "topics/doc-to-pdf.html",
+    "topics/docx-to-pdf.html",
+    "topics/word-97-2003-to-pdf.html",
+    "topics/ocr-pdf-online.html",
+    "topics/ocr-pdf-accuracy.html",
+    "topics/pdf-to-text.html",
+    "topics/compress-pdf-to-target-size.html",
+    "topics/pdf-to-jpg.html",
+    "topics/jpg-to-pdf-on-mobile.html",
+    "topics/pdf-page-size.html",
+    "topics/pdf-converter-file-formats.html",
+    "topics/private-pdf-converter.html"
+  ]
 ];
 
 export const supplementalPages = ["privacy.html", "terms.html", "contact.html"];
@@ -89,6 +108,25 @@ pageDates["tools/compress-pdf.html"] = "2026-09-28";
 pageDates["guides/compress-pdf.html"] = "2026-09-28";
 pageDates["tools/ocr-pdf.html"] = "2026-09-28";
 pageDates["guides/ocr-pdf-to-word.html"] = "2026-09-28";
+for (const relative of [
+  "topics/index.html",
+  "topics/pdf-to-word-without-upload.html",
+  "topics/scanned-pdf-to-word.html",
+  "topics/pdf-to-word-formatting.html",
+  "topics/pdf-to-word-tables.html",
+  "topics/doc-to-pdf.html",
+  "topics/docx-to-pdf.html",
+  "topics/word-97-2003-to-pdf.html",
+  "topics/ocr-pdf-online.html",
+  "topics/ocr-pdf-accuracy.html",
+  "topics/pdf-to-text.html",
+  "topics/compress-pdf-to-target-size.html",
+  "topics/pdf-to-jpg.html",
+  "topics/jpg-to-pdf-on-mobile.html",
+  "topics/pdf-page-size.html",
+  "topics/pdf-converter-file-formats.html",
+  "topics/private-pdf-converter.html"
+]) pageDates[relative] = "2026-09-28";
 
 export const articlePublishedDates = {
   "guides/reduce-pdf-file-size-for-email.html": "2026-08-31",
@@ -159,7 +197,24 @@ export const pageLabels = {
   "guides/pdf-to-word-converter.html": "How to Convert PDF to Word",
   "guides/word-to-pdf-converter.html": "How to Convert Word to PDF",
   "guides/compress-pdf.html": "How to Compress a PDF",
-  "guides/ocr-pdf-to-word.html": "How to OCR a Scanned PDF into Word"
+  "guides/ocr-pdf-to-word.html": "How to OCR a Scanned PDF into Word",
+  "topics/index.html": "PDF Conversion Topics",
+  "topics/pdf-to-word-without-upload.html": "PDF to Word Without Uploading",
+  "topics/scanned-pdf-to-word.html": "Scanned PDF to Word",
+  "topics/pdf-to-word-formatting.html": "PDF to Word Formatting",
+  "topics/pdf-to-word-tables.html": "PDF to Word Tables",
+  "topics/doc-to-pdf.html": "DOC to PDF",
+  "topics/docx-to-pdf.html": "DOCX to PDF",
+  "topics/word-97-2003-to-pdf.html": "Word 97–2003 to PDF",
+  "topics/ocr-pdf-online.html": "OCR PDF Online",
+  "topics/ocr-pdf-accuracy.html": "OCR PDF Accuracy",
+  "topics/pdf-to-text.html": "PDF to Text",
+  "topics/compress-pdf-to-target-size.html": "Compress PDF to a Target Size",
+  "topics/pdf-to-jpg.html": "PDF to JPG",
+  "topics/jpg-to-pdf-on-mobile.html": "JPG to PDF on Mobile",
+  "topics/pdf-page-size.html": "PDF Page Size",
+  "topics/pdf-converter-file-formats.html": "PDF Converter File Formats",
+  "topics/private-pdf-converter.html": "Private PDF Converter"
 };
 
 export function pagePathname(relative) {
