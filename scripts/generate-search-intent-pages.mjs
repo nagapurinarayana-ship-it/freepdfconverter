@@ -254,7 +254,7 @@ export const SEARCH_INTENT_PAGES = {
     ],
     tool: ["/pdf-converter-online","PDF Converter"],
     guides: [["/guides/pdf-converter-without-upload","No-upload guide"],["/guides/are-online-pdf-converters-safe","Online PDF safety guide"],["/privacy","Privacy Policy"]]
-  }
+  },
   "topics/adobe-acrobat-alternative.html": {
     title: "Adobe Acrobat Online Alternative — Local PDF Processing | FreePDF Tools",
     description: "Compare Adobe Acrobat online services with browser-local PDF processing, including document handling, sign-in, file retention and supported conversion workflows.",
