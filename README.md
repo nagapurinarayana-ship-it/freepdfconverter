@@ -6,6 +6,8 @@ Free, privacy-first PDF utilities that run in the browser. Selected documents ar
 
 ## Included tools
 
+FreePDF Tools currently ships 16 core browser-local PDF/document workflows, plus a guide and topic library for search and practical help.
+
 - Merge PDF
 - Split / extract PDF pages
 - Unlock password-protected PDFs with a known password
@@ -49,13 +51,13 @@ Workers Builds does not inject the final public URL into the build. After the fi
 
 ### Cloudflare Pages
 
-Use the native Cloudflare Pages Git integration for production deployment. Keep the production branch as `main`, build command as `npm run build`, and output directory as `dist`. Cloudflare then rebuilds and deploys the site automatically when `main` changes. The repository's GitHub Actions workflow validates the exact production build, including the legacy Microsoft Word 97–2003 parser and modern Word/DOCX workflow, before the change is considered production-ready.
+Use the native Cloudflare Pages Git integration for production deployment. Keep the production branch as `main`, build command as `npm run build`, and output directory as `dist`. Cloudflare then rebuilds and deploys the site automatically when `main` changes. The repository's GitHub Actions workflow validates the exact production build, including 16 core tools, the expanded 30-guide library and generated search-intent topic pages,, including the legacy Microsoft Word 97–2003 parser and modern Word/DOCX workflow, before the change is considered production-ready.
 
 Do not configure a second secret-based Wrangler deployment against the same Pages project unless you intentionally replace the native Git integration.
 
 ## Local checks
 
-Run `npm run verify` to validate local references, metadata, clean canonical URLs, JSON-LD and the generated sitemap. The document test validates a real Microsoft Word 97-2003 `.doc` fixture and checks that the modern `.docx` workflow remains enabled.
+Run `npm run verify` to validate local references, PDF/document regressions, clean canonical URLs, JSON-LD, the generated sitemap, localized SEO, guide/topic coverage, local-processing source checks and accessibility/performance rules. The document test validates a real Microsoft Word 97-2003 `.doc` fixture and checks that the modern `.docx` workflow remains enabled.
 
 ## Monetization
 
