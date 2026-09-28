@@ -1,9 +1,12 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { LOCALES, PAGE_KEYS, allLocalizedPaths, englishPath, getLocalizedPage, localePagePath } from "./localized-content.mjs";
 
 const dist = path.join(process.cwd(), "dist");
 const origin = (process.env.SITE_ORIGIN || "https://freepdfconverter-all-in-one.pages.dev").replace(/\/$/, "");
+const cssFiles = await readdir(path.join(dist, "assets", "css"));
+const stylesheet = cssFiles.find((name) => /^styles\.[a-f0-9]{10}\.css$/.test(name));
+if (!stylesheet) throw new Error("Fingerprinting stylesheet not found before localized page generation.");
 
 for (const { locale, key } of allLocalizedPaths()) {
   const data = getLocalizedPage(locale, key);
@@ -33,7 +36,7 @@ for (const { locale, key } of allLocalizedPaths()) {
 <meta name="description" content="${escapeAttribute(data.description)}">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/assets/css/${stylesheet}">
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="website"><meta property="og:site_name" content="FreePDF Tools">
 <meta property="og:title" content="${escapeAttribute(data.title)}"><meta property="og:description" content="${escapeAttribute(data.description)}"><meta property="og:url" content="${canonical}">
@@ -67,7 +70,7 @@ for (const { locale, key } of allLocalizedPaths()) {
 ${sections}
 <section class="section"><div class="container content-narrow"><h2>Mehr PDF-Aufgaben / Plus de tâches PDF / Más tareas PDF</h2><p>${escapeHtml(languageLinks)}</p><ul class="footer-links">${links}</ul></div></section>
 </main>
-<footer class="site-footer"><div class="container"><div class="footer-bottom"><span>© <span data-current-year></span> FreePDF Tools</span><span>PDF processing in your browser</span></div></div></footer>
+<footer class="site-footer"><div class="container"><div class="footer-bottom"><span>© ${new Date().getUTCFullYear()} FreePDF Tools</span><span>PDF processing in your browser</span></div></div></footer>
 </body></html>`;
 
   const filename = key === "home" ? "index.html" :
