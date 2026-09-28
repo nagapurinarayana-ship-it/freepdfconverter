@@ -7,7 +7,7 @@ if (!input) {
   process.exit(1);
 }
 
-const csv = fs.readFileSync(path.resolve(input), "utf8");
+const csv = fs.readFileSync(path.resolve(input), "utf8").replace(/^\uFEFF/, "");
 const rows = parseCsv(csv);
 if (!rows.length) throw new Error("The Search Console CSV contains no data rows.");
 
@@ -59,10 +59,12 @@ function value(row, names) {
   return "";
 }
 function number(row, names) {
-  const raw = value(row, names).replace(/%/g,"").replace(/,/g,"");
+  const original = value(row, names).trim();
+  const isCtr = names.includes("CTR") || names.includes("ctr");
+  const raw = original.replace(/%/g, "").replace(/,/g, "");
   const n = Number(raw);
   if (!Number.isFinite(n)) return 0;
-  return names.includes("CTR") || names.includes("ctr") ? (raw.includes("%") ? n/100 : n) : n;
+  return isCtr ? (original.includes("%") ? n / 100 : n) : n;
 }
 function aggregate(rows, key) {
   const map = new Map();
