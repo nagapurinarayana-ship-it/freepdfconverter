@@ -70,7 +70,13 @@ ${sections}
 <footer class="site-footer"><div class="container"><div class="footer-bottom"><span>© <span data-current-year></span> FreePDF Tools</span><span>PDF processing in your browser</span></div></div></footer>
 </body></html>`;
 
-  await writeFile(path.join(dir, key === "home" ? "index.html" : key.replace("pdfword", "pdf-to-word").replace("wordpdf", "word-to-pdf").replace("jpg", "jpg-to-pdf") + ".html"), html, "utf8");
+  const filename = key === "home" ? "index.html" :
+    key === "converter" ? "pdf-converter-online.html" :
+    key === "pdfword" ? "pdf-to-word.html" :
+    key === "wordpdf" ? "word-to-pdf.html" :
+    key === "jpg" ? "jpg-to-pdf.html" :
+    key + ".html";
+  await writeFile(path.join(dir, filename), html, "utf8");
 }
 
 console.log("Generated localized DE/FR/ES landing pages: " + allLocalizedPaths().length);
