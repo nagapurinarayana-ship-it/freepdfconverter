@@ -10,7 +10,8 @@ Google's current Search guidance emphasizes people-first, original, satisfying c
 
 - 16 browser-local PDF tools, including PDF to Word, Word to PDF and OCR.
 - Dedicated clean tool URLs plus a generated PDF topic library for high-intent search problems.
-- Search-intent pages for PDF to Word, scanned-PDF OCR, DOC/DOCX, privacy, text extraction, compression, images and page-size decisions.
+- Search-intent pages for PDF to Word, scanned-PDF OCR, DOC/DOCX, privacy, text extraction, compression, images, page-size decisions and factual competitor/workflow comparisons.
+- 30 English guide/article pages covering core PDF tasks, privacy, OCR, Office formats, mobile workflows, image formats and file-size problems.
 - Generated canonical URLs and XML sitemap, with localized DE/FR/ES landing-page clusters and hreflang for the supported localized tool pages.
 - Guide hub with workflow comparison table and tool-to-guide/topic internal linking.
 - Public technical explanation of local PDF processing.
@@ -19,6 +20,8 @@ Google's current Search guidance emphasizes people-first, original, satisfying c
 - A local Search Console CSV analyzer for observed query/page opportunities.
 
 ## Content clusters
+
+The guide library now uses 30 article pages as the baseline. New guides must solve a materially different PDF problem, add practical steps or explain a meaningful format/privacy tradeoff.
 
 ### Core task cluster
 
