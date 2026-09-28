@@ -8,13 +8,15 @@ Google's current Search guidance emphasizes people-first, original, satisfying c
 
 ## Current foundation
 
-- 12 working browser-local PDF tools.
-- Dedicated tool URLs with clean paths.
-- 27 existing indexable pages before the August 12, 2026 privacy cluster addition.
-- Generated canonical URLs and XML sitemap.
-- Guide hub with workflow comparison table.
+- 16 browser-local PDF tools, including PDF to Word, Word to PDF and OCR.
+- Dedicated clean tool URLs plus a generated PDF topic library for high-intent search problems.
+- Search-intent pages for PDF to Word, scanned-PDF OCR, DOC/DOCX, privacy, text extraction, compression, images and page-size decisions.
+- Generated canonical URLs and XML sitemap, with localized DE/FR/ES landing-page clusters and hreflang for the supported localized tool pages.
+- Guide hub with workflow comparison table and tool-to-guide/topic internal linking.
 - Public technical explanation of local PDF processing.
 - Self-hosted PDF libraries rather than code CDNs.
+- Automated generated-topic content checks and local-processing source checks in the production verification pipeline.
+- A local Search Console CSV analyzer for observed query/page opportunities.
 
 ## Content clusters
 
@@ -153,3 +155,16 @@ Track directionally rather than using guaranteed numbers:
 ## Monetization rule
 
 Traffic content comes first. Keep AdSense, EffectiveCPM and affiliate monetization separate from the product's core workflow. Do not add advertising specifically to manufacture content volume or make a page less useful without ads.
+
+## Release gates
+
+Before a search-focused release is considered complete, run the repository verification workflow successfully. The gate covers document/PDF regression tests, sitemap/canonical checks, localized SEO, structured data, generated topic content, local-processing source checks, and monetization placement checks.
+
+Search Console analysis is intentionally local. Export Performance data from Google Search Console and run `npm run seo:search-console -- path/to/export.csv`. Do not commit exported query data to the repository.
+
+## External dependencies
+
+Two frozen requirements cannot be completed by source-code changes alone:
+
+- A dedicated production domain requires a domain choice, DNS changes and a controlled canonical/redirect migration.
+- External authority requires legitimate third-party references, software-directory listings, documentation mentions or editorial links; the repository can prepare linkable resources but cannot create independent third-party links.
