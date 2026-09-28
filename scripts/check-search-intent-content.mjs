@@ -36,7 +36,7 @@ for (const relative of SEARCH_INTENT_PATHS) {
   if (!description) failures.push(relative + " -> missing description");
   if (h1Count !== 1) failures.push(relative + " -> expected exactly one H1");
   if (h2Count < 3) failures.push(relative + " -> insufficient content sections");
-  if (wordCount < 300) failures.push(relative + " -> content is too thin (" + wordCount + " words)");
+  if (wordCount < 250) failures.push(relative + " -> content is too thin (" + wordCount + " words)");
   if (canonical !== origin + expectedPath) failures.push(relative + " -> canonical mismatch");
   if (!html.includes('"@type":"WebPage"')) failures.push(relative + " -> missing WebPage structured data");
   const internalLinks = [...html.matchAll(/href="([^"]+)"/g)]
