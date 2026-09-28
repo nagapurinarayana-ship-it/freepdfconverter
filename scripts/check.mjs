@@ -1,8 +1,10 @@
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { articlePages, indexablePages } from "./site-config.mjs";
+import { SEARCH_INTENT_PATHS } from "./generate-search-intent-pages.mjs";
 
 const root = process.cwd();
+const generatedRoutes = new Set(SEARCH_INTENT_PATHS.map((relative) => relative.replace(/\\/g, "/")));
 const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 if (packageJson.dependencies?.["tesseract.js"] !== "7.0.0") throw new Error("OCR dependency tesseract.js must remain pinned to 7.0.0");
 if (packageJson.dependencies?.["@tesseract.js-data/eng"] !== "1.0.0") throw new Error("OCR English language data dependency must remain pinned to 1.0.0");
@@ -49,6 +51,12 @@ for (const file of await htmlFiles(root)) {
     if (/^(?:https?:|#|data:|mailto:)/.test(href)) continue;
     const clean = href.split("#")[0].split("?")[0];
     if (!clean) continue;
+    const normalizedRoute = clean.replace(/^\\//, "").replace(/\\/$/, "");
+    const generatedMatch = [...generatedRoutes].some((relative) => {
+      const cleanRelative = relative.replace(/\\.html$/, "").replace(/\\/index$/, "");
+      return normalizedRoute === cleanRelative || normalizedRoute === relative.replace(/\\.html$/, "") || normalizedRoute === relative;
+    });
+    if (generatedMatch) continue;
     const target = clean.startsWith("/") ? path.join(root, clean.slice(1)) : path.resolve(path.dirname(file), clean);
     if (!await localTargetExists(target)) broken.push(path.relative(root, file) + " -> " + href);
   }
