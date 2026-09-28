@@ -20,11 +20,7 @@ const required = [
   "assets/vendor/jszip/jszip.min.js", "assets/vendor/pdfjs/pdf.min.mjs", "assets/vendor/pdfjs/pdf.worker.min.mjs",
   "assets/vendor/qpdf/qpdf.js", "assets/vendor/qpdf/qpdf.wasm", "assets/vendor/qpdf/LICENSE-QPDF-WASM.txt",
   "assets/vendor/qpdf/LICENSE-QPDF.txt", "assets/vendor/qpdf/NOTICE-QPDF.md", "assets/vendor/qpdf/README.md",
-  "assets/vendor/tesseract/tesseract.min.js", "assets/vendor/tesseract/worker.min.js",
-  "assets/vendor/tesseract/core/tesseract-core.wasm.js", "assets/vendor/tesseract/core/tesseract-core-simd.wasm.js",
-  "assets/vendor/tesseract/core/tesseract-core-lstm.wasm.js", "assets/vendor/tesseract/core/tesseract-core-simd-lstm.wasm.js",
-  "assets/vendor/tesseract/core/tesseract-core-relaxedsimd.wasm.js", "assets/vendor/tesseract/core/tesseract-core-relaxedsimd-lstm.wasm.js",
-  "assets/vendor/tesseract/lang/eng.traineddata.gz",
+  "scripts/vendor-tesseract.mjs",
   "assets/images/freepdf-tools-social.jpg", "favicon.ico", "manifest.webmanifest", "service-worker.js", "offline.html", "_redirects"
 ];
 for (const relative of required) await access(path.join(root, relative));
@@ -85,6 +81,7 @@ const toolScripts = {
   "tools/remove-pdf-metadata.html": "assets/js/remove-pdf-metadata.js",
   "tools/crop-pdf.html": "assets/js/crop-pdf.js",
   "tools/extract-pdf-text.html": "assets/js/extract-pdf-text.js",
+  "tools/ocr-pdf.html": "assets/js/ocr-pdf.js",
   "tools/pdf-to-word.html": "assets/js/pdf-to-word.js",
   "tools/word-to-pdf.html": "assets/js/word-to-pdf.js"
 };
