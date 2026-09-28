@@ -3,7 +3,7 @@ import path from "node:path";
 
 export const SEARCH_INTENT_PAGES = {
   "topics/index.html": {
-    title: "PDF Conversion Topics & Guides — Word, OCR, Privacy & File Formats | FreePDF Tools",
+    title: "PDF Conversion Topics — Word, OCR & Privacy | FreePDF Tools",
     description: "Practical PDF conversion topics covering PDF to Word, scanned PDF OCR, Word to PDF, privacy, file formats, compression, images and page-size decisions.",
     h1: "PDF conversion topics and practical answers",
     intro: "Use these topic pages to understand the PDF workflow you need before opening a converter. Each topic explains the common problem, important limitations and the matching FreePDF Tools workflow.",
@@ -17,7 +17,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/pdf-to-word-without-upload.html": {
-    title: "PDF to Word Without Uploading — Private Browser Conversion | FreePDF Tools",
+    title: "PDF to Word Without Upload — Browser Conversion | FreePDF Tools",
     description: "Learn how browser-local PDF to Word conversion can keep supported document bytes on your device, what the workflow can and cannot preserve, and when OCR is needed.",
     h1: "Convert PDF to Word without uploading the document",
     intro: "A browser-local PDF to Word workflow can be useful when the document is sensitive and the PDF contains a normal selectable text layer. The important distinction is between loading the website and uploading the document itself.",
@@ -32,7 +32,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/scanned-pdf-to-word.html": {
-    title: "Scanned PDF to Word — OCR to Editable DOCX | FreePDF Tools",
+    title: "Scanned PDF to Word with OCR | FreePDF Tools",
     description: "Learn how to turn a scanned or image-only PDF into an editable Word document with OCR, including accuracy limits, tables, columns and review steps.",
     h1: "Scanned PDF to Word: use OCR before editing",
     intro: "A scanned PDF is usually a set of page images. A normal PDF-to-Word text extractor cannot invent text that is not present in a text layer. OCR is the bridge between the image and editable text.",
@@ -47,7 +47,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/pdf-to-word-formatting.html": {
-    title: "PDF to Word Formatting — What Converts and What Changes | FreePDF Tools",
+    title: "PDF to Word Formatting — What Changes | FreePDF Tools",
     description: "Understand PDF to Word formatting limits for text, tables, columns, images, fonts, page breaks and fixed-layout content before you edit the DOCX result.",
     h1: "PDF to Word formatting: what to expect",
     intro: "PDF is designed to describe a fixed page appearance, while Word is designed for editable document structure. Conversion therefore involves interpretation rather than a guaranteed pixel-perfect reconstruction.",
@@ -62,7 +62,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/pdf-to-word-tables.html": {
-    title: "PDF to Word Tables — Extract and Review Tables After Conversion | FreePDF Tools",
+    title: "PDF to Word Tables — What to Check | FreePDF Tools",
     description: "Learn why PDF tables can change during PDF to Word conversion, how to recognize difficult layouts and which parts should be checked in the resulting DOCX.",
     h1: "PDF to Word tables: why layout needs review",
     intro: "A visual table in a PDF does not always contain the same structural information as a Word table. Lines, spacing and positioned text can look like a table to a person while remaining independent PDF objects.",
@@ -77,7 +77,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/doc-to-pdf.html": {
-    title: "DOC to PDF Online — Microsoft Word 97-2003 to PDF | FreePDF Tools",
+    title: "DOC to PDF — Word 97-2003 Files | FreePDF Tools",
     description: "Convert supported legacy Microsoft Word 97–2003 DOC files to PDF in the browser and understand the layout checks needed for older documents.",
     h1: "DOC to PDF: converting older Microsoft Word files",
     intro: "Older Word documents use a different file format from modern DOCX files. Supporting the legacy .doc format is useful when an archive contains documents created with Microsoft Word 97–2003.",
@@ -92,7 +92,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/docx-to-pdf.html": {
-    title: "DOCX to PDF Online — Convert Word Documents in Your Browser | FreePDF Tools",
+    title: "DOCX to PDF Online — Browser Guide | FreePDF Tools",
     description: "Learn how supported DOCX files are converted to PDF in the browser, what formatting to check and how DOCX differs from legacy DOC files.",
     h1: "DOCX to PDF: a practical conversion guide",
     intro: "DOCX is the modern Office Open XML Word document format. Converting it to PDF creates a fixed-layout file that is easier to share consistently, but the generated page appearance still depends on the features used by the source document.",
@@ -107,7 +107,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/word-97-2003-to-pdf.html": {
-    title: "Word 97-2003 to PDF — Convert Legacy DOC Files in Your Browser | FreePDF Tools",
+    title: "Word 97-2003 to PDF — Legacy DOC | FreePDF Tools",
     description: "Convert supported Microsoft Word 97–2003 .doc files to PDF, with notes about parser compatibility, formatting checks and browser-local processing.",
     h1: "Word 97–2003 to PDF: legacy DOC conversion",
     intro: "Archives often contain .doc files from Microsoft Word 97–2003. They are still useful documents, but their binary format needs different parsing from modern DOCX files.",
@@ -122,7 +122,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/ocr-pdf-online.html": {
-    title: "OCR PDF Online — Turn Scanned PDFs into Searchable Text | FreePDF Tools",
+    title: "OCR PDF Online — Scanned PDF to Text | FreePDF Tools",
     description: "Learn how browser-based OCR turns scanned PDF page images into recognized text, editable Word or TXT files and what affects recognition quality.",
     h1: "OCR PDF online: turn scanned pages into text",
     intro: "OCR, or optical character recognition, analyzes visible characters in an image and produces text that can be selected, copied or placed into an editable document.",
@@ -137,7 +137,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/ocr-pdf-accuracy.html": {
-    title: "OCR PDF Accuracy — What Affects Recognition Quality? | FreePDF Tools",
+    title: "OCR PDF Accuracy — What Affects Results | FreePDF Tools",
     description: "Understand the factors that influence PDF OCR accuracy, including scan resolution, skew, contrast, columns, tables and character quality.",
     h1: "OCR PDF accuracy: the factors that matter",
     intro: "OCR quality is determined by the input image as much as the recognition engine. Improving the source page often helps more than changing the output format.",
@@ -152,7 +152,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/pdf-to-text.html": {
-    title: "PDF to Text — Extract Text from Selectable PDF Pages | FreePDF Tools",
+    title: "PDF to Text — Extract Selectable Text | FreePDF Tools",
     description: "Learn when direct PDF text extraction works, how scanned pages differ and what to expect from a TXT result.",
     h1: "PDF to text: extract the text layer before using OCR",
     intro: "A PDF with selectable text can often be processed without OCR. Direct extraction is usually simpler because the document already contains character information.",
@@ -167,7 +167,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/compress-pdf-to-target-size.html": {
-    title: "Compress PDF to a Target Size — What You Can and Cannot Guarantee | FreePDF Tools",
+    title: "Compress PDF to Target Size — What to Know | FreePDF Tools",
     description: "Learn why a PDF cannot always be reduced to an exact target size and how structure, images and existing compression affect the result.",
     h1: "Compress PDF to a target size: understand the limits",
     intro: "A PDF compressor can reduce file size, but an exact target such as 100 KB is not always achievable without changing image quality or removing content.",
@@ -197,7 +197,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/jpg-to-pdf-on-mobile.html": {
-    title: "JPG to PDF on Mobile — Convert Photos to a PDF in the Browser | FreePDF Tools",
+    title: "JPG to PDF on Mobile — Practical Guide | FreePDF Tools",
     description: "Learn how to turn phone photos or screenshots into a PDF, arrange pages, choose page sizes and verify the result on a mobile device.",
     h1: "JPG to PDF on mobile: a practical workflow",
     intro: "A phone camera produces image files, while many submission systems ask for one PDF. A browser-based image-to-PDF workflow can combine those photos without first moving them to a desktop.",
@@ -212,7 +212,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/pdf-page-size.html": {
-    title: "PDF Page Size — A4, Letter or Image Size? | FreePDF Tools",
+    title: "PDF Page Size — A4, Letter or Image | FreePDF Tools",
     description: "Understand A4, US Letter and image-sized PDF pages, when each choice makes sense and how page size affects printing and sharing.",
     h1: "PDF page size: choose A4, Letter or image-sized pages",
     intro: "Page size is a document-layout decision, not just a visual setting. The right choice depends on whether the resulting PDF will be printed, submitted, displayed or preserved as an image document.",
@@ -227,7 +227,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/pdf-converter-file-formats.html": {
-    title: "PDF Converter File Formats — PDF, DOC, DOCX, JPG, PNG & OCR | FreePDF Tools",
+    title: "PDF Converter File Formats — PDF, Word & Images | FreePDF Tools",
     description: "Understand the supported PDF, Word and image workflows, including legacy DOC, modern DOCX, JPG, PNG and OCR-based scanned document conversion.",
     h1: "PDF converter file formats: what each workflow means",
     intro: "The file extension is only the starting point. The internal structure of a document determines which conversion path is appropriate and what can be preserved.",
@@ -242,7 +242,7 @@ export const SEARCH_INTENT_PAGES = {
   },
 
   "topics/private-pdf-converter.html": {
-    title: "Private PDF Converter — What Browser-Local Processing Means | FreePDF Tools",
+    title: "Private PDF Converter — Browser-Local Processing | FreePDF Tools",
     description: "Understand private PDF conversion, browser-local processing, document bytes, hosting requests, offline cache behaviour and practical privacy checks.",
     h1: "Private PDF converter: understand browser-local processing",
     intro: "Privacy claims are meaningful only when you can explain what is actually local. This topic separates document processing from the normal network requests required to deliver a website.",

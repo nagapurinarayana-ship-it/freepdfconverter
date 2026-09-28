@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PAGE_KEYS, allLocalizedPaths, englishPath, localePagePath } from "./localized-content.mjs";
+import { pageDates } from "./site-config.mjs";
 
 const dist = path.join(process.cwd(), "dist");
 const origin = (process.env.SITE_ORIGIN || "https://freepdfconverter-all-in-one.pages.dev").replace(/\/$/, "");
@@ -9,7 +10,11 @@ let existing = "";
 try { existing = await readFile(file, "utf8"); } catch {}
 const existingUrls = [...existing.matchAll(/<url>[\s\S]*?<loc>([^<]+)<\/loc>[\s\S]*?<\/url>/g)].map((m) => m[0]);
 const seen = new Set(existingUrls.map((u) => u.match(/<loc>([^<]+)<\/loc>/)?.[1]));
-const lastmod = new Date().toISOString().slice(0, 10);
+const fallbackLastmod = new Date().toISOString().slice(0, 10);
+function pageDateForKey(key) {
+  const relative = key === "home" ? "index.html" : englishPath(key).replace(/^\//, "") + ".html";
+  return pageDates[relative] || fallbackLastmod;
+}
 
 const blocks = existingUrls.slice();
 for (const item of allLocalizedPaths()) {
@@ -22,7 +27,7 @@ for (const item of allLocalizedPaths()) {
     ["es", origin + localePagePath("es", item.key)]
   ];
   const links = variants.map(([lang, href]) => `<xhtml:link rel="alternate" hreflang="${lang}" href="${href}"/>`).join("");
-  const self = `<url><loc>${url}</loc><lastmod>${lastmod}</lastmod>${links}</url>`;
+  const self = `<url><loc>${url}</loc><lastmod>${pageDateForKey(item.key)}</lastmod>${links}</url>`;
   blocks.push(self);
 }
 for (const blockIndex of blocks.keys()) {
