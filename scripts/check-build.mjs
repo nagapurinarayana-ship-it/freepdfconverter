@@ -1,7 +1,7 @@
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { articlePages, indexablePages, pageDates, pagePathname } from "./site-config.mjs";
-import { allLocalizedPaths } from "./localized-content.mjs";
+import { allLocalizedPaths, englishPath } from "./localized-content.mjs";
 
 const root = process.cwd();
 const dist = path.join(root, "dist");
@@ -69,6 +69,8 @@ for (const relative of indexablePages) {
 const sitemap = await readFile(path.join(dist, "sitemap.xml"), "utf8");
 const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 const localizedItems = allLocalizedPaths();
+const localizedPageDate = (key) => pageDates[key === "home" ? "index.html" : (itemEnglishPath(key) + ".html")];
+function itemEnglishPath(key) { return englishPath(key).replace(/^\//, ""); }
 const expectedLocations = [
   ...indexablePages.map((relative) => origin + pagePathname(relative)),
   ...localizedItems.map((item) => origin + item.path)
@@ -78,7 +80,7 @@ if (locations.some((location) => location.endsWith(".html"))) failures.push("sit
 const lastmods = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
 const expectedLastmods = [
   ...indexablePages.map((relative) => pageDates[relative]),
-  ...localizedItems.map((item) => pageDates[item.key])
+  ...localizedItems.map((item) => localizedPageDate(item.key))
 ];
 if (JSON.stringify(lastmods) !== JSON.stringify(expectedLastmods)) failures.push("sitemap.xml -> lastmod set does not match page dates");
 
