@@ -78,6 +78,10 @@ h3 { font-size: 1.16rem; margin: 0 0 8px; }
 .side-card p,.side-card ul { color: var(--muted); font-size: .93rem; margin-bottom: 0; }
 .drop-zone { position: relative; display: grid; place-items: center; min-height: 190px; padding: 26px; text-align: center; border: 2px dashed #adc2e4; border-radius: 16px; background: #f9fbff; transition: .16s ease; }
 .drop-zone.is-dragging { border-color: var(--brand); background: #eef4ff; transform: scale(1.005); }
+.check-row { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; padding: 13px 15px; border: 1px solid var(--line); border-radius: 12px; background: #f9fbff; cursor: pointer; }
+.check-row input { margin-top: 4px; width: 17px; height: 17px; accent-color: var(--brand); }
+.check-row span { display: grid; gap: 2px; }
+.check-row small { color: var(--muted); font-size: .86rem; }
 .ad-container { width: 100%; min-height: 90px; margin: 24px auto; padding: 12px; display: grid; place-items: center; text-align: center; border: 1px solid transparent; border-radius: 12px; overflow: hidden; }
 .ad-container.is-active, .ad-native-container { border-color: #e7ebf2; background: rgba(255,255,255,.72); }
 .ad-label { display: block; width: 100%; margin-bottom: 6px; color: #8a96a8; font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
