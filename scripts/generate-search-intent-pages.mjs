@@ -336,6 +336,7 @@ function pageTemplate(origin, relative, page) {
     page.tool ? `<li><a href="${page.tool[0]}">${escapeHtml(page.tool[1])}</a></li>` : "",
     ...(page.guides || []).map(([href, label]) => `<li><a href="${href}">${escapeHtml(label)}</a></li>`)
   ].filter(Boolean).join("");
+  const sources = (page.sources || []).map(([href, label]) => `<li><a href="${href}" rel="nofollow">${escapeHtml(label)}</a></li>`).join("");
   const topicLinks = Object.entries(SEARCH_INTENT_PAGES)
     .filter(([key]) => key !== relative && key !== "topics/index.html")
     .slice(0, 5)
@@ -413,6 +414,11 @@ function pageTemplate(origin, relative, page) {
   ${isIndex ? `
   <section class="section"><div class="container content-narrow"><h2>Explore the topic library</h2><div class="guide-grid">${Object.entries(SEARCH_INTENT_PAGES).filter(([key])=>key!=="topics/index.html").map(([key,item])=>`<article class="guide-card"><span class="badge">PDF topic</span><h2>${escapeHtml(item.h1)}</h2><p>${escapeHtml(item.description)}</p><a href="/${key.replace(/\\/g,"/")}">Read topic →</a></article>`).join("")}</div></div></section>` : ""}
   ${!isIndex ? `
+  ${page.sources?.length ? `
+  <section class="section"><div class="container content-narrow">
+    <h2>Sources</h2><p>External product details can change. These links are the current official sources used for the factual comparison on this page.</p>
+    <ul class="footer-links">${sources}</ul>
+  </div></section>` : ""}
   <section class="section"><div class="container content-narrow">
     <h2>Use the related PDF tools</h2>
     <ul class="footer-links">${related}</ul>
