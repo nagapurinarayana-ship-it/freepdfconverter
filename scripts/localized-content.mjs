@@ -1,3 +1,5 @@
+import { LOCALIZED_TOPIC_KEYS, getLocalizedTopic, localizedTopicPath, englishTopicPath } from "./localized-topics.mjs";
+
 export const LOCALES = {
   de: { lang: "de", name: "Deutsch", path: "/de/" },
   fr: { lang: "fr", name: "Français", path: "/fr/" },
@@ -382,7 +384,7 @@ const content = {
 };
 
 export function getLocalizedPage(locale, key) {
-  return content[locale]?.[key] || null;
+  return content[locale]?.[key] || getLocalizedTopic(locale, key) || null;
 }
 
 export function localePagePath(locale, key) {
