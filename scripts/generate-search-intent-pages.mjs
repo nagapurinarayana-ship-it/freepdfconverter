@@ -187,25 +187,25 @@ export const SEARCH_INTENT_PAGES = {
     h1: "PDF to JPG: turn PDF pages into images",
     intro: "Converting PDF pages to JPG is useful when a page must be shared in an image-friendly workflow. Each selected PDF page becomes a raster image rather than an editable PDF page.",
     sections: [
-      ["When JPG makes sense", "JPG works well for photographs, previews and general-purpose images where compact file size matters more than lossless text edges."],
-      ["Resolution matters", "A rendered PDF page has a chosen pixel resolution. Higher output resolution creates a clearer image but also uses more memory and produces a larger file."],
-      ["JPG versus PNG", "PNG is often preferable for diagrams, screenshots and sharp text with flat colours. JPG can be smaller for photographic pages."],
-      ["Keep the PDF for editing", "The image result is a snapshot. Keep the original PDF when you need selectable text, vector content, links or future page edits."]
+      ["When JPG makes sense", "JPG works well for photographs and image-heavy pages where compact files matter. It is less suitable when crisp text or transparency is the main requirement."],
+      ["Rendering changes the file model", "The PDF page is rendered into pixels. Text is no longer selectable in the resulting JPG, and vector graphics become part of the raster image."],
+      ["Quality and resolution", "Higher rendering resolution can make small text clearer but produces larger images. Choose a practical resolution for the destination rather than assuming maximum resolution is always better."],
+      ["Check each page", "Review the first and last pages and a representative page containing text, graphics or photos before sharing a large batch of images."]
     ],
-    tool: ["/tools/pdf-to-image","PDF to JPG / PNG"],
-    guides: [["/guides/pdf-to-jpg-vs-png","PDF to JPG vs PNG guide"],["/guides/pdf-converter-without-upload","Private browser processing guide"]]
+    tool: ["/tools/pdf-to-image","PDF to Image"],
+    guides: [["/guides/pdf-to-jpg-vs-png","PDF to JPG vs PNG guide"]]
   },
 
   "topics/jpg-to-pdf-on-mobile.html": {
     title: "JPG to PDF on Mobile — Practical Guide | FreePDF Tools",
-    description: "Learn how to turn phone photos or screenshots into a PDF, arrange pages, choose page sizes and verify the result on a mobile device.",
+    description: "Learn how to turn phone photos into a PDF, choose practical page dimensions and keep image-heavy documents manageable in the browser.",
     h1: "JPG to PDF on mobile: a practical workflow",
-    intro: "A phone camera produces image files, while many submission systems ask for one PDF. A browser-based image-to-PDF workflow can combine those photos without first moving them to a desktop.",
+    intro: "Phone cameras make it easy to collect document photos, receipts and forms. Converting those images to PDF is useful when a submission or sharing workflow expects one page-oriented file.",
     sections: [
-      ["Choose the right images", "Select the clearest photos and keep the page order intentional. Retake a page when text is blurred rather than expecting the PDF conversion step to fix camera focus."],
-      ["Choose page size", "A4 or Letter is sensible for document submissions. An image-sized page can be useful when preserving a photo or screenshot matters more than print conventions."],
-      ["Watch mobile memory", "Large camera images can use considerable browser memory when several are processed together. Converting fewer pages at a time can be more reliable on a low-memory device."],
-      ["Check before submitting", "Open the generated PDF and verify page rotation, cropping, text readability, order and total file size."]
+      ["Choose the right images", "Use clear, upright photos with enough contrast to read the page. Crop distracting backgrounds when appropriate, but keep the complete document content."],
+      ["Page size matters", "A4 and Letter are common choices for document workflows. Image-sized pages can preserve the photo dimensions more directly but may be awkward for printing."],
+      ["Keep the PDF manageable", "Large camera images can create a large PDF. If the output is too big for a submission or email limit, use a PDF compression workflow afterward."],
+      ["Review before sending", "Open the generated PDF and check page order, orientation, margins and readability. Keep the original photos until the PDF has been accepted."]
     ],
     tool: ["/tools/jpg-to-pdf","JPG to PDF"],
     guides: [["/guides/jpg-png-to-pdf","JPG/PNG to PDF guide"],["/guides/compress-pdf","Compression guide"]]
@@ -213,17 +213,17 @@ export const SEARCH_INTENT_PAGES = {
 
   "topics/pdf-page-size.html": {
     title: "PDF Page Size — A4, Letter or Image | FreePDF Tools",
-    description: "Understand A4, US Letter and image-sized PDF pages, when each choice makes sense and how page size affects printing and sharing.",
-    h1: "PDF page size: choose A4, Letter or image-sized pages",
-    intro: "Page size is a document-layout decision, not just a visual setting. The right choice depends on whether the resulting PDF will be printed, submitted, displayed or preserved as an image document.",
+    description: "Understand A4, Letter and image-sized PDF pages and choose a practical page size for printing, sharing and photo-based workflows.",
+    h1: "PDF page size: A4, Letter or image dimensions?",
+    intro: "Page size affects printing, margins and how image-based PDFs look on screen. The best choice depends on whether the source is a document page, a photo or a mixed set.",
     sections: [
-      ["A4", "A4 is common in many countries and works well for reports, forms, letters and print-oriented submissions. It provides a predictable page boundary for office documents."],
-      ["US Letter", "Letter is common in the United States and some other workflows. Use it when the receiving system or source document expects the Letter page dimensions."],
-      ["Image-sized pages", "An image-sized page can avoid excessive empty margins around a photo or screenshot. It is often useful for image-first documents that will be viewed on screen rather than printed."],
-      ["Verify the destination", "Some submission systems enforce maximum dimensions or file sizes. Check the destination requirements before choosing a non-standard page size."]
+      ["A4 versus Letter", "A4 is widely used internationally, while Letter is common in the United States and some other regions. Choosing the expected paper size helps avoid unexpected scaling when printing."],
+      ["Image-sized pages", "For photos and screenshots, an image-sized page can avoid adding large margins. The tradeoff is that the resulting PDF may not behave like a conventional printable document."],
+      ["Mixed documents", "If a PDF contains pages from different sources, decide whether consistency or faithful image dimensions matter more. Standardizing pages can simplify later printing."],
+      ["Review the final PDF", "Check the page dimensions, orientation, margins and text readability before submitting or printing the document."]
     ],
     tool: ["/tools/jpg-to-pdf","JPG to PDF"],
-    guides: [["/guides/jpg-png-to-pdf","Image-to-PDF guide"],["/guides/pdf-to-jpg-vs-png","PDF image-format guide"]]
+    guides: [["/guides/jpg-png-to-pdf","JPG/PNG to PDF guide"],["/guides/pdf-to-jpg-vs-png","PDF image guide"]]
   },
 
   "topics/pdf-converter-file-formats.html": {
@@ -294,6 +294,14 @@ function pageTemplate(origin, relative, page) {
   </div>
 </section>`).join("");
 
+  const practicalChecklist = `
+  <section class="section">
+    <div class="container content-narrow">
+      <h2>Practical checklist before you finish</h2>
+      <p>Start with the original file and keep a copy until the output has been reviewed. Confirm that the selected workflow matches the source format, then inspect the result for missing text, unexpected page breaks, changed images, incorrect reading order or other layout differences. For important documents, compare key names, dates, numbers and totals with the source. If the workflow involves OCR, manually verify recognized text before relying on it.</p>
+    </div>
+  </section>`;
+
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -338,6 +346,7 @@ function pageTemplate(origin, relative, page) {
   <p class="lead">${escapeHtml(page.intro)}</p>
   <p class="updated">Updated September 28, 2026 · FreePDF Tools</p>
   ${sections}
+  ${practicalChecklist}
   ${isIndex ? `
   <section class="section"><div class="container content-narrow"><h2>Explore the topic library</h2><div class="guide-grid">${Object.entries(SEARCH_INTENT_PAGES).filter(([key])=>key!=="topics/index.html").map(([key,item])=>`<article class="guide-card"><span class="badge">PDF topic</span><h2>${escapeHtml(item.h1)}</h2><p>${escapeHtml(item.description)}</p><a href="/${key.replace(/\\/g,"/")}">Read topic →</a></article>`).join("")}</div></div></section>` : ""}
   ${!isIndex ? `
@@ -364,8 +373,10 @@ export async function generateSearchIntentPages(dist, origin) {
     await mkdir(path.dirname(file), {recursive:true});
     await writeFile(file, pageTemplate(origin,relative,page), "utf8");
   }
-  console.log("Generated search-intent topic pages: " + SEARCH_INTENT_PATHS.length);
+  console.log(`Generated search-intent topic pages: ${SEARCH_INTENT_PATHS.length}`);
 }
 
-function escapeAttr(value){return String(value).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
-function escapeHtml(value){return escapeAttr(value).replace(/>/g,"&gt;");}
+function escapeHtml(value) {
+  return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+}
+function escapeAttr(value) { return escapeHtml(value).replaceAll("'", "&#39;"); }
