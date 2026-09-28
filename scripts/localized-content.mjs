@@ -397,7 +397,7 @@ export function localePagePath(locale, key) {
 }
 
 export function englishPath(key) {
-  return ENGLISH_PATHS[key];
+  return ENGLISH_PATHS[key] || englishTopicPath(key);
 }
 
 export function allLocalizedPaths() {
