@@ -4,7 +4,7 @@ The product is designed for free access with advertising as the first revenue mo
 
 ## 1. Launch and build useful traffic first
 
-Publish the finished site on Cloudflare Pages, verify all six tools, submit the production sitemap to Google Search Console, and let the original tool explanations and PDF guide content get indexed.
+Publish the finished site on Cloudflare Pages, verify all 16 core tools, submit the production sitemap to Google Search Console, and let the original tool explanations and PDF guide content get indexed.
 
 Do not fill pages with ad placeholders before approval. Empty ad containers are hidden automatically.
 
@@ -44,7 +44,7 @@ Before serving personalized ads to visitors in regions where consent is required
 
 ## 7. Revenue growth order
 
-1. Reliable six-tool product.
+1. Reliable 16-tool product.
 2. Search indexing and useful PDF guides.
 3. AdSense after site review.
 4. Add more original guides based on real Search Console queries.
