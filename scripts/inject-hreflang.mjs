@@ -21,7 +21,8 @@ for (const key of PAGE_KEYS) targets.push({ file: englishPath(key), key });
 for (const item of allLocalizedPaths()) targets.push({ file: item.path, key: item.key });
 
 for (const target of targets) {
-  const file = path.join(dist, target.file.replace(/^\//, "")) + (target.file.endsWith("/") ? "index.html" : ".html");
+  const relative = target.file.replace(/^\//, "");
+  const file = path.join(dist, target.file.endsWith("/") ? path.join(relative, "index.html") : relative + ".html");
   let html;
   try { html = await readFile(file, "utf8"); } catch { continue; }
   html = html.replace(/\s*<!-- freepdf-hreflang:start -->[\s\S]*?<!-- freepdf-hreflang:end -->/g, "");
