@@ -11,6 +11,13 @@ const W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 const R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 const REL = "http://schemas.openxmlformats.org/package/2006/relationships";
 
+const OCR_LANGUAGES = {
+  eng: "English",
+  deu: "Deutsch",
+  fra: "Français",
+  spa: "Español"
+};
+
 const el = {
   zone: document.getElementById("dropZone"),
   input: document.getElementById("pdfFile"),
@@ -18,6 +25,7 @@ const el = {
   from: document.getElementById("fromPage"),
   to: document.getElementById("toPage"),
   ocr: document.getElementById("ocrScanned"),
+  ocrLanguage: document.getElementById("ocrLanguage"),
   convert: document.getElementById("convertButton"),
   clear: document.getElementById("clearButton"),
   progress: document.getElementById("progressBar"),
@@ -29,6 +37,7 @@ let pdf = null;
 let busy = false;
 let tesseractPromise = null;
 let ocrWorker = null;
+let ocrWorkerLanguage = "";
 
 function xml(value) {
   return String(value == null ? "" : value)
@@ -109,7 +118,7 @@ function update() {
   el.from.disabled = busy || !pdf;
   el.to.disabled = busy || !pdf;
   el.ocr.disabled = busy || !pdf;
-}
+  el.ocrLanguage.disabled = busy || !el.ocr.checked;
 
 async function destroyPdf() {
   if (pdf) { try { await pdf.destroy(); } catch (_) {} }
@@ -119,6 +128,7 @@ async function destroyPdf() {
 async function destroyWorker() {
   if (ocrWorker) { try { await ocrWorker.terminate(); } catch (_) {} }
   ocrWorker = null;
+  ocrWorkerLanguage = "";
 }
 
 async function loadTesseract() {
@@ -135,10 +145,11 @@ async function loadTesseract() {
   return tesseractPromise;
 }
 
-async function getOcrWorker() {
-  if (ocrWorker) return ocrWorker;
+async function getOcrWorker(language) {
+  if (ocrWorker && ocrWorkerLanguage === language) return ocrWorker;
+  if (ocrWorker) await destroyWorker();
   const Tesseract = await loadTesseract();
-  ocrWorker = await Tesseract.createWorker("eng", 1, {
+  ocrWorker = await Tesseract.createWorker(language, 1, {
     workerPath: "/assets/vendor/tesseract/worker.min.js",
     corePath: "/assets/vendor/tesseract/core",
     langPath: "/assets/vendor/tesseract/lang",
@@ -150,6 +161,7 @@ async function getOcrWorker() {
       U.setStatus(el.status, status + "…", "info");
     }
   });
+  ocrWorkerLanguage = language;
   return ocrWorker;
 }
 
@@ -170,8 +182,8 @@ async function renderPage(page) {
   return canvas;
 }
 
-async function ocrPage(page) {
-  const worker = await getOcrWorker();
+async function ocrPage(page, language) {
+  const worker = await getOcrWorker(language);
   const canvas = await renderPage(page);
   const result = await worker.recognize(canvas);
   canvas.width = 1;
@@ -215,8 +227,9 @@ async function convert() {
       const content = await page.getTextContent();
       let lines = pageText(content.items);
       if (!lines.length && el.ocr.checked) {
-        U.setStatus(el.status, "Page " + number + " has no text. Running local English OCR…", "info");
-        lines = await ocrPage(page);
+        const language = el.ocrLanguage.value;
+        U.setStatus(el.status, "Page " + number + " has no text. Running local " + (OCR_LANGUAGES[language] || language) + " OCR…", "info");
+        lines = await ocrPage(page, language);
       }
       pages.push({ number, lines });
       page.cleanup();
@@ -240,7 +253,7 @@ async function clear() {
   if (busy) return;
   await destroyPdf();
   await destroyWorker();
-  file = null; el.from.value = "1"; el.to.value = ""; el.ocr.checked = false;
+  file = null; el.from.value = "1"; el.to.value = ""; el.ocr.checked = false; el.ocrLanguage.value = "eng";
   U.setProgress(el.progress, 0); U.setStatus(el.status, "Choose a text PDF, or enable OCR for scanned pages.", "info"); update();
 }
 
@@ -249,4 +262,15 @@ el.convert.addEventListener("click", convert);
 el.clear.addEventListener("click", clear);
 el.from.addEventListener("change", function () { if (pdf) U.setStatus(el.status, "Page range updated.", "info"); });
 el.to.addEventListener("change", function () { if (pdf) U.setStatus(el.status, "Page range updated.", "info"); });
+el.ocr.addEventListener("change", function () {
+  if (!el.ocr.checked) {
+    el.ocrLanguage.disabled = true;
+    return;
+  }
+  el.ocrLanguage.disabled = busy;
+  U.setStatus(el.status, "Scanned pages will use local " + (OCR_LANGUAGES[el.ocrLanguage.value] || el.ocrLanguage.value) + " OCR.", "info");
+});
+el.ocrLanguage.addEventListener("change", function () {
+  if (el.ocr.checked) U.setStatus(el.status, "OCR language set to " + (OCR_LANGUAGES[el.ocrLanguage.value] || el.ocrLanguage.value) + ".", "info");
+});
 clear();

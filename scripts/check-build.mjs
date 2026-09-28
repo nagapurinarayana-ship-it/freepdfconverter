@@ -126,6 +126,9 @@ if (pdfWordJsAsset) {
   const pdfWordSource = await readFile(path.join(dist, "assets/js", pdfWordJsAsset), "utf8");
   if (!pdfWordSource.includes("buildDocx")) failures.push("PDF to Word -> DOCX builder is missing");
   if (!pdfWordSource.includes(".docx")) failures.push("PDF to Word -> modern DOCX output is missing");
+  if (!pdfWordSource.includes("ocrLanguage")) failures.push("PDF to Word -> OCR language selector is missing");
+  if (!pdfWordSource.includes('eng: "English"') || !pdfWordSource.includes('deu: "Deutsch"') || !pdfWordSource.includes('fra: "Français"') || !pdfWordSource.includes('spa: "Español"')) failures.push("PDF to Word -> four OCR language mappings are missing");
+  if (!pdfWordSource.includes("createWorker(language")) failures.push("PDF to Word -> selected OCR language is not passed to Tesseract");
 }
 
 const ocrPage = await readFile(path.join(dist, "tools/ocr-pdf.html"), "utf8");
@@ -143,6 +146,7 @@ if (ocrJsAsset) {
 }
 for (const file of ["tesseract.min.js","worker.min.js","core/tesseract-core.wasm.js","core/tesseract-core-simd.wasm.js","core/tesseract-core-lstm.wasm.js","core/tesseract-core-simd-lstm.wasm.js","core/tesseract-core-relaxedsimd.wasm.js","core/tesseract-core-relaxedsimd-lstm.wasm.js","lang/eng.traineddata.gz"]) await access(path.join(dist, "assets/vendor/tesseract", file));
 if (/assets\/vendor\/tesseract\/.*\.[a-f0-9]{10}\.(?:js|wasm)/.test(ocrPage)) failures.push("OCR PDF -> Tesseract vendor assets must stay at stable paths");
+if (!ocrPage.includes('value="eng"') || !ocrPage.includes('value="deu"') || !ocrPage.includes('value="fra"') || !ocrPage.includes('value="spa"')) failures.push("OCR PDF -> four language selector options are missing");
 
 const serviceWorker = await readFile(path.join(dist, "service-worker.js"), "utf8");
 if (serviceWorker.includes("__CACHE_VERSION__") || serviceWorker.includes("__PRECACHE_URLS__")) failures.push("service-worker.js -> build placeholders remain");

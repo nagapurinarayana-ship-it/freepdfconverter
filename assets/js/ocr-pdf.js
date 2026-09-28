@@ -11,12 +11,20 @@ const W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 const R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
 const REL = "http://schemas.openxmlformats.org/package/2006/relationships";
 
+const OCR_LANGUAGES = {
+  eng: "English",
+  deu: "Deutsch",
+  fra: "Français",
+  spa: "Español"
+};
+
 const el = {
   zone: document.getElementById("dropZone"),
   input: document.getElementById("pdfFile"),
   summary: document.getElementById("fileSummary"),
   from: document.getElementById("fromPage"),
   to: document.getElementById("toPage"),
+  language: document.getElementById("ocrLanguage"),
   ocr: document.getElementById("ocrButton"),
   copy: document.getElementById("copyButton"),
   downloadText: document.getElementById("downloadTextButton"),
@@ -32,6 +40,7 @@ let pdf = null;
 let busy = false;
 let worker = null;
 let workerPromise = null;
+let workerLanguage = "";
 let lastPages = [];
 
 function xml(value) {
@@ -134,6 +143,7 @@ function update() {
   el.input.disabled = busy;
   el.from.disabled = busy || !pdf;
   el.to.disabled = busy || !pdf;
+  el.language.disabled = busy;
 }
 
 async function destroyPdf() {
@@ -149,6 +159,7 @@ async function destroyWorker() {
   }
   worker = null;
   workerPromise = null;
+  workerLanguage = "";
 }
 
 async function loadTesseract() {
@@ -168,10 +179,12 @@ async function loadTesseract() {
   return workerPromise;
 }
 
-async function getWorker() {
+async function getWorker(language) {
   const Tesseract = await loadTesseract();
-  if (worker) return worker;
-  worker = await Tesseract.createWorker("eng", 1, {
+  if (worker && workerLanguage === language) return worker;
+  if (worker) await destroyWorker();
+
+  worker = await Tesseract.createWorker(language, 1, {
     workerPath: "/assets/vendor/tesseract/worker.min.js",
     corePath: "/assets/vendor/tesseract/core",
     langPath: "/assets/vendor/tesseract/lang",
@@ -183,6 +196,7 @@ async function getWorker() {
       U.setStatus(el.status, text + "…", "info");
     }
   });
+  workerLanguage = language;
   return worker;
 }
 
@@ -253,8 +267,10 @@ async function runOcr() {
   U.setProgress(el.progress, 1);
 
   try {
-    const ocrWorker = await getWorker();
+    const language = el.language.value;
+    const ocrWorker = await getWorker(language);
     const total = range.to - range.from + 1;
+    U.setStatus(el.status, "Using local " + (OCR_LANGUAGES[language] || language) + " OCR…", "info");
 
     for (let number = range.from; number <= range.to; number += 1) {
       const page = await pdf.getPage(number);
@@ -332,7 +348,7 @@ function clear() {
   el.output.value = "";
   el.to.value = "";
   U.setProgress(el.progress, 0);
-  U.setStatus(el.status, "Choose a scanned or image-only PDF to begin.", "info");
+  U.setStatus(el.status, "Choose a scanned or image-only PDF to begin. English, German, French and Spanish OCR are available locally.", "info");
   update();
 }
 
