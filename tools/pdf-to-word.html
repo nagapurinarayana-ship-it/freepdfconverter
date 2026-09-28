@@ -23,22 +23,23 @@
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header"><div class="container header-inner"><a class="logo" href="../"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav" aria-label="Main navigation"><a href="../#tools">PDF tools</a><a href="../guides/">Guides</a><a href="../privacy">Privacy</a><a href="../about">About</a></nav></div></header>
 <main id="main">
-<section class="tool-hero"><div class="container"><div class="breadcrumbs"><a href="../">Home</a> / PDF to Word</div><span class="eyebrow">PDF → editable DOCX · optional OCR · browser processing</span><h1>Convert PDF to Word with optional OCR</h1><p class="lead">Extract selectable PDF text into an editable Word document, or use local English OCR for image-only scanned pages.</p></div></section>
+<section class="tool-hero"><div class="container"><div class="breadcrumbs"><a href="../">Home</a> / PDF to Word</div><span class="eyebrow">PDF → editable DOCX · optional OCR · browser processing</span><h1>Convert PDF to Word with optional OCR</h1><p class="lead">Extract selectable PDF text into an editable Word document, or use local English, German, French or Spanish OCR for image-only scanned pages.</p></div></section>
 <div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>
 <div class="container tool-shell">
 <section class="tool-panel" aria-labelledby="pdf-word-title"><h2 id="pdf-word-title">Choose a PDF</h2>
 <div class="drop-zone" id="dropZone"><div><strong>Drop one PDF here</strong><p>Up to 60 MB · text extraction first, optional OCR for scanned pages</p><label class="file-picker" for="pdfFile">Choose PDF</label><input class="file-input" id="pdfFile" type="file" accept="application/pdf,.pdf"></div></div>
 <p id="fileSummary" class="selected-file" aria-live="polite">No PDF selected</p>
 <div class="control-grid"><div class="field"><label for="fromPage">First page</label><input id="fromPage" type="number" min="1" value="1"></div><div class="field"><label for="toPage">Last page</label><input id="toPage" type="number" min="1"></div></div>
-<label class="check-row"><input id="ocrScanned" type="checkbox"> <span><strong>OCR scanned pages</strong><small>Use local English OCR only when a page has no selectable text.</small></span></label>
+<div class="control-grid"><div class="field"><label for="ocrLanguage">OCR language</label><select id="ocrLanguage" disabled><option value="eng">English</option><option value="deu">Deutsch</option><option value="fra">Français</option><option value="spa">Español</option></select></div></div>
+<label class="check-row"><input id="ocrScanned" type="checkbox"> <span><strong>OCR scanned pages</strong><small>Use the selected local language only when a page has no selectable text.</small></span></label>
 <div class="action-row"><button class="button" id="convertButton" type="button" disabled>Convert to Word</button><button class="button danger" id="clearButton" type="button" disabled>Clear</button></div>
 <div class="progress"><span id="progressBar"></span></div><p class="status" id="toolStatus" role="status" aria-live="polite"></p>
 </section>
-<aside class="tool-side"><div class="side-card"><h3>What is preserved?</h3><p>Selectable text and page order are carried into an editable DOCX. PDF page geometry, fonts, images and complex tables are not recreated exactly.</p></div><div class="side-card"><h3>Scanned PDFs</h3><p>Enable <strong>OCR scanned pages</strong> to recognize image-only pages locally. English OCR is the initial fallback; review names, numbers, tables and columns before relying on the result.</p></div></aside>
+<aside class="tool-side"><div class="side-card"><h3>What is preserved?</h3><p>Selectable text and page order are carried into an editable DOCX. PDF page geometry, fonts, images and complex tables are not recreated exactly.</p></div><div class="side-card"><h3>Scanned PDFs</h3><p>Enable <strong>OCR scanned pages</strong> to recognize image-only pages locally. Choose English, German, French or Spanish and review names, numbers, tables and columns before relying on the result.</p></div></aside>
 </div>
 <section class="content-section"><div class="container content-narrow">
 <h2>PDF to Word conversion in your browser</h2>
-<p>The converter reads the PDF text layer with PDF.js and creates a standard DOCX package locally. When OCR fallback is enabled, pages with no usable text are rendered locally and recognized with the self-hosted Tesseract.js English runtime.</p>
+<p>The converter reads the PDF text layer with PDF.js and creates a standard DOCX package locally. When OCR fallback is enabled, pages with no usable text are rendered locally and recognized with the selected self-hosted Tesseract.js language runtime.</p>
 <p>Because PDF is a fixed-layout format, there is no universal one-to-one mapping back to Word. The converter prioritizes editable text and page boundaries rather than promising perfect visual reconstruction. OCR output is a reconstruction and should be reviewed.</p>
 <div class="notice"><strong>Privacy note:</strong> your selected PDF stays in this browser tab during conversion. The tool does not send the document to an application server. The OCR engine and language data are loaded as public application assets, not as document uploads.</div>
 <div class="ad-container" data-ad-zone="content" aria-label="Advertisement"></div>
@@ -46,7 +47,7 @@
 <div class="section related-content" aria-labelledby="related-pdf-content"><div class="section-heading"><h2 id="related-pdf-content">Related guidance</h2><p>Learn about PDF-to-Word formatting limits, scanned PDFs and local processing.</p><p><a class="button secondary" href="../topics/pdf-to-word-formatting">PDF to Word formatting →</a> <a class="button secondary" href="../guides/ocr-pdf-to-word">OCR scanned PDF guide →</a></p></div></div>
 <!-- freepdf-internal-links:end -->
 <h2>Frequently asked questions</h2><div class="faq">
-<details><summary>Can I convert scanned PDFs?</summary><p>Yes. Enable <strong>OCR scanned pages</strong>. Pages without selectable text are rendered and recognized locally with English OCR, then included in the DOCX.</p></details>
+<details><summary>Can I convert scanned PDFs?</summary><p>Yes. Enable <strong>OCR scanned pages</strong>, choose English, German, French or Spanish, and pages without selectable text will be rendered and recognized locally before being included in the DOCX.</p></details>
 <details><summary>Does OCR run on every page?</summary><p>No. Direct text extraction is attempted first. OCR is used only for pages that produce no usable text when the OCR option is enabled.</p></details>
 <details><summary>Will the Word file look exactly like the PDF?</summary><p>No. The output focuses on editable text and page order. Complex positioning, images, forms, tables and OCR layout can change.</p></details>
 <details><summary>Does the conversion upload my PDF?</summary><p>No. PDF.js, the DOCX builder and the self-hosted OCR runtime process the selected document in the browser.</p></details>
