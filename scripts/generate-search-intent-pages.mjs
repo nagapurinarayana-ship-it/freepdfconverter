@@ -187,25 +187,25 @@ export const SEARCH_INTENT_PAGES = {
     h1: "PDF to JPG: turn PDF pages into images",
     intro: "Converting PDF pages to JPG is useful when a page must be shared in an image-friendly workflow. Each selected PDF page becomes a raster image rather than an editable PDF page.",
     sections: [
-      ["When JPG makes sense", "JPG works well for photographs, previews and general-purpose images where compact file size matters more than lossless text edges."],
-      ["Resolution matters", "A rendered PDF page has a chosen pixel resolution. Higher output resolution creates a clearer image but also uses more memory and produces a larger file."],
-      ["JPG versus PNG", "PNG is often preferable for diagrams, screenshots and sharp text with flat colours. JPG can be smaller for photographic pages."],
-      ["Keep the PDF for editing", "The image result is a snapshot. Keep the original PDF when you need selectable text, vector content, links or future page edits."]
+      ["When JPG makes sense", "JPG works well for photographs and image-heavy pages where compact files matter. It is less suitable when crisp text or transparency is the main requirement."],
+      ["Rendering changes the file model", "The PDF page is rendered into pixels. Text is no longer selectable in the resulting JPG, and vector graphics become part of the raster image."],
+      ["Quality and resolution", "Higher rendering resolution can make small text clearer but produces larger images. Choose a practical resolution for the destination rather than assuming maximum resolution is always better."],
+      ["Check each page", "Review the first and last pages and a representative page containing text, graphics or photos before sharing a large batch of images."]
     ],
-    tool: ["/tools/pdf-to-image","PDF to JPG / PNG"],
-    guides: [["/guides/pdf-to-jpg-vs-png","PDF to JPG vs PNG guide"],["/guides/pdf-converter-without-upload","Private browser processing guide"]]
+    tool: ["/tools/pdf-to-image","PDF to Image"],
+    guides: [["/guides/pdf-to-jpg-vs-png","PDF to JPG vs PNG guide"]]
   },
 
   "topics/jpg-to-pdf-on-mobile.html": {
     title: "JPG to PDF on Mobile — Practical Guide | FreePDF Tools",
-    description: "Learn how to turn phone photos or screenshots into a PDF, arrange pages, choose page sizes and verify the result on a mobile device.",
+    description: "Learn how to turn phone photos into a PDF, choose practical page dimensions and keep image-heavy documents manageable in the browser.",
     h1: "JPG to PDF on mobile: a practical workflow",
-    intro: "A phone camera produces image files, while many submission systems ask for one PDF. A browser-based image-to-PDF workflow can combine those photos without first moving them to a desktop.",
+    intro: "Phone cameras make it easy to collect document photos, receipts and forms. Converting those images to PDF is useful when a submission or sharing workflow expects one page-oriented file.",
     sections: [
-      ["Choose the right images", "Select the clearest photos and keep the page order intentional. Retake a page when text is blurred rather than expecting the PDF conversion step to fix camera focus."],
-      ["Choose page size", "A4 or Letter is sensible for document submissions. An image-sized page can be useful when preserving a photo or screenshot matters more than print conventions."],
-      ["Watch mobile memory", "Large camera images can use considerable browser memory when several are processed together. Converting fewer pages at a time can be more reliable on a low-memory device."],
-      ["Check before submitting", "Open the generated PDF and verify page rotation, cropping, text readability, order and total file size."]
+      ["Choose the right images", "Use clear, upright photos with enough contrast to read the page. Crop distracting backgrounds when appropriate, but keep the complete document content."],
+      ["Page size matters", "A4 and Letter are common choices for document workflows. Image-sized pages can preserve the photo dimensions more directly but may be awkward for printing."],
+      ["Keep the PDF manageable", "Large camera images can create a large PDF. If the output is too big for a submission or email limit, use a PDF compression workflow afterward."],
+      ["Review before sending", "Open the generated PDF and check page order, orientation, margins and readability. Keep the original photos until the PDF has been accepted."]
     ],
     tool: ["/tools/jpg-to-pdf","JPG to PDF"],
     guides: [["/guides/jpg-png-to-pdf","JPG/PNG to PDF guide"],["/guides/compress-pdf","Compression guide"]]
@@ -213,17 +213,17 @@ export const SEARCH_INTENT_PAGES = {
 
   "topics/pdf-page-size.html": {
     title: "PDF Page Size — A4, Letter or Image | FreePDF Tools",
-    description: "Understand A4, US Letter and image-sized PDF pages, when each choice makes sense and how page size affects printing and sharing.",
-    h1: "PDF page size: choose A4, Letter or image-sized pages",
-    intro: "Page size is a document-layout decision, not just a visual setting. The right choice depends on whether the resulting PDF will be printed, submitted, displayed or preserved as an image document.",
+    description: "Understand A4, Letter and image-sized PDF pages and choose a practical page size for printing, sharing and photo-based workflows.",
+    h1: "PDF page size: A4, Letter or image dimensions?",
+    intro: "Page size affects printing, margins and how image-based PDFs look on screen. The best choice depends on whether the source is a document page, a photo or a mixed set.",
     sections: [
-      ["A4", "A4 is common in many countries and works well for reports, forms, letters and print-oriented submissions. It provides a predictable page boundary for office documents."],
-      ["US Letter", "Letter is common in the United States and some other workflows. Use it when the receiving system or source document expects the Letter page dimensions."],
-      ["Image-sized pages", "An image-sized page can avoid excessive empty margins around a photo or screenshot. It is often useful for image-first documents that will be viewed on screen rather than printed."],
-      ["Verify the destination", "Some submission systems enforce maximum dimensions or file sizes. Check the destination requirements before choosing a non-standard page size."]
+      ["A4 versus Letter", "A4 is widely used internationally, while Letter is common in the United States and some other regions. Choosing the expected paper size helps avoid unexpected scaling when printing."],
+      ["Image-sized pages", "For photos and screenshots, an image-sized page can avoid adding large margins. The tradeoff is that the resulting PDF may not behave like a conventional printable document."],
+      ["Mixed documents", "If a PDF contains pages from different sources, decide whether consistency or faithful image dimensions matter more. Standardizing pages can simplify later printing."],
+      ["Review the final PDF", "Check the page dimensions, orientation, margins and text readability before submitting or printing the document."]
     ],
     tool: ["/tools/jpg-to-pdf","JPG to PDF"],
-    guides: [["/guides/jpg-png-to-pdf","Image-to-PDF guide"],["/guides/pdf-to-jpg-vs-png","PDF image-format guide"]]
+    guides: [["/guides/jpg-png-to-pdf","JPG/PNG to PDF guide"],["/guides/pdf-to-jpg-vs-png","PDF image guide"]]
   },
 
   "topics/pdf-converter-file-formats.html": {
@@ -254,79 +254,7 @@ export const SEARCH_INTENT_PAGES = {
     ],
     tool: ["/pdf-converter-online","PDF Converter"],
     guides: [["/guides/pdf-converter-without-upload","No-upload guide"],["/guides/are-online-pdf-converters-safe","Online PDF safety guide"],["/privacy","Privacy Policy"]]
-  },
-  "topics/adobe-acrobat-alternative.html": {
-    title: "Adobe Acrobat Online Alternative — Local PDF | FreePDF Tools",
-    description: "Compare Adobe Acrobat online services with browser-local PDF processing, including document handling, sign-in, file retention and supported conversion workflows.",
-    h1: "Adobe Acrobat Online alternative: compare processing models",
-    intro: "An Adobe Acrobat online workflow and a browser-local PDF tool solve similar document problems but use different processing models. The useful comparison is not a universal winner; it is which model matches the document and workflow you need.",
-    sections: [
-      ["How Adobe's online model works", "Adobe's current Acrobat online FAQ says its online services upload files to Adobe cloud storage. If you do not sign in to save or share a file, Adobe says it deletes the server copy after a short period. Adobe also documents security controls for data in transit and stored files."],
-      ["How FreePDF Tools differs", "The supported FreePDF Tools document-processing workflows are designed to read selected files in the browser and create the result locally. That avoids intentionally sending the selected document bytes to an application conversion server for those workflows."],
-      ["Capability is part of the comparison", "Adobe's current online tools cover a broad set of conversion targets including Word, Excel, PowerPoint and image formats. FreePDF Tools currently focuses on a smaller browser-local PDF and document set, including PDF to Word, Word/document to PDF, OCR, image conversion and core PDF operations."],
-      ["Which model fits the task?", "Cloud processing can be useful when you need a large hosted feature set, collaboration or cross-device storage. Browser-local processing can be useful when avoiding document upload is more important. For any sensitive document, read the provider's current privacy and retention terms before processing it."]
-    ],
-    tool: ["/pdf-converter-online","FreePDF Tools PDF Converter"],
-    guides: [["/guides/pdf-converter-without-upload","How PDF conversion without upload works"],["/guides/are-online-pdf-converters-safe","Are online PDF converters safe?"]],
-    sources: [
-      ["https://helpx.adobe.com/document-cloud/faq/try-acrobat-online-services.html","Adobe Acrobat online services FAQ"],
-      ["https://www.adobe.com/in/acrobat/online/pdf-to-word.html","Adobe PDF to Word online tool"]
-    ]
-  },
-  "topics/smallpdf-alternative.html": {
-    title: "Smallpdf Alternative — Compare Browser PDF Workflows | FreePDF Tools",
-    description: "Compare Smallpdf's online PDF workflow with FreePDF Tools' browser-local approach, including signup, supported formats, OCR and document processing.",
-    h1: "Smallpdf alternative: compare browser PDF workflows",
-    intro: "Smallpdf and FreePDF Tools both provide browser-based PDF workflows, but users may care about different details: account requirements, supported file types, OCR, mobile access, processing location and the number of tools available.",
-    sections: [
-      ["Smallpdf's documented workflow", "Smallpdf's current PDF-to-Word page states that its converter can be tried without account creation and lists PDF, DOC, XLS, PPT, PNG and JPG as supported inputs around its PDF-to-Word workflow. Smallpdf also publishes separate guidance for scanned PDFs and OCR."],
-      ["FreePDF Tools' documented workflow", "FreePDF Tools is built around supported browser-local processing. PDF to Word reads selectable PDF text in the browser, OCR processes scanned pages locally, and Word/document conversion runs in the browser for the supported formats."],
-      ["OCR is a meaningful difference to check", "Smallpdf's May 2026 PDF-to-DOCX article explains that scanned PDFs can use OCR and notes OCR as a Pro feature. FreePDF Tools exposes OCR as a dedicated browser-local workflow and can create DOCX or TXT output."],
-      ["Choose based on the workflow", "A user who needs a mature ecosystem, mobile app or broad hosted integrations may care about capabilities beyond a small local-first tool. A user who wants the source document to remain inside the browser for a supported conversion may prefer a local-processing model."]
-    ],
-    tool: ["/pdf-converter-online","FreePDF Tools PDF Converter"],
-    guides: [["/guides/pdf-to-word-converter","PDF to Word guide"],["/guides/ocr-pdf-to-word","OCR to Word guide"],["/guides/pdf-converter-without-upload","No-upload processing guide"]],
-    sources: [
-      ["https://smallpdf.com/pdf-to-word","Smallpdf PDF to Word"],
-      ["https://smallpdf.com/blog/pdf-to-docx","Smallpdf PDF to DOCX and OCR guide"]
-    ]
-  },
-  "topics/pdf24-alternative.html": {
-    title: "PDF24 Alternative — Compare PDF Processing Models | FreePDF Tools",
-    description: "Compare PDF24's online PDF processing model with FreePDF Tools' browser-local workflows, including file transfer, deletion, registration and feature scope.",
-    h1: "PDF24 alternative: compare PDF processing models",
-    intro: "PDF24 is a long-running online PDF tools service with a large tool set. FreePDF Tools takes a narrower browser-local approach. The meaningful comparison is processing architecture, feature scope and the requirements of the document workflow.",
-    sections: [
-      ["What PDF24 documents", "PDF24's current PDF-to-Word page says the service is free, requires no registration, uses SSL-secured file transfer, processes files on servers in Germany and automatically deletes files from the PDF24 server after one hour."],
-      ["Browser-local FreePDF Tools model", "For supported workflows, FreePDF Tools processes the selected document in the browser instead of sending the document bytes to a conversion server. The website still makes normal requests needed to load the application and public assets; local processing refers specifically to the document-processing step."],
-      ["Feature breadth versus processing location", "PDF24 documents a broad set of online PDF operations and uses server-side processing systems. FreePDF Tools currently focuses on browser-local PDF operations, Word/document conversion, OCR and image workflows. These are different engineering tradeoffs rather than a simple feature-count contest."],
-      ["What to check before using either service", "Check the exact file type, size limits, conversion fidelity, retention policy and whether the workflow is local or server-side. For business, legal or identity documents, the processing model can be as important as the conversion result."]
-    ],
-    tool: ["/pdf-converter-online","FreePDF Tools PDF Converter"],
-    guides: [["/guides/are-online-pdf-converters-safe","Online PDF converter safety guide"],["/guides/pdf-converter-without-upload","No-upload processing guide"]],
-    sources: [
-      ["https://tools.pdf24.org/en/pdf-to-word","PDF24 PDF to Word"],
-      ["https://tools.pdf24.org/en/","PDF24 online tools"]
-    ]
-  },
-  "topics/cloud-vs-browser-pdf-converter.html": {
-    title: "Cloud vs Browser PDF Converter — Privacy | FreePDF Tools",
-    description: "Understand cloud/server PDF conversion versus browser-local processing, with practical tradeoffs around privacy, features, file limits, collaboration and device resources.",
-    h1: "Cloud vs browser PDF converter: what changes?",
-    intro: "Online PDF conversion can mean two different architectures. A cloud converter uploads the document to a remote service for processing; a browser-local converter downloads the processing code and handles the selected file on the device. Each model has practical tradeoffs.",
-    sections: [
-      ["Cloud or server-side conversion", "The browser sends the document to a remote service, which performs the conversion and returns the result. This can make heavy processing easier on the user's device and can support large hosted feature sets, storage, collaboration and cross-device workflows."],
-      ["Browser-local conversion", "The website downloads the application and processing libraries, then reads the selected file in browser memory. For a supported FreePDF Tools workflow, the source document is not intentionally uploaded to an application conversion server."],
-      ["Privacy is not the same as zero network traffic", "A browser-local site still needs network requests to load HTML, JavaScript, styles, fonts and other public assets. The important claim is narrower: the selected document bytes used by the supported conversion are processed locally rather than sent to a document-conversion server."],
-      ["Device and browser tradeoffs", "Local OCR and large PDFs can consume more memory and CPU on a phone or laptop. Cloud services may handle larger workloads more predictably but require the document to leave the device. Check both privacy requirements and practical device limits before choosing."]
-    ],
-    tool: ["/pdf-converter-online","FreePDF Tools PDF Converter"],
-    guides: [["/guides/pdf-converter-without-upload","How no-upload PDF processing works"],["/guides/are-online-pdf-converters-safe","Online PDF converter safety guide"]],
-    sources: [
-      ["https://helpx.adobe.com/document-cloud/faq/try-acrobat-online-services.html","Adobe documentation on online file processing"],
-      ["https://tools.pdf24.org/en/pdf-to-word","PDF24 documentation on online processing"]
-    ]
-  },
+  }
 };
 
 export const SEARCH_INTENT_PATHS = Object.keys(SEARCH_INTENT_PAGES);
@@ -336,7 +264,6 @@ function pageTemplate(origin, relative, page) {
     page.tool ? `<li><a href="${page.tool[0]}">${escapeHtml(page.tool[1])}</a></li>` : "",
     ...(page.guides || []).map(([href, label]) => `<li><a href="${href}">${escapeHtml(label)}</a></li>`)
   ].filter(Boolean).join("");
-  const sources = (page.sources || []).map(([href, label]) => `<li><a href="${href}" rel="nofollow">${escapeHtml(label)}</a></li>`).join("");
   const topicLinks = Object.entries(SEARCH_INTENT_PAGES)
     .filter(([key]) => key !== relative && key !== "topics/index.html")
     .slice(0, 5)
@@ -366,6 +293,14 @@ function pageTemplate(origin, relative, page) {
     <p>${escapeHtml(text)}</p>
   </div>
 </section>`).join("");
+
+  const practicalChecklist = `
+  <section class="section">
+    <div class="container content-narrow">
+      <h2>Practical checklist before you finish</h2>
+      <p>Start with the original file and keep a copy until the output has been reviewed. Confirm that the selected workflow matches the source format, then inspect the result for missing text, unexpected page breaks, changed images, incorrect reading order or other layout differences. For important documents, compare key names, dates, numbers and totals with the source. If the workflow involves OCR, manually verify recognized text before relying on it.</p>
+    </div>
+  </section>`;
 
   return `<!doctype html>
 <html lang="en">
@@ -411,14 +346,10 @@ function pageTemplate(origin, relative, page) {
   <p class="lead">${escapeHtml(page.intro)}</p>
   <p class="updated">Updated September 28, 2026 · FreePDF Tools</p>
   ${sections}
+  ${practicalChecklist}
   ${isIndex ? `
   <section class="section"><div class="container content-narrow"><h2>Explore the topic library</h2><div class="guide-grid">${Object.entries(SEARCH_INTENT_PAGES).filter(([key])=>key!=="topics/index.html").map(([key,item])=>`<article class="guide-card"><span class="badge">PDF topic</span><h2>${escapeHtml(item.h1)}</h2><p>${escapeHtml(item.description)}</p><a href="/${key.replace(/\\/g,"/")}">Read topic →</a></article>`).join("")}</div></div></section>` : ""}
   ${!isIndex ? `
-  ${page.sources?.length ? `
-  <section class="section"><div class="container content-narrow">
-    <h2>Sources</h2><p>External product details can change. These links are the current official sources used for the factual comparison on this page.</p>
-    <ul class="footer-links">${sources}</ul>
-  </div></section>` : ""}
   <section class="section"><div class="container content-narrow">
     <h2>Use the related PDF tools</h2>
     <ul class="footer-links">${related}</ul>
@@ -442,8 +373,10 @@ export async function generateSearchIntentPages(dist, origin) {
     await mkdir(path.dirname(file), {recursive:true});
     await writeFile(file, pageTemplate(origin,relative,page), "utf8");
   }
-  console.log("Generated search-intent topic pages: " + SEARCH_INTENT_PATHS.length);
+  console.log(`Generated search-intent topic pages: ${SEARCH_INTENT_PATHS.length}`);
 }
 
-function escapeAttr(value){return String(value).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");}
-function escapeHtml(value){return escapeAttr(value).replace(/>/g,"&gt;");}
+function escapeHtml(value) {
+  return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+}
+function escapeAttr(value) { return escapeHtml(value).replaceAll("'", "&#39;"); }
