@@ -16,7 +16,7 @@ export const ENGLISH_PATHS = {
   ocr: "/tools/ocr-pdf"
 };
 
-export const PAGE_KEYS = Object.keys(ENGLISH_PATHS);
+export const PAGE_KEYS = [...Object.keys(ENGLISH_PATHS), ...LOCALIZED_TOPIC_KEYS];
 
 const content = {
   de: {
@@ -386,6 +386,7 @@ export function getLocalizedPage(locale, key) {
 }
 
 export function localePagePath(locale, key) {
+  if (LOCALIZED_TOPIC_KEYS.includes(key)) return localizedTopicPath(locale, key);
   if (key === "home") return "/" + locale + "/";
   const slug = key === "converter" ? "pdf-converter-online" :
     key === "pdfword" ? "pdf-to-word" :
