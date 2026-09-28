@@ -37,7 +37,7 @@ export const LOCALIZED_TOPIC_CONTENT = {
       eyebrow: "PDF zu Word · privat",
       h1: "PDF ohne Upload in Word umwandeln",
       lead: "Bei unterstützten Arbeitsabläufen bleibt die ausgewählte PDF-Datei im Browser. Das ist besonders nützlich für sensible Dokumente.",
-      sections: [["Lokale Verarbeitung", "Der Browser lädt die Anwendung und die benötigten Bibliotheken. Die ausgewählte PDF wird anschließend im Browser gelesen und das DOCX lokal erzeugt."],["Wann OCR nötig ist", "Wenn Text nicht markiert oder kopiert werden kann, handelt es sich oft um einen Scan. Aktivieren Sie für image-only Seiten die lokale englische OCR."],["Ergebnis prüfen", "Kontrollieren Sie Überschriften, Tabellen, Zahlen, Seitenumbrüche und Sonderzeichen im erzeugten DOCX, bevor Sie es weitergeben."]]
+      sections: [["Lokale Verarbeitung", "Der Browser lädt die Anwendung und die benötigten Bibliotheken. Die ausgewählte PDF wird anschließend im Browser gelesen und das DOCX lokal erzeugt."],["Wann OCR nötig ist", "Wenn Text nicht markiert oder kopiert werden kann, handelt es sich oft um einen Scan. Aktivieren Sie für image-only Seiten die lokal verfügbare OCR-Sprache."],["Ergebnis prüfen", "Kontrollieren Sie Überschriften, Tabellen, Zahlen, Seitenumbrüche und Sonderzeichen im erzeugten DOCX, bevor Sie es weitergeben."]]
     },
     "topic-scanned-pdf-word": {
       slug: "gescanntes-pdf-zu-word",
@@ -46,7 +46,7 @@ export const LOCALIZED_TOPIC_CONTENT = {
       eyebrow: "OCR · gescanntes PDF",
       h1: "Gescannte PDF in Word umwandeln",
       lead: "Ein gescanntes PDF enthält oft nur Bilder. OCR erkennt die sichtbaren Zeichen und erzeugt daraus bearbeitbaren Text.",
-      sections: [["Scan erkennen", "Wenn Sie den Text einer Seite nicht markieren können, ist sie wahrscheinlich bildbasiert. Gemischte PDFs können sowohl Text- als auch Scan-Seiten enthalten."],["OCR ausführen", "Die Seite wird lokal gerendert und mit englischer OCR verarbeitet. Das Ergebnis ist eine Rekonstruktion des erkannten Textes und keine pixelgenaue Kopie."],["Wichtige Inhalte prüfen", "Namen, Datumsangaben, Nummern, Tabellen und Spalten sollten mit dem Original verglichen werden."]]
+      sections: [["Scan erkennen", "Wenn Sie den Text einer Seite nicht markieren können, ist sie wahrscheinlich bildbasiert. Gemischte PDFs können sowohl Text- als auch Scan-Seiten enthalten."],["OCR ausführen", "Die Seite wird lokal gerendert und mit der ausgewählten OCR-Sprache verarbeitet. Das Ergebnis ist eine Rekonstruktion des erkannten Textes und keine pixelgenaue Kopie."],["Wichtige Inhalte prüfen", "Namen, Datumsangaben, Nummern, Tabellen und Spalten sollten mit dem Original verglichen werden."]]
     },
     "topic-pdf-word-formatting": {
       slug: "pdf-zu-word-formatierung",
@@ -266,7 +266,7 @@ export const LOCALIZED_TOPIC_CONTENT = {
       eyebrow: "OCR · PDF escaneado",
       h1: "Convertir PDF escaneado a Word",
       lead: "Un PDF escaneado suele contener imágenes. OCR reconoce los caracteres visibles para producir texto editable.",
-      sections: [["Identificar un escaneo", "Si no puedes seleccionar el texto, la página probablemente está basada en una imagen."],["Ejecutar OCR", "La página se renderiza localmente y se reconoce con OCR en inglés. El resultado es una reconstrucción, no una copia visual exacta."],["Revisar datos importantes", "Compara nombres, fechas, números, tablas y columnas con el documento original."]]
+      sections: [["Identificar un escaneo", "Si no puedes seleccionar el texto, la página probablemente está basada en una imagen."],["Ejecutar OCR", "La página se renderiza localmente y se reconoce con el idioma OCR seleccionado. El resultado es una reconstrucción, no una copia visual exacta."],["Revisar datos importantes", "Compara nombres, fechas, números, tablas y columnas con el documento original."]]
     },
     "topic-pdf-word-formatting": {
       slug: "formato-pdf-a-word",
