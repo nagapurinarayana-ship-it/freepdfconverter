@@ -120,12 +120,12 @@ if (pdfWordJsAsset) {
 
 const ocrPage = await readFile(path.join(dist, "tools/ocr-pdf.html"), "utf8");
 if (!ocrPage.includes("OCR PDF") || !ocrPage.includes("scanned")) failures.push("OCR PDF -> tool page is missing scanned-PDF OCR copy");
-if (!ocrPage.includes("/assets/vendor/tesseract/tesseract.min.js")) failures.push("OCR PDF -> local Tesseract runtime reference is missing");
 if (!/assets\/js\/ocr-pdf\.[a-f0-9]{10}\.js/.test(ocrPage)) failures.push("OCR PDF -> fingerprinted browser script reference is missing");
 const ocrJsAsset = jsAssets.find((file) => /^ocr-pdf\.[a-f0-9]{10}\.js$/.test(file));
 if (!ocrJsAsset) failures.push("OCR PDF -> fingerprinted browser script is missing");
 if (ocrJsAsset) {
   const ocrJsSource = await readFile(path.join(dist, "assets/js", ocrJsAsset), "utf8");
+  if (!ocrJsSource.includes("/assets/vendor/tesseract/tesseract.min.js")) failures.push("OCR PDF -> local Tesseract runtime path is missing");
   if (!ocrJsSource.includes("/assets/vendor/tesseract/worker.min.js")) failures.push("OCR PDF -> local Tesseract worker path is missing");
   if (!ocrJsSource.includes("/assets/vendor/tesseract/core")) failures.push("OCR PDF -> local Tesseract core path is missing");
   if (!ocrJsSource.includes("/assets/vendor/tesseract/lang")) failures.push("OCR PDF -> local English language-data path is missing");
