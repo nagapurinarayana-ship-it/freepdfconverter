@@ -51,13 +51,14 @@ for (const file of await htmlFiles(root)) {
     if (/^(?:https?:|#|data:|mailto:)/.test(href)) continue;
     const clean = href.split("#")[0].split("?")[0];
     if (!clean) continue;
-    const normalizedRoute = clean.replace(/^\//, "").replace(/\/$/, "");
+    const target = clean.startsWith("/") ? path.join(root, clean.slice(1)) : path.resolve(path.dirname(file), clean);
+    const relativeTarget = path.relative(root, target).replaceAll(path.sep, "/");
+    const normalizedTarget = relativeTarget.replace(/\.html$/, "").replace(/\/$/, "");
     const generatedMatch = [...generatedRoutes].some((relative) => {
-      const cleanRelative = relative.replace(/\.html$/, "").replace(/\/index$/, "");
-      return normalizedRoute === cleanRelative || normalizedRoute === relative.replace(/\.html$/, "") || normalizedRoute === relative;
+      const normalizedGenerated = relative.replace(/\.html$/, "").replace(/\/$/, "").replace(/\/index$/, "");
+      return normalizedTarget === normalizedGenerated;
     });
     if (generatedMatch) continue;
-    const target = clean.startsWith("/") ? path.join(root, clean.slice(1)) : path.resolve(path.dirname(file), clean);
     if (!await localTargetExists(target)) broken.push(path.relative(root, file) + " -> " + href);
   }
   const relative = path.relative(root, file);
