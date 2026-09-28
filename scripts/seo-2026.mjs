@@ -22,7 +22,11 @@ const overrides = {
   'guides/pdf-converter-without-upload.html': [
     'PDF Converter Without Upload — How Private Browser Processing Works',
     'Learn how to convert and manage PDF files without uploading them to an application server, when local browser processing helps and what its limitations are.'
-  ]
+  ],
+  'tools/ocr-pdf.html': [
+    'OCR PDF Online Free — Scanned PDF to Word | FreePDF Tools',
+    'OCR scanned PDF files in your browser and download recognized text as Word DOCX or plain text without uploading the source document.'
+  ],
 }
 
 const files = []
