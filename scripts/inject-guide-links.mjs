@@ -98,6 +98,73 @@ const related = {
   ]
 };
 
+
+related["guides/merge-pdf-on-phone.html"] = [
+  ["guides/merge-pdf-safely.html", "Merge PDFs safely"],
+  ["guides/keep-pdf-quality-when-combining.html", "Keep PDF quality when combining"],
+  ["guides/organize-pdf-pages-on-phone.html", "Organize PDF pages on a phone"]
+];
+related["guides/split-pdf-into-separate-files.html"] = [
+  ["guides/split-extract-pdf-pages.html", "Split and extract PDF pages"],
+  ["guides/organize-pdf-pages.html", "Organize PDF pages"],
+  ["guides/merge-pdf-on-phone.html", "Merge PDFs on a phone"]
+];
+related["guides/convert-scanned-images-to-pdf.html"] = [
+  ["guides/jpg-png-to-pdf.html", "Convert JPG or PNG to PDF"],
+  ["guides/jpg-vs-png-to-pdf.html", "JPG vs PNG for PDF"],
+  ["guides/prepare-scanned-pdf-for-ocr.html", "Prepare a scanned PDF for OCR"]
+];
+related["guides/keep-pdf-quality-when-combining.html"] = [
+  ["guides/merge-pdf-safely.html", "Merge PDFs safely"],
+  ["guides/compress-pdf.html", "Compress a PDF"],
+  ["guides/pdf-to-jpg-vs-png.html", "PDF to JPG vs PNG"]
+];
+related["guides/what-pdf-metadata-contains.html"] = [
+  ["guides/remove-pdf-metadata.html", "Remove PDF metadata"],
+  ["guides/are-online-pdf-converters-safe.html", "Are online PDF converters safe?"],
+  ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading"]
+];
+related["guides/pdf-to-word-vs-ocr.html"] = [
+  ["guides/pdf-to-word-converter.html", "Convert PDF to Word"],
+  ["guides/ocr-pdf-to-word.html", "OCR a scanned PDF into Word"],
+  ["guides/prepare-scanned-pdf-for-ocr.html", "Prepare a scanned PDF for OCR"]
+];
+related["guides/prepare-scanned-pdf-for-ocr.html"] = [
+  ["guides/ocr-pdf-to-word.html", "OCR a scanned PDF into Word"],
+  ["guides/pdf-to-word-vs-ocr.html", "PDF to Word vs OCR"],
+  ["guides/rotate-pdf-pages.html", "Rotate PDF pages"]
+];
+related["guides/reduce-pdf-size-for-upload.html"] = [
+  ["guides/compress-pdf.html", "Compress a PDF"],
+  ["guides/pdf-too-large-for-email.html", "PDF too large for email"],
+  ["guides/reduce-pdf-file-size-for-email.html", "Reduce PDF size for email"]
+];
+related["guides/pdf-too-large-for-email.html"] = [
+  ["guides/reduce-pdf-file-size-for-email.html", "Reduce PDF size for email"],
+  ["guides/compress-pdf.html", "Compress a PDF"],
+  ["guides/reduce-pdf-size-for-upload.html", "Reduce PDF size for an upload limit"]
+];
+related["guides/jpg-vs-png-to-pdf.html"] = [
+  ["guides/jpg-png-to-pdf.html", "Convert JPG or PNG to PDF"],
+  ["guides/pdf-to-jpg-vs-png.html", "PDF to JPG vs PNG"],
+  ["guides/convert-scanned-images-to-pdf.html", "Convert scanned images into PDF"]
+];
+related["guides/pdf-page-size-a4-vs-letter.html"] = [
+  ["guides/jpg-png-to-pdf.html", "Convert JPG or PNG to PDF"],
+  ["guides/convert-scanned-images-to-pdf.html", "Convert scanned images into PDF"],
+  ["guides/jpg-vs-png-to-pdf.html", "JPG vs PNG for PDF"]
+];
+related["guides/convert-old-doc-to-pdf.html"] = [
+  ["guides/word-to-pdf-converter.html", "Convert Word to PDF"],
+  ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading"],
+  ["guides/pdf-converter-file-formats.html", "PDF converter file formats"]
+];
+related["guides/organize-pdf-pages-on-phone.html"] = [
+  ["guides/organize-pdf-pages.html", "Organize PDF pages"],
+  ["guides/merge-pdf-on-phone.html", "Merge PDFs on a phone"],
+  ["guides/split-pdf-into-separate-files.html", "Split a PDF into separate files"]
+];
+
 const files = [];
 await collectHtml(dist);
 
