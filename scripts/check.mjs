@@ -3,6 +3,9 @@ import path from "node:path";
 import { articlePages, indexablePages } from "./site-config.mjs";
 
 const root = process.cwd();
+const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+if (packageJson.dependencies?.["tesseract.js"] !== "7.0.0") throw new Error("OCR dependency tesseract.js must remain pinned to 7.0.0");
+if (packageJson.dependencies?.["@tesseract.js-data/eng"] !== "1.0.0") throw new Error("OCR English language data dependency must remain pinned to 1.0.0");
 const required = [
   "index.html", "about.html", "privacy.html", "terms.html", "contact.html",
   "tools/merge-pdf.html", "tools/split-pdf.html", "tools/rotate-pdf.html",
