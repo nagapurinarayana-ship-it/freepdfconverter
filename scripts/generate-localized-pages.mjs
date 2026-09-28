@@ -76,7 +76,7 @@ ${sections}
   const pagePath = localePagePath(locale, key);
   const relativePage = pagePath.replace(new RegExp("^/" + locale + "/"), "");
   const outputFile = pagePath.endsWith("/")
-    ? path.join(dist, relativePage, "index.html")
+    ? path.join(dist, locale, relativePage, "index.html")
     : path.join(dist, locale, relativePage + ".html");
   await mkdir(path.dirname(outputFile), { recursive: true });
   await writeFile(outputFile, html, "utf8");
