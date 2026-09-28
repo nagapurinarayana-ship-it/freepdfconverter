@@ -73,13 +73,13 @@ ${sections}
 <footer class="site-footer"><div class="container"><div class="footer-bottom"><span>© ${new Date().getUTCFullYear()} FreePDF Tools</span><span>PDF processing in your browser</span></div></div></footer>
 </body></html>`;
 
-  const filename = key === "home" ? "index.html" :
-    key === "converter" ? "pdf-converter-online.html" :
-    key === "pdfword" ? "pdf-to-word.html" :
-    key === "wordpdf" ? "word-to-pdf.html" :
-    key === "jpg" ? "jpg-to-pdf.html" :
-    key + ".html";
-  await writeFile(path.join(dir, filename), html, "utf8");
+  const pagePath = localePagePath(locale, key);
+  const relativePage = pagePath.replace(new RegExp("^/" + locale + "/"), "");
+  const outputFile = pagePath.endsWith("/")
+    ? path.join(dist, locale, relativePage, "index.html")
+    : path.join(dist, locale, relativePage + ".html");
+  await mkdir(path.dirname(outputFile), { recursive: true });
+  await writeFile(outputFile, html, "utf8");
 }
 
 console.log("Generated localized DE/FR/ES landing pages: " + allLocalizedPaths().length);

@@ -151,6 +151,9 @@ pageDates["guides/jpg-vs-png-to-pdf.html"] = "2026-09-28";
 pageDates["guides/pdf-page-size-a4-vs-letter.html"] = "2026-09-28";
 pageDates["guides/convert-old-doc-to-pdf.html"] = "2026-09-28";
 pageDates["guides/organize-pdf-pages-on-phone.html"] = "2026-09-28";
+for (const localizedTopicKey of [
+  "topic-pdf-word-private","topic-scanned-pdf-word","topic-pdf-word-formatting","topic-ocr-pdf-online","topic-ocr-pdf-accuracy","topic-word-97-2003-pdf","topic-docx-to-pdf","topic-private-pdf","topic-pdf-to-text","topic-compress-target","topic-jpg-mobile","topic-pdf-page-size"
+]) pageDates[localizedTopicKey] = "2026-09-28";
 for (const relative of [
   "topics/adobe-acrobat-alternative.html",
   "topics/smallpdf-alternative.html",

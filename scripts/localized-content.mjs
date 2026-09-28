@@ -1,3 +1,5 @@
+import { LOCALIZED_TOPIC_KEYS, getLocalizedTopic, localizedTopicPath, englishTopicPath } from "./localized-topics.mjs";
+
 export const LOCALES = {
   de: { lang: "de", name: "Deutsch", path: "/de/" },
   fr: { lang: "fr", name: "Français", path: "/fr/" },
@@ -16,7 +18,7 @@ export const ENGLISH_PATHS = {
   ocr: "/tools/ocr-pdf"
 };
 
-export const PAGE_KEYS = Object.keys(ENGLISH_PATHS);
+export const PAGE_KEYS = [...Object.keys(ENGLISH_PATHS), ...LOCALIZED_TOPIC_KEYS];
 
 const content = {
   de: {
@@ -382,10 +384,11 @@ const content = {
 };
 
 export function getLocalizedPage(locale, key) {
-  return content[locale]?.[key] || null;
+  return content[locale]?.[key] || getLocalizedTopic(locale, key) || null;
 }
 
 export function localePagePath(locale, key) {
+  if (LOCALIZED_TOPIC_KEYS.includes(key)) return localizedTopicPath(locale, key);
   if (key === "home") return "/" + locale + "/";
   const slug = key === "converter" ? "pdf-converter-online" :
     key === "pdfword" ? "pdf-to-word" :
@@ -396,7 +399,7 @@ export function localePagePath(locale, key) {
 }
 
 export function englishPath(key) {
-  return ENGLISH_PATHS[key];
+  return ENGLISH_PATHS[key] || englishTopicPath(key);
 }
 
 export function allLocalizedPaths() {
