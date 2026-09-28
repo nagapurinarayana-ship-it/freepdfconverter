@@ -21,6 +21,8 @@ for (const item of allLocalizedPaths()) {
   }
   const canonical = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1] || "";
   if (!canonical.endsWith(item.path)) failures.push(relative + " -> canonical mismatch");
+  const stylesheet = html.match(/<link\s+rel="stylesheet"\s+href="([^"]+)"/i)?.[1] || "";
+  if (!/^\/assets\/css\/styles\.[a-f0-9]{10}\.css$/.test(stylesheet)) failures.push(relative + " -> stylesheet is not fingerprinted");
 }
 
 for (const key of PAGE_KEYS) {
