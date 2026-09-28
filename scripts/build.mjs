@@ -2,6 +2,7 @@ import { cp, mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/pro
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { articlePages, articlePublishedDates, indexablePages, pageDates, pageLabels, pagePathname, supplementalPages } from "./site-config.mjs";
+import { SEARCH_INTENT_PATHS, generateSearchIntentPages } from "./generate-search-intent-pages.mjs";
 
 const root = process.cwd();
 const dist = path.join(root, "dist");
@@ -66,13 +67,15 @@ await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
 
 const htmlFiles = [...new Set([...indexablePages, ...supplementalPages, "404.html"])];
-const copyCandidates = [...files, ...htmlFiles.filter((relative) => !files.includes(relative))];
+const generatedSearchPages = new Set(SEARCH_INTENT_PATHS);
+const copyCandidates = [...files, ...htmlFiles.filter((relative) => !files.includes(relative) && !generatedSearchPages.has(relative))];
 for (const relative of copyCandidates) {
   const source = path.join(root, relative);
   const target = path.join(dist, relative);
   await cp(source, target);
 }
 for (const directory of directories) await cp(path.join(root, directory), path.join(dist, directory), { recursive: true });
+await generateSearchIntentPages(dist, origin);
 
 for (const relative of htmlFiles) {
   const file = path.join(dist, relative);
