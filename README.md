@@ -21,10 +21,11 @@ FreePDF Tools currently ships 16 core browser-local PDF/document workflows, plus
 - Remove common PDF metadata
 - Crop PDF pages
 - Extract selectable PDF text
-- PDF to Word (editable modern `.docx` for text-based PDFs)
+- OCR scanned PDF pages locally with English, German, French or Spanish language models
+- PDF to Word (editable modern `.docx` for text-based PDFs, with optional multilingual OCR fallback)
 - Word / document to PDF: Microsoft Word 97-2003 `.doc` **and** modern `.docx`/`.docm`/`.dotx`/`.dotm`, plus ODT, RTF, TXT and HTML
 
-The site is static HTML, CSS and JavaScript. Word conversion supports both modern Office Open XML documents and legacy Microsoft Word 97-2003 binary `.doc` documents through a browser-side MS-DOC parser. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js, JSZip and QPDF WebAssembly libraries. QPDF runs in a dedicated browser worker for the Unlock PDF workflow. A progressive web app service worker caches the public tool code for offline use; selected documents and passwords are never placed in that cache.
+The site is static HTML, CSS and JavaScript. The production content layer includes 30 practical English guides, 21 search-intent topic pages, and localized German/French/Spanish landing and topic clusters. Word conversion supports both modern Office Open XML documents and legacy Microsoft Word 97-2003 binary `.doc` documents through a browser-side MS-DOC parser. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js, JSZip and QPDF WebAssembly libraries. QPDF runs in a dedicated browser worker for the Unlock PDF workflow. Tesseract.js runs OCR in a browser worker using self-hosted English, German, French and Spanish trained data. A progressive web app service worker caches the public tool code for offline use; selected documents and passwords are never placed in that cache.
 
 ## Verify the privacy model
 
@@ -51,14 +52,22 @@ Workers Builds does not inject the final public URL into the build. After the fi
 
 ### Cloudflare Pages
 
-Use the native Cloudflare Pages Git integration for production deployment. Keep the production branch as `main`, build command as `npm run build`, and output directory as `dist`. Cloudflare then rebuilds and deploys the site automatically when `main` changes. The repository's GitHub Actions workflow validates the exact production build, including 16 core tools, the expanded 30-guide library and generated search-intent topic pages,, including the legacy Microsoft Word 97–2003 parser and modern Word/DOCX workflow, before the change is considered production-ready.
+Use the native Cloudflare Pages Git integration for production deployment. Keep the production branch as `main`, build command as `npm run build`, and output directory as `dist`. Cloudflare then rebuilds and deploys the site automatically when `main` changes. The repository's GitHub Actions workflow validates the exact production build, including 16 core tools, the 30-guide library, generated search-intent topic pages, localized SEO, the legacy Microsoft Word 97–2003 parser, modern Word/DOCX workflow, multilingual OCR assets and local-processing checks before the change is considered production-ready.
 
 Do not configure a second secret-based Wrangler deployment against the same Pages project unless you intentionally replace the native Git integration.
 
 ## Local checks
 
-Run `npm run verify` to validate local references, PDF/document regressions, clean canonical URLs, JSON-LD, the generated sitemap, localized SEO, guide/topic coverage, local-processing source checks and accessibility/performance rules. The document test validates a real Microsoft Word 97-2003 `.doc` fixture and checks that the modern `.docx` workflow remains enabled.
+Run `npm run verify` to validate local references, PDF/document regressions, clean canonical URLs, JSON-LD, the generated sitemap, localized SEO, guide/topic coverage, multilingual OCR assets, local-processing source checks and accessibility/performance rules. Use `npm run seo:search-console -- path/to/export.csv` to analyze a local Search Console export without uploading query data. The document test validates a real Microsoft Word 97-2003 `.doc` fixture and checks that the modern `.docx` workflow remains enabled.
 
 ## Monetization
 
 See `docs/MONETIZATION.md`. Do not add sample AdSense IDs. Only enable ads with the real publisher and ad-unit IDs after the site is eligible and connected to AdSense.
+
+
+## Search growth and external reference assets
+
+- `docs/SEO-TRAFFIC-ROADMAP.md` defines the frozen search-growth strategy and content-quality rules.
+- `docs/SEARCH-CONSOLE-WORKFLOW.md` documents the local Search Console analysis workflow.
+- `docs/SEARCH-CONSOLE-BASELINE-2026-09-27.md` records the first query/page performance baseline and the initial high-impression opportunities.
+- `docs/EXTERNAL-REFERENCE-ASSETS.md` contains factual descriptions for legitimate software-directory, developer-resource and editorial reference opportunities. It does not use fake reviews, rankings or unsupported claims.
