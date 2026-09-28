@@ -46,6 +46,19 @@ export const indexablePages = [
   "guides/pdf-to-word-converter.html",
   "guides/word-to-pdf-converter.html",
   "guides/ocr-pdf-to-word.html",
+  "guides/merge-pdf-on-phone.html",
+  "guides/split-pdf-into-separate-files.html",
+  "guides/convert-scanned-images-to-pdf.html",
+  "guides/keep-pdf-quality-when-combining.html",
+  "guides/what-pdf-metadata-contains.html",
+  "guides/pdf-to-word-vs-ocr.html",
+  "guides/prepare-scanned-pdf-for-ocr.html",
+  "guides/reduce-pdf-size-for-upload.html",
+  "guides/pdf-too-large-for-email.html",
+  "guides/jpg-vs-png-to-pdf.html",
+  "guides/pdf-page-size-a4-vs-letter.html",
+  "guides/convert-old-doc-to-pdf.html",
+  "guides/organize-pdf-pages-on-phone.html",
   ...[
     "topics/index.html",
     "topics/pdf-to-word-without-upload.html",
@@ -90,7 +103,20 @@ export const articlePages = new Set([
   "guides/pdf-to-word-converter.html",
   "guides/word-to-pdf-converter.html",
   "guides/compress-pdf.html",
-  "guides/ocr-pdf-to-word.html"
+  "guides/ocr-pdf-to-word.html",
+  "guides/merge-pdf-on-phone.html",
+  "guides/split-pdf-into-separate-files.html",
+  "guides/convert-scanned-images-to-pdf.html",
+  "guides/keep-pdf-quality-when-combining.html",
+  "guides/what-pdf-metadata-contains.html",
+  "guides/pdf-to-word-vs-ocr.html",
+  "guides/prepare-scanned-pdf-for-ocr.html",
+  "guides/reduce-pdf-size-for-upload.html",
+  "guides/pdf-too-large-for-email.html",
+  "guides/jpg-vs-png-to-pdf.html",
+  "guides/pdf-page-size-a4-vs-letter.html",
+  "guides/convert-old-doc-to-pdf.html",
+  "guides/organize-pdf-pages-on-phone.html"
 ]);
 
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
@@ -112,6 +138,19 @@ pageDates["tools/compress-pdf.html"] = "2026-09-28";
 pageDates["guides/compress-pdf.html"] = "2026-09-28";
 pageDates["tools/ocr-pdf.html"] = "2026-09-28";
 pageDates["guides/ocr-pdf-to-word.html"] = "2026-09-28";
+pageDates["guides/merge-pdf-on-phone.html"] = "2026-09-28";
+pageDates["guides/split-pdf-into-separate-files.html"] = "2026-09-28";
+pageDates["guides/convert-scanned-images-to-pdf.html"] = "2026-09-28";
+pageDates["guides/keep-pdf-quality-when-combining.html"] = "2026-09-28";
+pageDates["guides/what-pdf-metadata-contains.html"] = "2026-09-28";
+pageDates["guides/pdf-to-word-vs-ocr.html"] = "2026-09-28";
+pageDates["guides/prepare-scanned-pdf-for-ocr.html"] = "2026-09-28";
+pageDates["guides/reduce-pdf-size-for-upload.html"] = "2026-09-28";
+pageDates["guides/pdf-too-large-for-email.html"] = "2026-09-28";
+pageDates["guides/jpg-vs-png-to-pdf.html"] = "2026-09-28";
+pageDates["guides/pdf-page-size-a4-vs-letter.html"] = "2026-09-28";
+pageDates["guides/convert-old-doc-to-pdf.html"] = "2026-09-28";
+pageDates["guides/organize-pdf-pages-on-phone.html"] = "2026-09-28";
 for (const relative of [
   "topics/adobe-acrobat-alternative.html",
   "topics/smallpdf-alternative.html",
@@ -153,7 +192,20 @@ export const articlePublishedDates = {
   "guides/pdf-to-word-converter.html": "2026-09-27",
   "guides/word-to-pdf-converter.html": "2026-09-27",
   "guides/compress-pdf.html": "2026-09-28",
-  "guides/ocr-pdf-to-word.html": "2026-09-28"
+  "guides/ocr-pdf-to-word.html": "2026-09-28",
+  "guides/merge-pdf-on-phone.html": "2026-09-28",
+  "guides/split-pdf-into-separate-files.html": "2026-09-28",
+  "guides/convert-scanned-images-to-pdf.html": "2026-09-28",
+  "guides/keep-pdf-quality-when-combining.html": "2026-09-28",
+  "guides/what-pdf-metadata-contains.html": "2026-09-28",
+  "guides/pdf-to-word-vs-ocr.html": "2026-09-28",
+  "guides/prepare-scanned-pdf-for-ocr.html": "2026-09-28",
+  "guides/reduce-pdf-size-for-upload.html": "2026-09-28",
+  "guides/pdf-too-large-for-email.html": "2026-09-28",
+  "guides/jpg-vs-png-to-pdf.html": "2026-09-28",
+  "guides/pdf-page-size-a4-vs-letter.html": "2026-09-28",
+  "guides/convert-old-doc-to-pdf.html": "2026-09-28",
+  "guides/organize-pdf-pages-on-phone.html": "2026-09-28"
 };
 
 export const pageLabels = {
@@ -206,6 +258,19 @@ export const pageLabels = {
   "guides/word-to-pdf-converter.html": "How to Convert Word to PDF",
   "guides/compress-pdf.html": "How to Compress a PDF",
   "guides/ocr-pdf-to-word.html": "How to OCR a Scanned PDF into Word",
+  "guides/merge-pdf-on-phone.html": "How to Merge PDFs on a Phone",
+  "guides/split-pdf-into-separate-files.html": "How to Split a PDF into Separate Files",
+  "guides/convert-scanned-images-to-pdf.html": "Convert Scanned Images to PDF",
+  "guides/keep-pdf-quality-when-combining.html": "Merge PDFs Without Losing Quality",
+  "guides/what-pdf-metadata-contains.html": "What PDF Metadata Contains",
+  "guides/pdf-to-word-vs-ocr.html": "PDF to Word vs OCR",
+  "guides/prepare-scanned-pdf-for-ocr.html": "Prepare a Scanned PDF for OCR",
+  "guides/reduce-pdf-size-for-upload.html": "Reduce PDF Size for Upload",
+  "guides/pdf-too-large-for-email.html": "PDF Too Large for Email",
+  "guides/jpg-vs-png-to-pdf.html": "JPG vs PNG for PDF",
+  "guides/pdf-page-size-a4-vs-letter.html": "PDF Page Size: A4 vs Letter",
+  "guides/convert-old-doc-to-pdf.html": "Convert Old DOC Files to PDF",
+  "guides/organize-pdf-pages-on-phone.html": "Organize PDF Pages on a Phone",
   "topics/index.html": "PDF Conversion Topics",
   "topics/pdf-to-word-without-upload.html": "PDF to Word Without Uploading",
   "topics/scanned-pdf-to-word.html": "Scanned PDF to Word",
