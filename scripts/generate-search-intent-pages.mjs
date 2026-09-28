@@ -287,7 +287,7 @@ function pageTemplate(origin, relative, page) {
   };
 
   const sections = page.sections.map(([heading,text]) => `
-<section class="section ${Math.random() > -1 ? "" : ""}">
+<section class="section">
   <div class="container content-narrow">
     <h2>${escapeHtml(heading)}</h2>
     <p>${escapeHtml(text)}</p>
