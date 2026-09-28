@@ -63,7 +63,11 @@ export const indexablePages = [
     "topics/jpg-to-pdf-on-mobile.html",
     "topics/pdf-page-size.html",
     "topics/pdf-converter-file-formats.html",
-    "topics/private-pdf-converter.html"
+    "topics/private-pdf-converter.html",
+    "topics/adobe-acrobat-alternative.html",
+    "topics/smallpdf-alternative.html",
+    "topics/pdf24-alternative.html",
+    "topics/cloud-vs-browser-pdf-converter.html"
   ]
 ];
 
@@ -109,6 +113,10 @@ pageDates["guides/compress-pdf.html"] = "2026-09-28";
 pageDates["tools/ocr-pdf.html"] = "2026-09-28";
 pageDates["guides/ocr-pdf-to-word.html"] = "2026-09-28";
 for (const relative of [
+  "topics/adobe-acrobat-alternative.html",
+  "topics/smallpdf-alternative.html",
+  "topics/pdf24-alternative.html",
+  "topics/cloud-vs-browser-pdf-converter.html",
   "topics/index.html",
   "topics/pdf-to-word-without-upload.html",
   "topics/scanned-pdf-to-word.html",
@@ -214,7 +222,11 @@ export const pageLabels = {
   "topics/jpg-to-pdf-on-mobile.html": "JPG to PDF on Mobile",
   "topics/pdf-page-size.html": "PDF Page Size",
   "topics/pdf-converter-file-formats.html": "PDF Converter File Formats",
-  "topics/private-pdf-converter.html": "Private PDF Converter"
+  "topics/private-pdf-converter.html": "Private PDF Converter",
+  "topics/adobe-acrobat-alternative.html": "Adobe Acrobat Online Alternative",
+  "topics/smallpdf-alternative.html": "Smallpdf Alternative",
+  "topics/pdf24-alternative.html": "PDF24 Alternative",
+  "topics/cloud-vs-browser-pdf-converter.html": "Cloud vs Browser PDF Converter"
 };
 
 export function pagePathname(relative) {
