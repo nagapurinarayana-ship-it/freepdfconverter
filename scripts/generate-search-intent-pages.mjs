@@ -256,7 +256,7 @@ export const SEARCH_INTENT_PAGES = {
     guides: [["/guides/pdf-converter-without-upload","No-upload guide"],["/guides/are-online-pdf-converters-safe","Online PDF safety guide"],["/privacy","Privacy Policy"]]
   },
   "topics/adobe-acrobat-alternative.html": {
-    title: "Adobe Acrobat Online Alternative — Local PDF Processing | FreePDF Tools",
+    title: "Adobe Acrobat Online Alternative — Local PDF | FreePDF Tools",
     description: "Compare Adobe Acrobat online services with browser-local PDF processing, including document handling, sign-in, file retention and supported conversion workflows.",
     h1: "Adobe Acrobat Online alternative: compare processing models",
     intro: "An Adobe Acrobat online workflow and a browser-local PDF tool solve similar document problems but use different processing models. The useful comparison is not a universal winner; it is which model matches the document and workflow you need.",
@@ -310,7 +310,7 @@ export const SEARCH_INTENT_PAGES = {
     ]
   },
   "topics/cloud-vs-browser-pdf-converter.html": {
-    title: "Cloud vs Browser PDF Converter — Privacy & Workflow | FreePDF Tools",
+    title: "Cloud vs Browser PDF Converter — Privacy | FreePDF Tools",
     description: "Understand cloud/server PDF conversion versus browser-local processing, with practical tradeoffs around privacy, features, file limits, collaboration and device resources.",
     h1: "Cloud vs browser PDF converter: what changes?",
     intro: "Online PDF conversion can mean two different architectures. A cloud converter uploads the document to a remote service for processing; a browser-local converter downloads the processing code and handles the selected file on the device. Each model has practical tradeoffs.",
