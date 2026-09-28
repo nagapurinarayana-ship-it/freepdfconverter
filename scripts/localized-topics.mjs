@@ -1,3 +1,18 @@
+export const ENGLISH_TOPIC_PATHS = {
+  "topic-pdf-word-private": "/topics/pdf-to-word-without-upload",
+  "topic-scanned-pdf-word": "/topics/scanned-pdf-to-word",
+  "topic-pdf-word-formatting": "/topics/pdf-to-word-formatting",
+  "topic-ocr-pdf-online": "/topics/ocr-pdf-online",
+  "topic-ocr-pdf-accuracy": "/topics/ocr-pdf-accuracy",
+  "topic-word-97-2003-pdf": "/topics/word-97-2003-to-pdf",
+  "topic-docx-to-pdf": "/topics/docx-to-pdf",
+  "topic-private-pdf": "/topics/private-pdf-converter",
+  "topic-pdf-to-text": "/topics/pdf-to-text",
+  "topic-compress-target": "/topics/compress-pdf-to-target-size",
+  "topic-jpg-mobile": "/topics/jpg-to-pdf-on-mobile",
+  "topic-pdf-page-size": "/topics/pdf-page-size"
+};
+
 export const LOCALIZED_TOPIC_KEYS = [
   "topic-pdf-word-private",
   "topic-scanned-pdf-word",
@@ -354,4 +369,8 @@ export function localizedTopicPath(locale, key) {
   const data = getLocalizedTopic(locale, key);
   if (!data) throw new Error("Missing localized topic: " + locale + "/" + key);
   return "/" + locale + "/topics/" + data.slug;
+}
+
+export function englishTopicPath(key) {
+  return ENGLISH_TOPIC_PATHS[key] || null;
 }
