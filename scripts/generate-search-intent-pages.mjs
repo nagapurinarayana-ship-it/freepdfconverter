@@ -331,6 +331,7 @@ function pageTemplate(origin, relative, page) {
 </header>
 <main id="main">
 <article class="article container">
+  <!-- freepdf-topic-content:start -->
   <div class="breadcrumbs"><a href="/">Home</a> / <a href="/topics/">PDF Topics</a>${isIndex ? "" : " / " + escapeHtml(page.h1)}</div>
   <span class="eyebrow">PDF topic guide</span>
   <h1>${escapeHtml(page.h1)}</h1>
