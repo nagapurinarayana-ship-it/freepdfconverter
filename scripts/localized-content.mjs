@@ -387,7 +387,7 @@ export function getLocalizedPage(locale, key) {
 
 export function localePagePath(locale, key) {
   if (key === "home") return "/" + locale + "/";
-  const slug = key === "pdfword" ? "pdf-to-word" :
+  const slug = key === "converter" ? "pdf-converter-online" :\n    key === "pdfword" ? "pdf-to-word" :
     key === "wordpdf" ? "word-to-pdf" :
     key === "jpg" ? "jpg-to-pdf" :
     key === "pdf-converter-online" ? "pdf-converter-online" : key;
