@@ -190,14 +190,15 @@
       var png = await doc.embedPng(source.toDataURL("image/png"));
       var pages = doc.getPages();
       var targets = el.scope.value === "all" ? pages.map(function (_, i) { return i; }) : [targetPage - 1];
-      var width = Number.parseInt(el.size.value, 10) || 190;
-      var imageScale = Math.min(1, width / png.width);
-      var dims = png.scale(imageScale);
+      var desiredWidth = Number.parseInt(el.size.value, 10) || 190;
       var margin = 36;
       for (var i = 0; i < targets.length; i += 1) {
         var index = targets[i];
         var page = pages[index];
         var size = page.getSize();
+        var availableWidth = Math.max(60, size.width - margin * 2);
+        var imageScale = Math.min(1, desiredWidth / png.width, availableWidth / png.width);
+        var dims = png.scale(imageScale);
         var x = el.position.value === "bottom-left" ? margin : el.position.value === "bottom-right" ? size.width - dims.width - margin : (size.width - dims.width) / 2;
         var y = margin + 8;
         page.drawImage(png, { x: Math.max(margin, x), y: Math.max(margin, y), width: dims.width, height: dims.height, opacity: 1 });
