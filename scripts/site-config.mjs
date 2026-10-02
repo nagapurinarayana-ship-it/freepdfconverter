@@ -120,9 +120,9 @@ export const articlePages = new Set([
 ]);
 
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
-pageDates["index.html"] = "2026-09-27";
+pageDates["index.html"] = "2026-10-02";
 pageDates["pdf-converter-online.html"] = "2026-09-27";
-pageDates["about.html"] = "2026-09-27";
+pageDates["about.html"] = "2026-10-02";
 pageDates["guides/index.html"] = "2026-09-27";
 pageDates["guides/reduce-pdf-file-size-for-email.html"] = "2026-08-31";
 pageDates["tools/organize-pdf.html"] = "2026-09-27";
