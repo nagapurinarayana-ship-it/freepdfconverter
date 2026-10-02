@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+<title id="title">PDF signing review checklist</title>
+<desc id="desc">Review the signed PDF, confirm the signature position, keep the original, and remember that a visual signature is not a certificate-based digital signature.</desc>
+<rect width="960" height="540" rx="28" fill="#f6f9fd"/>
+<text x="72" y="90" font-family="Arial,sans-serif" font-size="32" font-weight="700" fill="#152338">Before you share the signed PDF</text>
+<g font-family="Arial,sans-serif">
+  <rect x="72" y="132" width="816" height="72" rx="16" fill="#fff" stroke="#d8e2ef" stroke-width="2"/>
+  <circle cx="112" cy="168" r="19" fill="#dff3e7"/><text x="112" y="177" text-anchor="middle" font-size="23" font-weight="700" fill="#167344">✓</text>
+  <text x="150" y="177" font-size="23" fill="#23344d">Open the downloaded PDF and verify the signature is visible.</text>
+  <rect x="72" y="222" width="816" height="72" rx="16" fill="#fff" stroke="#d8e2ef" stroke-width="2"/>
+  <circle cx="112" cy="258" r="19" fill="#dff3e7"/><text x="112" y="267" text-anchor="middle" font-size="23" font-weight="700" fill="#167344">✓</text>
+  <text x="150" y="267" font-size="23" fill="#23344d">Keep the original unsigned document as a separate copy.</text>
+  <rect x="72" y="312" width="816" height="72" rx="16" fill="#fff" stroke="#d8e2ef" stroke-width="2"/>
+  <circle cx="112" cy="348" r="19" fill="#dff3e7"/><text x="112" y="357" text-anchor="middle" font-size="23" font-weight="700" fill="#167344">✓</text>
+  <text x="150" y="357" font-size="23" fill="#23344d">Check the page position and ensure it does not cover important text.</text>
+  <rect x="72" y="402" width="816" height="82" rx="16" fill="#fff7e6" stroke="#e7c67c" stroke-width="2"/>
+  <circle cx="112" cy="443" r="19" fill="#ffe4b5"/><text x="112" y="451" text-anchor="middle" font-size="22" font-weight="700" fill="#8a5a00">!</text>
+  <text x="150" y="438" font-size="20" font-weight="700" fill="#5c4209">Visual signature ≠ cryptographic digital signature.</text>
+  <text x="150" y="465" font-size="18" fill="#6b5730">Use a certificate-based signing service when that requirement applies.</text>
+</g>
+</svg>
