@@ -27,6 +27,7 @@ export const indexablePages = [
   "tools/compress-pdf.html",
   "tools/ocr-pdf.html",
   "tools/sign-pdf.html",
+  "tools/protect-pdf.html",
   "guides/index.html",
   "guides/reduce-pdf-file-size-for-email.html",
   "guides/compress-pdf.html",
@@ -61,6 +62,7 @@ export const indexablePages = [
   "guides/convert-old-doc-to-pdf.html",
   "guides/organize-pdf-pages-on-phone.html",
   "guides/sign-pdf-online.html",
+  "guides/password-protect-pdf.html",
   ...[
     "topics/index.html",
     "topics/pdf-to-word-without-upload.html",
@@ -119,7 +121,8 @@ export const articlePages = new Set([
   "guides/pdf-page-size-a4-vs-letter.html",
   "guides/convert-old-doc-to-pdf.html",
   "guides/organize-pdf-pages-on-phone.html",
-  "guides/sign-pdf-online.html"
+  "guides/sign-pdf-online.html",
+  "guides/password-protect-pdf.html"
 ]);
 
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
@@ -142,6 +145,8 @@ pageDates["guides/compress-pdf.html"] = "2026-09-28";
 pageDates["tools/ocr-pdf.html"] = "2026-09-28";
 pageDates["tools/sign-pdf.html"] = "2026-10-02";
 pageDates["guides/sign-pdf-online.html"] = "2026-10-02";
+pageDates["tools/protect-pdf.html"] = "2026-10-02";
+pageDates["guides/password-protect-pdf.html"] = "2026-10-02";
 pageDates["guides/ocr-pdf-to-word.html"] = "2026-09-28";
 pageDates["guides/merge-pdf-on-phone.html"] = "2026-09-28";
 pageDates["guides/split-pdf-into-separate-files.html"] = "2026-09-28";
@@ -213,7 +218,8 @@ export const articlePublishedDates = {
   "guides/jpg-vs-png-to-pdf.html": "2026-09-28",
   "guides/pdf-page-size-a4-vs-letter.html": "2026-09-28",
   "guides/convert-old-doc-to-pdf.html": "2026-09-28",
-  "guides/organize-pdf-pages-on-phone.html": "2026-09-28"
+  "guides/organize-pdf-pages-on-phone.html": "2026-09-28",
+  "guides/password-protect-pdf.html": "2026-10-02"
 };
 
 export const pageLabels = {
@@ -247,6 +253,7 @@ export const pageLabels = {
   "tools/compress-pdf.html": "Compress PDF",
   "tools/ocr-pdf.html": "OCR PDF",
   "tools/sign-pdf.html": "Sign PDF",
+  "tools/protect-pdf.html": "Protect PDF",
   "guides/index.html": "PDF Guides",
   "guides/reduce-pdf-file-size-for-email.html": "Reduce PDF File Size for Email",
   "guides/merge-pdf-safely.html": "How to Merge PDFs Safely",
@@ -281,6 +288,7 @@ export const pageLabels = {
   "guides/convert-old-doc-to-pdf.html": "Convert Old DOC Files to PDF",
   "guides/organize-pdf-pages-on-phone.html": "Organize PDF Pages on a Phone",
   "guides/sign-pdf-online.html": "How to Sign a PDF Online Without Uploading It",
+  "guides/password-protect-pdf.html": "How to Password Protect a PDF Safely",
   "topics/index.html": "PDF Conversion Topics",
   "topics/pdf-to-word-without-upload.html": "PDF to Word Without Uploading",
   "topics/scanned-pdf-to-word.html": "Scanned PDF to Word",

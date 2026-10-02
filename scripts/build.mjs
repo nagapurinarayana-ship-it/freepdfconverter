@@ -39,6 +39,8 @@ const pageKeywords = {
   "tools/ocr-pdf.html": ["ocr pdf", "pdf ocr", "scanned pdf to text", "scanned pdf to word", "ocr pdf to word"],
   "tools/sign-pdf.html": ["sign pdf online", "sign pdf free", "add signature to pdf", "draw signature on pdf", "type signature on pdf"],
   "guides/sign-pdf-online.html": ["how to sign a pdf", "sign pdf online", "sign pdf without upload", "draw signature on pdf", "visual pdf signature"],
+  "tools/protect-pdf.html": ["protect pdf", "password protect pdf", "encrypt pdf", "secure pdf", "pdf password protection"],
+  "guides/password-protect-pdf.html": ["password protect pdf", "protect pdf with password", "encrypt pdf", "pdf security", "pdf owner password"],
   "guides/index.html": ["pdf guides", "pdf help", "how to use pdf tools", "pdf tutorials", "pdf tips"],
   "guides/merge-pdf-safely.html": ["how to merge pdfs", "merge pdf safely", "combine pdf files", "merge pdf without losing quality", "pdf merger guide"],
   "guides/split-extract-pdf-pages.html": ["how to split a pdf", "extract pages from pdf", "split pdf guide", "separate pdf pages", "pdf page extraction"],

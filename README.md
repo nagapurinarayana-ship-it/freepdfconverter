@@ -6,11 +6,12 @@ Free, privacy-first PDF utilities that run in the browser. Selected documents ar
 
 ## Included tools
 
-FreePDF Tools currently ships 17 core browser-local PDF/document workflows, plus a guide and topic library for search and practical help.
+FreePDF Tools currently ships 18 core browser-local PDF/document workflows, plus a guide and topic library for search and practical help.
 
 - Merge PDF
 - Split / extract PDF pages
 - Unlock password-protected PDFs with a known password
+- Protect PDFs with a password and 256-bit encryption, plus common print/copy/edit permissions
 - Rotate PDF pages
 - JPG / PNG to PDF
 - PDF to JPG / PNG
@@ -25,7 +26,7 @@ FreePDF Tools currently ships 17 core browser-local PDF/document workflows, plus
 - PDF to Word (editable modern `.docx` for text-based PDFs, with optional multilingual OCR fallback)
 - Word / document to PDF: Microsoft Word 97-2003 `.doc` **and** modern `.docx`/`.docm`/`.dotx`/`.dotm`, plus ODT, RTF, TXT and HTML
 
-The site is static HTML, CSS and JavaScript. The production content layer includes 30 practical English guides, 21 search-intent topic pages, and localized German/French/Spanish landing and topic clusters. Word conversion supports both modern Office Open XML documents and legacy Microsoft Word 97-2003 binary `.doc` documents through a browser-side MS-DOC parser. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js, JSZip and QPDF WebAssembly libraries. QPDF runs in a dedicated browser worker for the Unlock PDF workflow. Tesseract.js runs OCR in a browser worker using self-hosted English, German, French and Spanish trained data. A progressive web app service worker caches the public tool code for offline use; selected documents and passwords are never placed in that cache.
+The site is static HTML, CSS and JavaScript. The production content layer includes 30 practical English guides, 21 search-intent topic pages, and localized German/French/Spanish landing and topic clusters. Word conversion supports both modern Office Open XML documents and legacy Microsoft Word 97-2003 binary `.doc` documents through a browser-side MS-DOC parser. PDF processing uses pinned, self-hosted copies of the open-source pdf-lib, Mozilla PDF.js, JSZip and QPDF WebAssembly libraries. QPDF runs in dedicated browser workers for the Unlock PDF and Protect PDF workflows. Tesseract.js runs OCR in a browser worker using self-hosted English, German, French and Spanish trained data. A progressive web app service worker caches the public tool code for offline use; selected documents and passwords are never placed in that cache.
 
 ## Verify the privacy model
 
@@ -52,7 +53,7 @@ Workers Builds does not inject the final public URL into the build. After the fi
 
 ### Cloudflare Pages
 
-Use the native Cloudflare Pages Git integration for production deployment. Keep the production branch as `main`, build command as `npm run build`, and output directory as `dist`. Cloudflare then rebuilds and deploys the site automatically when `main` changes. The repository's GitHub Actions workflow validates the exact production build, including 17 core tools, the 30-guide library, generated search-intent topic pages, localized SEO, the legacy Microsoft Word 97–2003 parser, modern Word/DOCX workflow, multilingual OCR assets and local-processing checks before the change is considered production-ready.
+Use the native Cloudflare Pages Git integration for production deployment. Keep the production branch as `main`, build command as `npm run build`, and output directory as `dist`. Cloudflare then rebuilds and deploys the site automatically when `main` changes. The repository's GitHub Actions workflow validates the exact production build, including 18 core tools, the 30-guide library, generated search-intent topic pages, localized SEO, the legacy Microsoft Word 97–2003 parser, modern Word/DOCX workflow, multilingual OCR assets and local-processing checks before the change is considered production-ready.
 
 Do not configure a second secret-based Wrangler deployment against the same Pages project unless you intentionally replace the native Git integration.
 
