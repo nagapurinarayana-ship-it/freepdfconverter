@@ -307,4 +307,5 @@ export function pagePathname(relative) {
   const withoutIndex = relative.replace(/index\.html$/, "");
   return "/" + withoutIndex.replace(/\.html$/, "");
 }
-\npageLabels["guides/sign-pdf-online.html"] = "How to Sign a PDF Online Without Uploading It";\n
+
+pageLabels["guides/sign-pdf-online.html"] = "How to Sign a PDF Online Without Uploading It";
