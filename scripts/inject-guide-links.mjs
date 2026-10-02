@@ -159,6 +159,11 @@ related["guides/convert-old-doc-to-pdf.html"] = [
   ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading"],
   ["guides/pdf-converter-file-formats.html", "PDF converter file formats"]
 ];
+related["guides/sign-pdf-online.html"] = [
+  ["guides/pdf-converter-without-upload.html", "Convert PDFs without uploading files"],
+  ["guides/are-online-pdf-converters-safe.html", "Are online PDF converters safe?"],
+  ["guides/word-to-pdf-converter.html", "Convert Word documents to PDF"]
+];
 related["guides/organize-pdf-pages-on-phone.html"] = [
   ["guides/organize-pdf-pages.html", "Organize PDF pages"],
   ["guides/merge-pdf-on-phone.html", "Merge PDFs on a phone"],
