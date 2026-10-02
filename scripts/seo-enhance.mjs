@@ -60,7 +60,9 @@ const seo = {
   "guides/pdf-to-word-converter.html": ["How to Convert PDF to Word — Editable DOCX Guide | FreePDF Tools", "Learn how to convert text-based PDFs to editable Word DOCX files, what happens to tables and layout, and why scanned PDFs may need OCR."],
   "guides/word-to-pdf-converter.html": ["How to Convert Word to PDF — DOC & DOCX | FreePDF Tools", "Learn how to convert DOC, DOCX and Word 97–2003 files to PDF in your browser, including layout limitations and final quality checks."],
   "guides/compress-pdf.html": ["How to Compress a PDF — Reduce File Size Safely | FreePDF Tools", "Learn how to compress a PDF, what lossless compression can change, why image-heavy files may shrink less and when stronger image optimization is needed."],
-  "guides/ocr-pdf-to-word.html": ["How to OCR a Scanned PDF into Word — Complete Guide | FreePDF Tools", "Learn how OCR turns scanned PDF page images into selectable text and an editable Word document, what affects accuracy and how to review the result."]
+  "guides/ocr-pdf-to-word.html": ["How to OCR a Scanned PDF into Word — Complete Guide | FreePDF Tools", "Learn how OCR turns scanned PDF page images into selectable text and an editable Word document, what affects accuracy and how to review the result."],
+  "tools/protect-pdf.html": ["Protect PDF Online Free — Add Password & Encryption | FreePDF Tools", "Protect a PDF with a password and 256-bit encryption in your browser. Choose printing, copying and editing permissions, then download the protected PDF without uploading it."],
+  "guides/password-protect-pdf.html": ["How to Password Protect a PDF Safely | FreePDF Tools", "Learn how to password-protect a PDF with 256-bit encryption, separate user and owner passwords, and practical permission settings while keeping the file in your browser."]
 };
 
 const htmlFiles = [];
