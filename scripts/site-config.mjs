@@ -118,7 +118,8 @@ export const articlePages = new Set([
   "guides/jpg-vs-png-to-pdf.html",
   "guides/pdf-page-size-a4-vs-letter.html",
   "guides/convert-old-doc-to-pdf.html",
-  "guides/organize-pdf-pages-on-phone.html"
+  "guides/organize-pdf-pages-on-phone.html",
+  "guides/sign-pdf-online.html"
 ]);
 
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
