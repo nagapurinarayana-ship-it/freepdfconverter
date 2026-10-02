@@ -24,7 +24,8 @@ const clusters = [
   ["tools/word-to-pdf.html", "guides/word-to-pdf-converter.html", "Word to PDF", "How to Convert Word to PDF"],
   ["tools/compress-pdf.html", "guides/compress-pdf.html", "Compress PDF", "How to Compress a PDF"],
   ["tools/ocr-pdf.html", "guides/ocr-pdf-to-word.html", "OCR PDF", "How to OCR a Scanned PDF into Word"],
-  ["tools/sign-pdf.html", "guides/sign-pdf-online.html", "Sign PDF", "How to Sign a PDF Online Without Uploading It"]
+  ["tools/sign-pdf.html", "guides/sign-pdf-online.html", "Sign PDF", "How to Sign a PDF Online Without Uploading It"],
+  ["tools/protect-pdf.html", "guides/password-protect-pdf.html", "Protect PDF", "How to Password Protect a PDF Safely"]
 ];
 
 const files = [];
