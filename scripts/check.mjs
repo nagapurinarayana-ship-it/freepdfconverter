@@ -12,13 +12,13 @@ const required = [
   "index.html", "about.html", "privacy.html", "terms.html", "contact.html",
   "tools/merge-pdf.html", "tools/split-pdf.html", "tools/rotate-pdf.html",
   "tools/unlock-pdf.html",
-  "tools/jpg-to-pdf.html", "tools/pdf-to-image.html", "tools/watermark-pdf.html", "tools/sign-pdf.html",
+  "tools/jpg-to-pdf.html", "tools/pdf-to-image.html", "tools/watermark-pdf.html", "tools/sign-pdf.html", "tools/protect-pdf.html",
   "tools/organize-pdf.html", "tools/add-page-numbers.html", "tools/remove-pdf-metadata.html",
   "tools/crop-pdf.html", "tools/extract-pdf-text.html", "tools/pdf-to-word.html", "tools/word-to-pdf.html", "tools/ocr-pdf.html", "how-local-processing.html",
   ...indexablePages.filter((relative) => relative.startsWith("guides/")),
   "assets/js/common.js", "assets/js/merge-pdf.js", "assets/js/split-pdf.js",
   "assets/js/rotate-pdf.js", "assets/js/jpg-to-pdf.js", "assets/js/pdf-to-image.js",
-  "assets/js/watermark-pdf.js", "assets/js/sign-pdf.js", "assets/css/styles.css"
+  "assets/js/watermark-pdf.js", "assets/js/sign-pdf.js", "assets/js/protect-pdf.js", "assets/js/protect-pdf-worker.js", "assets/css/styles.css"
   , "assets/js/organize-pdf.js", "assets/js/add-page-numbers.js", "assets/js/remove-pdf-metadata.js",
   "assets/js/crop-pdf.js", "assets/js/extract-pdf-text.js", "assets/js/pdf-to-word.js", "assets/js/word-to-pdf.js", "assets/js/ocr-pdf.js", "assets/js/unlock-pdf.js", "assets/js/unlock-pdf-worker.js",
   "assets/vendor/pdf-lib/pdf-lib.min.js",
@@ -89,6 +89,7 @@ const toolScripts = {
   "tools/pdf-to-image.html": "assets/js/pdf-to-image.js",
   "tools/watermark-pdf.html": "assets/js/watermark-pdf.js",
   "tools/sign-pdf.html": "assets/js/sign-pdf.js",
+  "tools/protect-pdf.html": "assets/js/protect-pdf.js",
   "tools/organize-pdf.html": "assets/js/organize-pdf.js",
   "tools/add-page-numbers.html": "assets/js/add-page-numbers.js",
   "tools/remove-pdf-metadata.html": "assets/js/remove-pdf-metadata.js",
