@@ -11,6 +11,7 @@ const guidesWithMatchingTools = new Set([
   "guides/merge-pdf-safely.html",
   "guides/split-extract-pdf-pages.html",
   "guides/unlock-password-protected-pdf.html",
+  "guides/password-protect-pdf.html",
   "guides/rotate-pdf-pages.html",
   "guides/jpg-png-to-pdf.html",
   "guides/pdf-to-jpg-vs-png.html",
