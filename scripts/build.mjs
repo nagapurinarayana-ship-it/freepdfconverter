@@ -36,7 +36,7 @@ const pageKeywords = {
   "tools/crop-pdf.html": ["crop pdf", "crop pdf pages", "crop pdf online", "trim pdf pages", "pdf cropper"],
   "tools/extract-pdf-text.html": ["extract text from pdf", "pdf text extractor", "extract pdf text online", "copy text from pdf", "pdf to text"],
   "tools/compress-pdf.html": ["compress pdf", "pdf compressor", "reduce pdf size", "pdf size reducer", "compress pdf online"],
-  "tools/ocr-pdf.html": ["ocr pdf", "pdf ocr", "scanned pdf to text", "scanned pdf to word", "ocr pdf to word"],
+  "tools/ocr-pdf.html": ["ocr pdf", "pdf ocr", "scanned pdf to text", "scanned pdf to word", "ocr pdf to word"],\n  "tools/sign-pdf.html": ["sign pdf online", "sign pdf free", "add signature to pdf", "draw signature on pdf", "type signature on pdf"],\n  "guides/sign-pdf-online.html": ["how to sign a pdf", "sign pdf online", "sign pdf without upload", "draw signature on pdf", "visual pdf signature"],
   "guides/index.html": ["pdf guides", "pdf help", "how to use pdf tools", "pdf tutorials", "pdf tips"],
   "guides/merge-pdf-safely.html": ["how to merge pdfs", "merge pdf safely", "combine pdf files", "merge pdf without losing quality", "pdf merger guide"],
   "guides/split-extract-pdf-pages.html": ["how to split a pdf", "extract pages from pdf", "split pdf guide", "separate pdf pages", "pdf page extraction"],
