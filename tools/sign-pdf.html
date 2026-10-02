@@ -1,0 +1,73 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign PDF Online Free — Draw or Type Your Signature | FreePDF Tools</title>
+<meta name="description" content="Sign a PDF online for free in your browser. Draw or type a signature, place it on a page and download the signed PDF without uploading your document.">
+<meta name="theme-color" content="#1f67ff">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/css/styles.css">
+<script src="../assets/vendor/pdf-lib/pdf-lib.min.js" defer></script>
+<script src="../assets/js/common.js" defer></script><script src="../assets/js/sign-pdf.js" defer></script>
+<script src="../assets/js/monetization-config.js" defer></script><script src="../assets/js/ads.js" defer></script>
+<link rel="canonical" href="https://freepdfconverter-all-in-one.pages.dev/tools/sign-pdf">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta property="og:type" content="website"><meta property="og:site_name" content="FreePDF Tools">
+<meta property="og:title" content="Sign PDF Online Free — Draw or Type Your Signature | FreePDF Tools">
+<meta property="og:description" content="Sign a PDF online for free in your browser. Draw or type a signature, place it on a page and download the signed PDF without uploading your document.">
+<meta property="og:url" content="https://freepdfconverter-all-in-one.pages.dev/tools/sign-pdf">
+<meta property="og:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg">
+<meta property="og:image:alt" content="FreePDF Tools — private browser-based PDF utilities">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Sign PDF Online Free — Draw or Type Your Signature | FreePDF Tools">
+<meta name="twitter:description" content="Sign a PDF online for free in your browser. Draw or type a signature, place it on a page and download the signed PDF without uploading your document.">
+<meta name="twitter:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg"><meta name="twitter:image:alt" content="FreePDF Tools — private browser-based PDF utilities">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Sign PDF Online Free — Draw or Type Your Signature | FreePDF Tools","description":"Sign a PDF online for free in your browser. Draw or type a signature, place it on a page and download the signed PDF without uploading your document.","url":"https://freepdfconverter-all-in-one.pages.dev/tools/sign-pdf","image":"https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg","isPartOf":{"@type":"WebSite","name":"FreePDF Tools","url":"https://freepdfconverter-all-in-one.pages.dev/"},"inLanguage":"en"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Sign PDF Online Free — Draw or Type Your Signature | FreePDF Tools","description":"Sign a PDF online for free in your browser. Draw or type a signature, place it on a page and download the signed PDF without uploading your document.","url":"https://freepdfconverter-all-in-one.pages.dev/tools/sign-pdf","applicationCategory":"UtilitiesApplication","operatingSystem":"Web browser","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+</head><body>
+<a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="container header-inner"><a class="logo" href="../"><span class="logo-mark" aria-hidden="true">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav" aria-label="Main navigation"><a href="../#tools">PDF tools</a><a href="../guides/">Guides</a><a href="../privacy">Privacy</a><a href="../about">About</a></nav></div></header>
+<main id="main">
+<section class="tool-hero"><div class="container"><div class="breadcrumbs"><a href="../">Home</a> / Sign PDF</div><span class="eyebrow">Free · private · no upload</span><h1>Sign a PDF online</h1><p class="lead">Draw or type your signature, place it on one page or every page, and download a new signed PDF. The source document and signature stay in your browser.</p></div></section>
+<div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>
+<div class="container tool-shell">
+<section class="tool-panel" aria-labelledby="sign-title"><h2 id="sign-title">Create your signature</h2>
+<div class="drop-zone" id="dropZone"><div><strong>Drop one PDF here</strong><p>Up to 120 MB</p><label class="file-picker" for="pdfFile">Choose PDF</label><input class="file-input" id="pdfFile" type="file" accept="application/pdf,.pdf"></div></div>
+<p id="fileSummary" class="selected-file" aria-live="polite">No PDF selected</p>
+<div class="control-grid three">
+<div class="field"><label for="signatureMode">Signature style</label><select id="signatureMode"><option value="draw">Draw signature</option><option value="type">Type signature</option></select></div>
+<div class="field"><label for="inkColor">Ink colour</label><input id="inkColor" type="color" value="#17243a"></div>
+<div class="field"><label for="signatureSize">Signature size</label><select id="signatureSize"><option value="140">Small</option><option value="190" selected>Medium</option><option value="250">Large</option></select></div>
+</div>
+<div class="field full"><label for="typedSignature">Typed signature</label><input id="typedSignature" maxlength="80" autocomplete="off" placeholder="Type your name"></div>
+<div class="field full"><label for="signatureCanvas">Signature drawing</label><canvas id="signatureCanvas" width="1000" height="320" aria-label="Draw your signature here" style="display:block;width:100%;height:auto;min-height:170px;border:1px dashed #b8c6da;border-radius:14px;background:#fff;touch-action:none;cursor:crosshair;"></canvas><p class="field-help">Use a mouse, trackpad, stylus or finger. A transparent signature image is embedded into the PDF.</p><button class="button secondary" id="clearSignature" type="button">Clear signature</button></div>
+<div class="control-grid three">
+<div class="field"><label for="signPage">Page</label><input id="signPage" type="number" min="1" value="1" disabled></div>
+<div class="field"><label for="signScope">Apply to</label><select id="signScope" disabled><option value="page">Selected page only</option><option value="all">Every page</option></select></div>
+<div class="field"><label for="signPosition">Position</label><select id="signPosition" disabled><option value="bottom-left">Bottom left</option><option value="bottom-center" selected>Bottom centre</option><option value="bottom-right">Bottom right</option></select></div>
+</div>
+<div class="action-row"><button class="button" id="signButton" type="button" disabled>Sign PDF</button><button class="button danger" id="clearFile" type="button" disabled>Clear PDF</button></div>
+<div class="progress"><span id="progressBar"></span></div><p class="status" id="toolStatus" role="status" aria-live="polite"></p>
+</section>
+<aside class="tool-side">
+<div class="side-card"><h3>Private by design</h3><p>The PDF is read and the signed copy is created by JavaScript in this browser tab. This tool does not upload your document or signature.</p></div>
+<div class="side-card"><h3>What this signature is</h3><p>This tool places a visual signature image onto the PDF. It is not a cryptographic certificate, qualified electronic signature or identity-verification service.</p></div>
+<div class="side-card"><h3>Need more PDF control?</h3><p>Use <a href="organize-pdf">Organize PDF</a> to rearrange pages first, then sign the finished document.</p></div>
+</aside>
+</div>
+<section class="content-section"><div class="container content-narrow">
+<h2>How to sign a PDF without uploading it</h2>
+<p>Choose a PDF, create a signature by drawing with your finger or mouse, or type your name and use the generated signature image. Select the PDF page, choose where the signature should appear and apply it. The tool creates a new PDF in memory and starts the download when processing finishes.</p>
+<h2>When local PDF signing is useful</h2>
+<ul><li>Sign a form before emailing it back.</li><li>Add a simple approval signature to an internal document.</li><li>Sign a PDF on a phone without installing an app.</li><li>Keep sensitive documents on your device while preparing a signed copy.</li></ul>
+<h2>Important security and legal limits</h2>
+<p>A visual signature is not the same as a cryptographic digital signature. The output can show who signed a document, but it does not independently prove identity, certificate ownership or that the document was signed with a trusted electronic-signature credential. Use your organization's approved signing process when a legally qualified or certificate-based signature is required.</p>
+<h2>Tips for a cleaner signed PDF</h2>
+<ul><li>Sign a copy, not the only copy of an important original.</li><li>Leave enough white space near the signature location before adding it.</li><li>Review the final page after download, especially when the source page has a footer or form field near the bottom.</li><li>For sensitive documents, remember that your browser extension environment and device security still matter even when the site itself does not upload the file.</li></ul>
+<div class="ad-container" data-ad-zone="content" aria-label="Advertisement"></div>
+<h2>Frequently asked questions</h2><div class="faq">
+<details><summary>Are my PDF and signature uploaded?</summary><p>No. This tool uses browser APIs and PDF libraries to create the signed document locally.</p></details>
+<details><summary>Can I sign every page?</summary><p>Yes. Choose “Every page” and the signature is placed in the same selected position on each page.</p></details>
+<details><summary>Can I move the signature anywhere?</summary><p>This first version provides predictable bottom-left, bottom-centre and bottom-right placement. Free positioning can be added later without changing the privacy model.</p></details>
+<details><summary>Is this a digital signature certificate?</summary><p>No. It is a visible signature image. It does not create PKI-based certificate validation or a qualified electronic signature.</p></details>
+</div>
+</div></section>
+</main>
+<footer class="site-footer"><div class="container"><div class="footer-grid"><div><a class="logo" href="../"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><p>Sign PDFs locally in your browser without uploading the source document.</p></div><div><h3>Tools</h3><ul class="footer-links"><li><a href="merge-pdf">Merge PDF</a></li><li><a href="organize-pdf">Organize PDF</a></li><li><a href="watermark-pdf">Watermark PDF</a></li><li><a href="add-page-numbers">Add page numbers</a></li></ul></div><div><h3>Information</h3><ul class="footer-links"><li><a href="../guides/">PDF guides</a></li><li><a href="../how-local-processing">Local processing</a></li><li><a href="../privacy">Privacy</a></li></ul></div></div><div class="footer-bottom"><span>© <span data-current-year></span> FreePDF Tools</span><span>No file uploads · No accounts · Browser processing</span></div></div></footer>
+</body></html>

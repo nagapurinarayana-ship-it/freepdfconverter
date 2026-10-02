@@ -26,6 +26,7 @@ export const indexablePages = [
   "tools/word-to-pdf.html",
   "tools/compress-pdf.html",
   "tools/ocr-pdf.html",
+  "tools/sign-pdf.html",
   "guides/index.html",
   "guides/reduce-pdf-file-size-for-email.html",
   "guides/compress-pdf.html",
@@ -59,6 +60,7 @@ export const indexablePages = [
   "guides/pdf-page-size-a4-vs-letter.html",
   "guides/convert-old-doc-to-pdf.html",
   "guides/organize-pdf-pages-on-phone.html",
+  "guides/sign-pdf-online.html",
   ...[
     "topics/index.html",
     "topics/pdf-to-word-without-upload.html",
@@ -116,14 +118,15 @@ export const articlePages = new Set([
   "guides/jpg-vs-png-to-pdf.html",
   "guides/pdf-page-size-a4-vs-letter.html",
   "guides/convert-old-doc-to-pdf.html",
-  "guides/organize-pdf-pages-on-phone.html"
+  "guides/organize-pdf-pages-on-phone.html",
+  "guides/sign-pdf-online.html"
 ]);
 
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
-pageDates["index.html"] = "2026-09-27";
+pageDates["index.html"] = "2026-10-02";
 pageDates["pdf-converter-online.html"] = "2026-09-27";
-pageDates["about.html"] = "2026-09-27";
-pageDates["guides/index.html"] = "2026-09-27";
+pageDates["about.html"] = "2026-10-02";
+pageDates["guides/index.html"] = "2026-10-02";
 pageDates["guides/reduce-pdf-file-size-for-email.html"] = "2026-08-31";
 pageDates["tools/organize-pdf.html"] = "2026-09-27";
 pageDates["guides/organize-pdf-pages.html"] = "2026-09-27";
@@ -137,6 +140,8 @@ pageDates["guides/word-to-pdf-converter.html"] = "2026-09-27";
 pageDates["tools/compress-pdf.html"] = "2026-09-28";
 pageDates["guides/compress-pdf.html"] = "2026-09-28";
 pageDates["tools/ocr-pdf.html"] = "2026-09-28";
+pageDates["tools/sign-pdf.html"] = "2026-10-02";
+pageDates["guides/sign-pdf-online.html"] = "2026-10-02";
 pageDates["guides/ocr-pdf-to-word.html"] = "2026-09-28";
 pageDates["guides/merge-pdf-on-phone.html"] = "2026-09-28";
 pageDates["guides/split-pdf-into-separate-files.html"] = "2026-09-28";
@@ -241,6 +246,7 @@ export const pageLabels = {
   "tools/word-to-pdf.html": "Word to PDF",
   "tools/compress-pdf.html": "Compress PDF",
   "tools/ocr-pdf.html": "OCR PDF",
+  "tools/sign-pdf.html": "Sign PDF",
   "guides/index.html": "PDF Guides",
   "guides/reduce-pdf-file-size-for-email.html": "Reduce PDF File Size for Email",
   "guides/merge-pdf-safely.html": "How to Merge PDFs Safely",
@@ -274,6 +280,7 @@ export const pageLabels = {
   "guides/pdf-page-size-a4-vs-letter.html": "PDF Page Size: A4 vs Letter",
   "guides/convert-old-doc-to-pdf.html": "Convert Old DOC Files to PDF",
   "guides/organize-pdf-pages-on-phone.html": "Organize PDF Pages on a Phone",
+  "guides/sign-pdf-online.html": "How to Sign a PDF Online Without Uploading It",
   "topics/index.html": "PDF Conversion Topics",
   "topics/pdf-to-word-without-upload.html": "PDF to Word Without Uploading",
   "topics/scanned-pdf-to-word.html": "Scanned PDF to Word",
@@ -302,3 +309,4 @@ export function pagePathname(relative) {
   const withoutIndex = relative.replace(/index\.html$/, "");
   return "/" + withoutIndex.replace(/\.html$/, "");
 }
+

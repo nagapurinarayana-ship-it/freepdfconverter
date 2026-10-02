@@ -150,6 +150,7 @@
         ["/tools/pdf-to-word", "PDF to Word converter"],
         ["/tools/word-to-pdf", "Word to PDF converter"],
         ["/tools/organize-pdf", "organize PDF pages"],
+        ["/tools/sign-pdf", "sign PDF online"],
         ["/guides/reduce-pdf-file-size-for-email", "PDF too large for email"],
         ["/guides/pdf-converter-without-upload", "PDF tools without upload"]
       ]
