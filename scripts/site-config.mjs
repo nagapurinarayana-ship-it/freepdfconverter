@@ -25,7 +25,8 @@ export const indexablePages = [
   "tools/pdf-to-word.html",
   "tools/word-to-pdf.html",
   "tools/compress-pdf.html",
-  "tools/ocr-pdf.html",\n  "tools/sign-pdf.html",
+  "tools/ocr-pdf.html",
+  "tools/sign-pdf.html",
   "guides/index.html",
   "guides/reduce-pdf-file-size-for-email.html",
   "guides/compress-pdf.html",
@@ -58,7 +59,8 @@ export const indexablePages = [
   "guides/jpg-vs-png-to-pdf.html",
   "guides/pdf-page-size-a4-vs-letter.html",
   "guides/convert-old-doc-to-pdf.html",
-  "guides/organize-pdf-pages-on-phone.html",\n  "guides/sign-pdf-online.html",
+  "guides/organize-pdf-pages-on-phone.html",
+  "guides/sign-pdf-online.html",
   ...[
     "topics/index.html",
     "topics/pdf-to-word-without-upload.html",
@@ -136,7 +138,9 @@ pageDates["guides/pdf-to-word-converter.html"] = "2026-09-27";
 pageDates["guides/word-to-pdf-converter.html"] = "2026-09-27";
 pageDates["tools/compress-pdf.html"] = "2026-09-28";
 pageDates["guides/compress-pdf.html"] = "2026-09-28";
-pageDates["tools/ocr-pdf.html"] = "2026-09-28";\npageDates["tools/sign-pdf.html"] = "2026-10-02";\npageDates["guides/sign-pdf-online.html"] = "2026-10-02";
+pageDates["tools/ocr-pdf.html"] = "2026-09-28";
+pageDates["tools/sign-pdf.html"] = "2026-10-02";
+pageDates["guides/sign-pdf-online.html"] = "2026-10-02";
 pageDates["guides/ocr-pdf-to-word.html"] = "2026-09-28";
 pageDates["guides/merge-pdf-on-phone.html"] = "2026-09-28";
 pageDates["guides/split-pdf-into-separate-files.html"] = "2026-09-28";
@@ -240,7 +244,8 @@ export const pageLabels = {
   "tools/pdf-to-word.html": "PDF to Word",
   "tools/word-to-pdf.html": "Word to PDF",
   "tools/compress-pdf.html": "Compress PDF",
-  "tools/ocr-pdf.html": "OCR PDF",\n  "tools/sign-pdf.html": "Sign PDF",
+  "tools/ocr-pdf.html": "OCR PDF",
+  "tools/sign-pdf.html": "Sign PDF",
   "guides/index.html": "PDF Guides",
   "guides/reduce-pdf-file-size-for-email.html": "Reduce PDF File Size for Email",
   "guides/merge-pdf-safely.html": "How to Merge PDFs Safely",
