@@ -125,7 +125,7 @@ export const pageDates = Object.fromEntries(indexablePages.map((relative) => [re
 pageDates["index.html"] = "2026-10-02";
 pageDates["pdf-converter-online.html"] = "2026-09-27";
 pageDates["about.html"] = "2026-10-02";
-pageDates["guides/index.html"] = "2026-09-27";
+pageDates["guides/index.html"] = "2026-10-02";
 pageDates["guides/reduce-pdf-file-size-for-email.html"] = "2026-08-31";
 pageDates["tools/organize-pdf.html"] = "2026-09-27";
 pageDates["guides/organize-pdf-pages.html"] = "2026-09-27";
@@ -279,6 +279,7 @@ export const pageLabels = {
   "guides/pdf-page-size-a4-vs-letter.html": "PDF Page Size: A4 vs Letter",
   "guides/convert-old-doc-to-pdf.html": "Convert Old DOC Files to PDF",
   "guides/organize-pdf-pages-on-phone.html": "Organize PDF Pages on a Phone",
+  "guides/sign-pdf-online.html": "How to Sign a PDF Online Without Uploading It",
   "topics/index.html": "PDF Conversion Topics",
   "topics/pdf-to-word-without-upload.html": "PDF to Word Without Uploading",
   "topics/scanned-pdf-to-word.html": "Scanned PDF to Word",
@@ -308,4 +309,3 @@ export function pagePathname(relative) {
   return "/" + withoutIndex.replace(/\.html$/, "");
 }
 
-pageLabels["guides/sign-pdf-online.html"] = "How to Sign a PDF Online Without Uploading It";
