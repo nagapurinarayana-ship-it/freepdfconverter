@@ -119,6 +119,19 @@ if (photoToolAsset) {
   if (!photoToolSource.includes("downloadBlob") || !photoToolSource.includes("image-form-policy")) failures.push("Photo Compressor -> direct download or shared policy integration is missing");
   if (/JSZip|\.zip|ZIP|archive-engine|createZipBlob/i.test(photoToolSource)) failures.push("Photo Compressor -> ZIP/archive output code remains");
 }
+const thumbPage = await readFile(path.join(dist, "tools/thumb-impression-resizer.html"), "utf8");
+if (!thumbPage.includes('data-tool="thumb-impression-resizer"') || !thumbPage.includes('300 × 300 px') || !thumbPage.includes('600 × 600 px') || !thumbPage.includes('Auto-crop extra whitespace') || !thumbPage.includes('custom')) {
+  failures.push("Thumb Impression Resizer -> presets, cleanup or custom-size workflow is incomplete");
+}
+if (!thumbPage.includes("assets/js/tool-runtime")) failures.push("Thumb Impression Resizer -> shared tool runtime is missing");
+if (/\bZIP\b/i.test(thumbPage) || /\.zip\b/i.test(thumbPage)) failures.push("Thumb Impression Resizer -> ZIP output reference remains");
+const thumbToolAsset = toolJsAssets.find((file) => /^thumb-impression-resizer\.tool\.[a-f0-9]{10}\.js$/.test(file));
+if (!thumbToolAsset) failures.push("Thumb Impression Resizer -> fingerprinted tool module is missing");
+if (thumbToolAsset) {
+  const thumbToolSource = await readFile(path.join(dist, "assets/js/tools", thumbToolAsset), "utf8");
+  if (!thumbToolSource.includes("encodeBestUnderTarget") || !thumbToolSource.includes("trimWhitespace") || !thumbToolSource.includes("downloadBlob")) failures.push("Thumb Impression Resizer -> shared encoder, cleanup or direct-download integration is missing");
+  if (/\.zip\b/i.test(thumbToolSource)) failures.push("Thumb Impression Resizer -> ZIP archive output code remains");
+}
 const passportPage = await readFile(path.join(dist, "tools/passport-id-photo-maker.html"), "utf8");
 if (!passportPage.includes('data-tool="passport-id-photo-maker"') || !passportPage.includes('35 × 45 mm') || !passportPage.includes('2 × 2 in') || !passportPage.includes('focusY') || !passportPage.includes('custom')) {
   failures.push("Passport & ID Photo Maker -> preset, custom-size or framing workflow is incomplete");
