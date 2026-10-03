@@ -32,44 +32,29 @@ export class ToolController {
   }
 
   bindDropZone() {
+    // Use the same shared picker implementation as the proven Image → PDF
+    // tools. This keeps native Android/iOS file-picker behaviour identical
+    // across legacy and ToolController-based tools.
+    if (typeof window.FreePDF?.bindDropZone === "function") {
+      window.FreePDF.bindDropZone(
+        this.el.zone,
+        this.el.input,
+        (files) => this.select(files)
+      );
+      return;
+    }
+
+    // Defensive fallback if common.js has not initialized yet.
     const zone = this.el.zone;
     const input = this.el.input;
-
-    ["dragenter", "dragover"].forEach((eventName) => {
-      zone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        zone.classList.add("is-dragging");
-      });
+    zone.addEventListener("drop", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      this.select(event.dataTransfer.files);
     });
-
-    ["dragleave", "drop"].forEach((eventName) => {
-      zone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        zone.classList.remove("is-dragging");
-      });
-    });
-
-    zone.addEventListener("drop", (event) => this.select(event.dataTransfer.files));
-    this.bindFileInput(input);
-  }
-
-  bindFileInput(input) {
     input.addEventListener("change", () => {
-      // Snapshot the File objects before touching the native input. Do not set
-      // input.value during the change event: some Android file pickers expose
-      // the native FileList transiently while the event is being dispatched.
       const files = Array.from(input.files || []);
-      if (!files.length) return;
-
-      // Replace the native input after the File objects have been copied.
-      // This resets same-file selection without mutating the active FileList
-      // during change dispatch.
-      const replacement = input.cloneNode(true);
-      input.parentNode.replaceChild(replacement, input);
-      this.el.input = replacement;
-      this.bindFileInput(replacement);
-
-      this.select(files);
+      if (files.length) this.select(files);
     });
   }
 
@@ -203,7 +188,6 @@ export class ToolController {
       state: this.state,
       el: this.el,
       busy: this.busy,
-      multiple: this.multiple,
       setStatus: (message, type) => this.setStatus(message, type),
       setProgress: (value) => this.setProgress(value),
       formatBytes: window.FreePDF.formatBytes,
@@ -212,50 +196,36 @@ export class ToolController {
     };
   }
 
-  updateFileSummary() {
-    if (this.el.summary) {
-      if (this.multiple) {
-        if (!this.files.length) {
-          this.el.summary.textContent = this.options.emptySummary || "No files selected";
-        } else {
-          const totalBytes = this.files.reduce((sum, file) => sum + file.size, 0);
-          this.el.summary.textContent =
-            this.files.length + " file" + (this.files.length === 1 ? "" : "s") +
-            " · " + window.FreePDF.formatBytes(totalBytes);
-        }
-      } else {
-        this.el.summary.textContent = this.file
-          ? this.file.name + " · " + window.FreePDF.formatBytes(this.file.size)
-          : this.options.emptySummary || "No file selected";
-      }
-    }
-
-    if (this.el.originalSize) {
-      if (this.multiple) {
-        const totalBytes = this.files.reduce((sum, file) => sum + file.size, 0);
-        this.el.originalSize.textContent = this.files.length
-          ? window.FreePDF.formatBytes(totalBytes)
-          : "—";
-      } else {
-        this.el.originalSize.textContent = this.file
-          ? window.FreePDF.formatBytes(this.file.size)
-          : "—";
-      }
-    }
-  }
-
-  updateAvailability() {
-    const hasSelection = this.multiple ? this.files.length > 0 : Boolean(this.file);
-    if (this.el.action) this.el.action.disabled = this.busy || !hasSelection || !this.ready;
-    if (this.el.clear) this.el.clear.disabled = this.busy || !hasSelection;
-    if (this.el.input) this.el.input.disabled = this.busy;
-  }
-
   setStatus(message, type = "info") {
     window.FreePDF.setStatus(this.el.status, message, type);
   }
 
   setProgress(value) {
     window.FreePDF.setProgress(this.el.progress, value);
+  }
+
+  updateAvailability() {
+    this.el.action.disabled = this.busy || !this.ready;
+    this.el.clear.disabled = this.busy || (!this.file && !this.files.length);
+  }
+
+  updateFileSummary() {
+    if (!this.el.summary) return;
+    if (!this.multiple) {
+      this.el.summary.textContent = this.file
+        ? this.file.name + " · " + window.FreePDF.formatBytes(this.file.size)
+        : this.options.emptySummary || "No file selected";
+      return;
+    }
+
+    if (!this.files.length) {
+      this.el.summary.textContent = this.options.emptySummary || "No files selected";
+      return;
+    }
+
+    const totalBytes = this.files.reduce((sum, file) => sum + file.size, 0);
+    this.el.summary.textContent =
+      this.files.length + " file" + (this.files.length === 1 ? "" : "s") +
+      " selected · " + window.FreePDF.formatBytes(totalBytes);
   }
 }
