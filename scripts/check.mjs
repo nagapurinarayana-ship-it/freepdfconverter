@@ -110,7 +110,7 @@ for (const file of toolJavaScriptFiles) {
   }
   if (file.endsWith("assets/js/core/tool-controller.js")) {
     const changeStart = content.indexOf("this.bindFileInput(input)");
-    if (changeStart < 0 || !content.includes("input.replaceWith(replacement)")) {
+    if (changeStart < 0 || !content.includes("input.parentNode.replaceChild(replacement, input)")) {
       broken.push(path.relative(root, file) + " -> ToolController file-picker must snapshot files and reset the native input by replacement");
     }
   }
