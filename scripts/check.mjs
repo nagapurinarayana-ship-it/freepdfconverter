@@ -102,8 +102,17 @@ for (const file of toolJavaScriptFiles) {
   if (/\.zip\b/i.test(content) || /(?:downloadBlob\([^\n]*\.zip)/i.test(content)) {
     broken.push(path.relative(root, file) + " -> ZIP archive downloads are prohibited; generated files must download directly");
   }
-  if (/addEventListener\(["']change["'][\s\S]{0,320}?\.value\s*=\s*["']["']/i.test(content)) {
-    broken.push(path.relative(root, file) + " -> file input must not be cleared inside its change handler; snapshot first and clear on picker open");
+  if (file.endsWith("assets/js/common.js")) {
+    const changeStart = content.indexOf("bindFileInput(input, onFiles)");
+    if (changeStart < 0 || !content.includes("input.parentNode.replaceChild(replacement, input)")) {
+      broken.push(path.relative(root, file) + " -> common file-picker must snapshot files and reset the native input by replacement");
+    }
+  }
+  if (file.endsWith("assets/js/core/tool-controller.js")) {
+    const changeStart = content.indexOf("this.bindFileInput(input)");
+    if (changeStart < 0 || !content.includes("input.replaceWith(replacement)")) {
+      broken.push(path.relative(root, file) + " -> ToolController file-picker must snapshot files and reset the native input by replacement");
+    }
   }
   if (/instanceof\s+File\b/.test(content)) {
     broken.push(path.relative(root, file) + " -> avoid instanceof File for browser picker compatibility; use file-like checks");

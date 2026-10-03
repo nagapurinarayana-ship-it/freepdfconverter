@@ -50,18 +50,25 @@ export class ToolController {
     });
 
     zone.addEventListener("drop", (event) => this.select(event.dataTransfer.files));
+    this.bindFileInput(input);
+  }
 
-    // Do not clear the native input during click. On Android/mobile browsers,
-    // changing input.value while the native picker is opening can leave the
-    // picker showing the chosen filename while the subsequent change event
-    // exposes an empty FileList.
-    //
-    // The change handler snapshots the File objects first, then clears the
-    // native input from the already-snapshotted selection. This also means
-    // selecting the same file again reliably emits a usable selection.
+  bindFileInput(input) {
     input.addEventListener("change", () => {
+      // Snapshot the File objects before touching the native input. Do not set
+      // input.value during the change event: some Android file pickers expose
+      // the native FileList transiently while the event is being dispatched.
       const files = Array.from(input.files || []);
-      input.value = "";
+      if (!files.length) return;
+
+      // Replace the native input after the File objects have been copied.
+      // This resets same-file selection without mutating the active FileList
+      // during change dispatch.
+      const replacement = input.cloneNode(true);
+      input.replaceWith(replacement);
+      this.el.input = replacement;
+      this.bindFileInput(replacement);
+
       this.select(files);
     });
   }

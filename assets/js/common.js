@@ -102,12 +102,22 @@
     zone.addEventListener("drop", function (event) {
       onFiles(Array.from(event.dataTransfer.files || []));
     });
+    bindFileInput(input, onFiles);
+  }
+
+  function bindFileInput(input, onFiles) {
     input.addEventListener("change", function () {
-      // Snapshot the File objects first. Clearing the native input after the
-      // snapshot supports same-file re-selection without breaking Android
-      // browsers that expose a transient FileList during change dispatch.
+      // Snapshot the File objects before touching the native input. Do not set
+      // input.value during change: some Android file pickers expose the
+      // FileList transiently while the event is being dispatched.
       var files = Array.from(input.files || []);
-      input.value = "";
+      if (!files.length) return;
+
+      // Replacing the input after the snapshot resets same-file selection
+      // without mutating the active FileList during change dispatch.
+      var replacement = input.cloneNode(true);
+      input.parentNode.replaceChild(replacement, input);
+      bindFileInput(replacement, onFiles);
       onFiles(files);
     });
   }
