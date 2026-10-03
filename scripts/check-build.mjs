@@ -159,12 +159,28 @@ if (signatureToolAsset) {
 if (!photoToolAsset) failures.push("Photo Compressor -> fingerprinted photo tool module is missing");
 if (!toolJsAssets.some((file) => /photo-compressor\.tool\.[a-f0-9]{10}\.js$/.test(file))) failures.push("Image tools -> fingerprinted photo tool module is missing");
 
+const handwrittenPage = await readFile(path.join(dist, "tools/handwritten-declaration-resizer.html"), "utf8");
+if (!handwrittenPage.includes('data-tool="handwritten-declaration-resizer"') || !handwrittenPage.includes('10 KB') || !handwrittenPage.includes('50 KB') || !handwrittenPage.includes('100 KB') || !handwrittenPage.includes('customTarget') || !handwrittenPage.includes('Auto-crop extra whitespace') || !handwrittenPage.includes('Millimetres')) {
+  failures.push("Handwritten Declaration Resizer -> target sizes, cleanup or dimension workflow is incomplete");
+}
+if (!handwrittenPage.includes("assets/js/tool-runtime")) failures.push("Handwritten Declaration Resizer -> shared tool runtime is missing");
+if (/\bZIP\b/i.test(handwrittenPage) || /\.zip\b/i.test(handwrittenPage)) failures.push("Handwritten Declaration Resizer -> ZIP output reference remains");
+const handwrittenToolAsset = toolJsAssets.find((file) => /^handwritten-declaration-resizer\.tool\.[a-f0-9]{10}\.js$/.test(file));
+if (!handwrittenToolAsset) failures.push("Handwritten Declaration Resizer -> fingerprinted tool module is missing");
+if (handwrittenToolAsset) {
+  const handwrittenToolSource = await readFile(path.join(dist, "assets/js/tools", handwrittenToolAsset), "utf8");
+  if (!handwrittenToolSource.includes("ToolController") || !handwrittenToolSource.includes("multiple: true")) failures.push("Handwritten Declaration Resizer -> shared multi-file controller integration is missing");
+  if (!handwrittenToolSource.includes("encodeBestUnderTarget") || !handwrittenToolSource.includes("trimWhitespace") || !handwrittenToolSource.includes("downloadBlob")) failures.push("Handwritten Declaration Resizer -> shared encoder, cleanup or direct-download integration is missing");
+  if (/\.zip\b/i.test(handwrittenToolSource)) failures.push("Handwritten Declaration Resizer -> ZIP archive output code remains");
+}
+
 const directDownloadPages = [
   ["tools/photo-compressor.html", "Photo Compressor"],
   ["tools/signature-resizer.html", "Signature Resizer"],
   ["tools/split-pdf.html", "Split PDF"],
   ["tools/pdf-to-image.html", "PDF to Image"],
-  ["tools/passport-id-photo-maker.html", "Passport & ID Photo Maker"]
+  ["tools/passport-id-photo-maker.html", "Passport & ID Photo Maker"],
+  ["tools/handwritten-declaration-resizer.html", "Handwritten Declaration Resizer"]
 ];
 for (const [relative, label] of directDownloadPages) {
   const html = await readFile(path.join(dist, relative), "utf8");
