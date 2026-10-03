@@ -32,29 +32,48 @@ export class ToolController {
   }
 
   bindDropZone() {
-    // Use the same shared picker implementation as the proven Image → PDF
-    // tools. This keeps native Android/iOS file-picker behaviour identical
-    // across legacy and ToolController-based tools.
-    if (typeof window.FreePDF?.bindDropZone === "function") {
-      window.FreePDF.bindDropZone(
-        this.el.zone,
-        this.el.input,
-        (files) => this.select(files)
-      );
-      return;
-    }
-
-    // Defensive fallback if common.js has not initialized yet.
     const zone = this.el.zone;
     const input = this.el.input;
-    zone.addEventListener("drop", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      this.select(event.dataTransfer.files);
+
+    // ToolController owns the file-input lifecycle directly. Do not delegate
+    // to the legacy common.js picker here: that picker replaces the <input>
+    // node during the Android change event, while this controller intentionally
+    // retains a stable element reference. Keeping one input node eliminates a
+    // mobile-only race where the native picker closes successfully but the
+    // controller never receives the selected File objects.
+    ["dragenter", "dragover"].forEach((name) => {
+      zone.addEventListener(name, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        zone.classList.add("is-dragging");
+      });
     });
-    input.addEventListener("change", () => {
-      const files = Array.from(input.files || []);
-      if (files.length) this.select(files);
+
+    ["dragleave", "drop"].forEach((name) => {
+      zone.addEventListener(name, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        zone.classList.remove("is-dragging");
+      });
+    });
+
+    zone.addEventListener("drop", (event) => {
+      this.select(event.dataTransfer?.files || []);
+    });
+
+    input.addEventListener("change", (event) => {
+      // Snapshot the File objects synchronously. Android browsers can expose a
+      // transient FileList while the native picker is returning control.
+      const files = Array.from(event.currentTarget?.files || []);
+      if (!files.length) return;
+
+      this.select(files);
+
+      // Allow the user to choose the exact same file again without replacing
+      // the input node (which is the important part for Android reliability).
+      window.setTimeout(() => {
+        if (!this.busy) input.value = "";
+      }, 0);
     });
   }
 
