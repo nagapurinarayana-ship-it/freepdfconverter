@@ -57,38 +57,58 @@ async function convert() {
   const r = range();
   if (r === "too-many") return U.setStatus(el.status,"Convert at most 60 pages at a time to protect browser memory.","error");
   if (!r) return U.setStatus(el.status,"Enter a valid page range.","error");
-  if (!window.JSZip && r.to > r.from) return U.setStatus(el.status,"The ZIP library did not load. Refresh and retry.","error");
+
   busy = true; controls(); U.setProgress(el.progress,2);
   try {
-    const format = el.format.value; const mime = format === "png" ? "image/png" : "image/jpeg";
-    const extension = format === "png" ? "png" : "jpg"; const scale = Number(el.scale.value) || 1.5;
-    const quality = Math.max(.5,Math.min(1,Number(el.quality.value) || .9)); const total = r.to - r.from + 1;
-    const zip = total > 1 ? new window.JSZip() : null; let onlyBlob = null;
+    const format = el.format.value;
+    const mime = format === "png" ? "image/png" : "image/jpeg";
+    const extension = format === "png" ? "png" : "jpg";
+    const scale = Number(el.scale.value) || 1.5;
+    const quality = Math.max(.5,Math.min(1,Number(el.quality.value) || .9));
+    const total = r.to - r.from + 1;
+
     for (let number = r.from; number <= r.to; number += 1) {
-      U.setStatus(el.status,"Rendering page " + number + " of " + r.to + "…","info");
-      const page = await pdf.getPage(number); const viewport = page.getViewport({ scale });
-      const canvas = document.createElement("canvas"); canvas.width = Math.ceil(viewport.width); canvas.height = Math.ceil(viewport.height);
+      U.setStatus(el.status,"Rendering and downloading page " + number + " of " + r.to + "…","info");
+
+      const page = await pdf.getPage(number);
+      const viewport = page.getViewport({ scale });
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.ceil(viewport.width);
+      canvas.height = Math.ceil(viewport.height);
+
       const context = canvas.getContext("2d",{ alpha: format === "png" });
-      if (format !== "png") { context.fillStyle = "#ffffff"; context.fillRect(0,0,canvas.width,canvas.height); }
+      if (format !== "png") {
+        context.fillStyle = "#ffffff";
+        context.fillRect(0,0,canvas.width,canvas.height);
+      }
+
       await page.render({ canvasContext: context, viewport }).promise;
+
       const blob = await canvasBlob(canvas,mime,quality);
       const name = U.safeBaseName(file.name) + "-page-" + String(number).padStart(3,"0") + "." + extension;
-      if (zip) zip.file(name,blob); else onlyBlob = blob;
-      canvas.width = 1; canvas.height = 1; page.cleanup();
-      U.setProgress(el.progress,((number-r.from+1)/total)*90);
+      U.downloadBlob(blob,name);
+
+      canvas.width = 1;
+      canvas.height = 1;
+      page.cleanup();
+
+      U.setProgress(el.progress,((number-r.from+1)/total)*100);
     }
-    if (zip) {
-      U.setStatus(el.status,"Packaging images into ZIP…","info");
-      const blob = await zip.generateAsync({ type: "blob" },meta => U.setProgress(el.progress,90+meta.percent*.1));
-      U.downloadBlob(blob,U.safeBaseName(file.name)+"-"+extension+"-pages.zip");
-    } else {
-      U.downloadBlob(onlyBlob,U.safeBaseName(file.name)+"-page-"+String(r.from).padStart(3,"0")+"."+extension);
-    }
-    U.setProgress(el.progress,100); U.setStatus(el.status,total + " page" + (total === 1 ? "" : "s") + " converted. Download started.","success");
+
+    U.setProgress(el.progress,100);
+    U.setStatus(
+      el.status,
+      total + " page" + (total === 1 ? "" : "s") +
+        " converted. Individual image downloads were started. Your browser may ask to allow multiple downloads.",
+      "success"
+    );
   } catch (error) {
-    console.error(error); U.setProgress(el.progress,0); U.setStatus(el.status,"Could not render these pages. Try a smaller range or lower quality.","error");
+    console.error(error);
+    U.setProgress(el.progress,0);
+    U.setStatus(el.status,"Could not render these pages. Try a smaller range or lower quality.","error");
   } finally { busy = false; controls(); }
 }
+
 U.bindDropZone(el.zone,el.input,load);
 el.format.addEventListener("change",controls); el.convert.addEventListener("click",convert); el.clear.addEventListener("click",reset);
 reset();
