@@ -4,12 +4,15 @@
  * This is the web equivalent of a Page Object / controller layer:
  * DOM wiring, file validation, busy state, progress and status are centralized.
  * Individual tools only implement their business-specific selection/process logic.
+ *
+ * Supports both single-file tools and multi-file batch tools.
  */
 export class ToolController {
   constructor(options) {
     this.options = options;
     this.state = Object.assign({}, options.initialState || {});
     this.file = null;
+    this.files = [];
     this.ready = false;
     this.busy = false;
 
@@ -18,6 +21,10 @@ export class ToolController {
       this.el[name] = document.querySelector(selector);
       if (!this.el[name]) throw new Error("Missing required tool element: " + selector);
     }
+  }
+
+  get multiple() {
+    return this.options.multiple === true;
   }
 
   mount() {
@@ -55,23 +62,62 @@ export class ToolController {
   async select(collection) {
     if (this.busy) return;
 
-    const next = Array.from(collection || [])[0];
-    if (!next) return;
+    const candidates = this.multiple
+      ? Array.from(collection || [])
+      : Array.from(collection || []).slice(0, 1);
 
-    const error = this.validateFile(next);
-    if (error) {
-      this.setStatus(error, "error");
+    if (!candidates.length) return;
+
+    const invalid = candidates
+      .map((file) => ({ file, error: this.validateFile(file) }))
+      .find((entry) => entry.error);
+
+    if (invalid) {
+      this.setStatus(invalid.error, "error");
       return;
     }
 
+    if (this.multiple && this.options.maxFiles && candidates.length > this.options.maxFiles) {
+      this.setStatus(
+        this.options.maxFilesMessage || ("Choose no more than " + this.options.maxFiles + " files."),
+        "error"
+      );
+      return;
+    }
+
+    if (this.multiple && this.options.maxTotalFileBytes) {
+      const totalBytes = candidates.reduce((sum, file) => sum + file.size, 0);
+      if (totalBytes > this.options.maxTotalFileBytes) {
+        this.setStatus(
+          this.options.maxTotalFileMessage || "The selected batch is too large for browser memory.",
+          "error"
+        );
+        return;
+      }
+    }
+
     try {
-      this.file = next;
+      this.file = candidates[0] || null;
+      this.files = candidates;
       this.ready = false;
-      await (this.options.onFileSelected?.(this.context()));
+
+      if (this.multiple) {
+        await (this.options.onFilesSelected?.(this.context()) ?? this.options.onFileSelected?.(this.context()));
+      } else {
+        await this.options.onFileSelected?.(this.context());
+      }
+
       this.ready = true;
-      this.setStatus(this.options.readyMessage || "Ready to process.", "success");
+      this.setStatus(
+        this.options.readyMessage ||
+          (this.multiple
+            ? candidates.length + " file" + (candidates.length === 1 ? "" : "s") + " ready to process."
+            : "Ready to process."),
+        "success"
+      );
     } catch (error) {
       this.file = null;
+      this.files = [];
       this.ready = false;
       this.options.onReset?.(this.context());
       this.setStatus(
@@ -96,7 +142,7 @@ export class ToolController {
   }
 
   async run() {
-    if (this.busy || !this.file || !this.ready) return;
+    if (this.busy || !this.ready || (!this.multiple && !this.file) || (this.multiple && !this.files.length)) return;
 
     this.busy = true;
     this.updateAvailability();
@@ -122,6 +168,7 @@ export class ToolController {
   reset() {
     if (this.busy) return;
     this.file = null;
+    this.files = [];
     this.ready = false;
     this.state = Object.assign({}, this.options.initialState || {});
     this.el.input.value = "";
@@ -135,9 +182,11 @@ export class ToolController {
   context() {
     return {
       file: this.file,
+      files: this.files,
       state: this.state,
       el: this.el,
       busy: this.busy,
+      multiple: this.multiple,
       setStatus: (message, type) => this.setStatus(message, type),
       setProgress: (value) => this.setProgress(value),
       formatBytes: window.FreePDF.formatBytes,
@@ -148,20 +197,40 @@ export class ToolController {
 
   updateFileSummary() {
     if (this.el.summary) {
-      this.el.summary.textContent = this.file
-        ? this.file.name + " · " + window.FreePDF.formatBytes(this.file.size)
-        : this.options.emptySummary || "No file selected";
+      if (this.multiple) {
+        if (!this.files.length) {
+          this.el.summary.textContent = this.options.emptySummary || "No files selected";
+        } else {
+          const totalBytes = this.files.reduce((sum, file) => sum + file.size, 0);
+          this.el.summary.textContent =
+            this.files.length + " file" + (this.files.length === 1 ? "" : "s") +
+            " · " + window.FreePDF.formatBytes(totalBytes);
+        }
+      } else {
+        this.el.summary.textContent = this.file
+          ? this.file.name + " · " + window.FreePDF.formatBytes(this.file.size)
+          : this.options.emptySummary || "No file selected";
+      }
     }
+
     if (this.el.originalSize) {
-      this.el.originalSize.textContent = this.file
-        ? window.FreePDF.formatBytes(this.file.size)
-        : "—";
+      if (this.multiple) {
+        const totalBytes = this.files.reduce((sum, file) => sum + file.size, 0);
+        this.el.originalSize.textContent = this.files.length
+          ? window.FreePDF.formatBytes(totalBytes)
+          : "—";
+      } else {
+        this.el.originalSize.textContent = this.file
+          ? window.FreePDF.formatBytes(this.file.size)
+          : "—";
+      }
     }
   }
 
   updateAvailability() {
-    if (this.el.action) this.el.action.disabled = this.busy || !this.file || !this.ready;
-    if (this.el.clear) this.el.clear.disabled = this.busy || !this.file;
+    const hasSelection = this.multiple ? this.files.length > 0 : Boolean(this.file);
+    if (this.el.action) this.el.action.disabled = this.busy || !hasSelection || !this.ready;
+    if (this.el.clear) this.el.clear.disabled = this.busy || !hasSelection;
     if (this.el.input) this.el.input.disabled = this.busy;
   }
 
