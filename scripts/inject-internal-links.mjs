@@ -1,5 +1,6 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { toolRegistry } from "./tool-registry.mjs";
 
 const dist = path.join(process.cwd(), "dist");
 const START = "<!-- freepdf-internal-links:start -->";
@@ -29,6 +30,12 @@ const clusters = [
   ["tools/photo-compressor.html", "guides/compress-photo-to-20kb.html", "Photo Compressor", "How to Compress a Photo to 20KB, 50KB or 100KB"],
   ["tools/signature-resizer.html", "guides/resize-signature-for-forms.html", "Signature Resizer", "How to Resize a Signature for Online Forms"]
 ];
+
+for (const tool of toolRegistry) {
+  if (!tool.guide) continue;
+  if (clusters.some(([toolPath]) => toolPath === tool.path)) continue;
+  clusters.push([tool.path, tool.guide, tool.label, tool.guideLabel || tool.guide]);
+}
 
 const files = [];
 await collectHtml(dist);
