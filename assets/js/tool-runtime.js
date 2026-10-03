@@ -33,7 +33,11 @@
   }
 
   try {
-    const module = await import("./tools/" + toolId + ".tool.js");
+    const modulePath = TOOL_MODULES[toolId];
+    if (!modulePath) {
+      throw new Error("No built tool module registered for: " + toolId);
+    }
+    const module = await import(modulePath);
     if (typeof module.mount !== "function") {
       throw new Error("Tool module must export mount()");
     }
