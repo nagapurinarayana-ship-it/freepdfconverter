@@ -1,11 +1,8 @@
 /**
  * Shared browser tool lifecycle.
  *
- * This is the web equivalent of a Page Object / controller layer:
  * DOM wiring, file validation, busy state, progress and status are centralized.
- * Individual tools only implement their business-specific selection/process logic.
- *
- * Supports both single-file tools and multi-file batch tools.
+ * Individual tools only implement business-specific selection/process logic.
  */
 export class ToolController {
   constructor(options) {
@@ -54,8 +51,11 @@ export class ToolController {
 
     zone.addEventListener("drop", (event) => this.select(event.dataTransfer.files));
     input.addEventListener("change", () => {
-      this.select(input.files);
+      // Snapshot FileList before clearing the native input. Some mobile browsers
+      // expose the FileList through a transient native object.
+      const files = Array.from(input.files || []);
       input.value = "";
+      this.select(files);
     });
   }
 
@@ -74,6 +74,7 @@ export class ToolController {
 
     if (invalid) {
       this.setStatus(invalid.error, "error");
+      this.updateAvailability();
       return;
     }
 
@@ -124,6 +125,7 @@ export class ToolController {
         this.options.readErrorMessage || "The selected file could not be read in your browser.",
         "error"
       );
+      console.error("FreePDF file selection failed:", error);
     }
 
     this.updateAvailability();
@@ -131,7 +133,11 @@ export class ToolController {
   }
 
   validateFile(file) {
-    if (!(file instanceof File)) return "Choose a supported file.";
+    // Avoid relying only on instanceof File: mobile browsers, embedded webviews,
+    // and cross-realm file objects can expose a valid File-like object whose
+    // constructor is not the page's File constructor.
+    const isFileLike = file && typeof file.name === "string" && Number.isFinite(Number(file.size));
+    if (!isFileLike) return "Choose a supported file.";
     if (this.options.accept && !this.options.accept(file)) {
       return this.options.invalidTypeMessage || "Choose a supported file.";
     }
