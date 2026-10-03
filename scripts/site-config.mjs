@@ -50,6 +50,7 @@ export const indexablePages = [
   "guides/password-protect-pdf.html",
   "guides/compress-photo-to-20kb.html",
   "guides/resize-signature-for-forms.html",
+  "guides/passport-id-photo-size.html",
   ...[
     "topics/index.html",
     "topics/pdf-to-word-without-upload.html",
@@ -111,7 +112,8 @@ export const articlePages = new Set([
   "guides/sign-pdf-online.html",
   "guides/password-protect-pdf.html",
   "guides/compress-photo-to-20kb.html",
-  "guides/resize-signature-for-forms.html"
+  "guides/resize-signature-for-forms.html",
+  "guides/passport-id-photo-size.html"
 ]);
 
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
@@ -150,6 +152,7 @@ pageDates["guides/jpg-vs-png-to-pdf.html"] = "2026-09-28";
 pageDates["guides/pdf-page-size-a4-vs-letter.html"] = "2026-09-28";
 pageDates["guides/convert-old-doc-to-pdf.html"] = "2026-09-28";
 pageDates["guides/organize-pdf-pages-on-phone.html"] = "2026-09-28";
+pageDates["guides/passport-id-photo-size.html"] = "2026-10-03";
 for (const localizedTopicKey of [
   "topic-pdf-word-private","topic-scanned-pdf-word","topic-pdf-word-formatting","topic-ocr-pdf-online","topic-ocr-pdf-accuracy","topic-word-97-2003-pdf","topic-docx-to-pdf","topic-private-pdf","topic-pdf-to-text","topic-compress-target","topic-jpg-mobile","topic-pdf-page-size"
 ]) pageDates[localizedTopicKey] = "2026-09-28";
@@ -214,7 +217,8 @@ export const articlePublishedDates = {
   "guides/organize-pdf-pages-on-phone.html": "2026-09-28",
   "guides/password-protect-pdf.html": "2026-10-02",
   "guides/compress-photo-to-20kb.html": "2026-10-03",
-  "guides/resize-signature-for-forms.html": "2026-10-03"
+  "guides/resize-signature-for-forms.html": "2026-10-03",
+  "guides/passport-id-photo-size.html": "2026-10-03"
 };
 
 export const pageLabels = {
@@ -286,6 +290,7 @@ export const pageLabels = {
   "guides/password-protect-pdf.html": "How to Password Protect a PDF Safely",
   "guides/compress-photo-to-20kb.html": "How to Compress a Photo to 20KB, 50KB or 100KB",
   "guides/resize-signature-for-forms.html": "How to Resize a Signature for Online Forms",
+  "guides/passport-id-photo-size.html": "How to Resize a Passport or ID Photo",
   "topics/index.html": "PDF Conversion Topics",
   "topics/pdf-to-word-without-upload.html": "PDF to Word Without Uploading",
   "topics/scanned-pdf-to-word.html": "Scanned PDF to Word",
