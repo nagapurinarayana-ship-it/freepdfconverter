@@ -106,19 +106,21 @@
   }
 
   function bindFileInput(input, onFiles) {
-    input.addEventListener("change", function () {
-      // Snapshot the File objects before touching the native input. Do not set
-      // input.value during change: some Android file pickers expose the
-      // FileList transiently while the event is being dispatched.
-      var files = Array.from(input.files || []);
+    input.addEventListener("change", function (event) {
+      // Snapshot the File objects before touching the native input. Android
+      // file pickers can expose a transient FileList while the picker returns
+      // control to the page.
+      var files = Array.from(event.currentTarget.files || []);
       if (!files.length) return;
 
-      // Replacing the input after the snapshot resets same-file selection
-      // without mutating the active FileList during change dispatch.
-      var replacement = input.cloneNode(true);
-      input.parentNode.replaceChild(replacement, input);
-      bindFileInput(replacement, onFiles);
+      // Keep the original input node. Replacing it during the native change
+      // event can cause mobile browsers to lose the selection event. Clear the
+      // value only after the callback has consumed the File objects so the same
+      // file can be selected again later without changing the DOM reference.
       onFiles(files);
+      window.setTimeout(function () {
+        try { input.value = ""; } catch (_) { /* Some browsers make file inputs immutable. */ }
+      }, 0);
     });
   }
 
