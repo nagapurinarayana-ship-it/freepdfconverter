@@ -260,12 +260,11 @@ export function mount() {
     },
     onError: (error, { setStatus }) => {
       const message =
-        error?.message === "zip-engine-not-loaded"
-error?.message === "encode-failed"
-            ? "The browser could not encode the signature. Try a larger target or a different output format."
-            : "The selected signature images could not be prepared in your browser.";
+        error?.message === "encode-failed"
+          ? "The browser could not encode the signature. Try a larger target or a different output format."
+          : "The selected signature images could not be prepared in your browser.";
       setStatus(message, "error");
-    }
+    }}
   });
 
   controller.mount();
