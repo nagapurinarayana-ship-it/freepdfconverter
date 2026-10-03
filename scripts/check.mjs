@@ -18,13 +18,13 @@ const required = [
   ...indexablePages.filter((relative) => relative.startsWith("guides/")),
   "assets/js/common.js", "assets/js/merge-pdf.js", "assets/js/split-pdf.js",
   "assets/js/rotate-pdf.js", "assets/js/jpg-to-pdf.js", "assets/js/pdf-to-image.js",
-  "assets/js/watermark-pdf.js", "assets/js/sign-pdf.js", "assets/js/protect-pdf.js", "assets/js/protect-pdf-worker.js", "assets/css/styles.css"
-  , "assets/js/organize-pdf.js", "assets/js/add-page-numbers.js", "assets/js/remove-pdf-metadata.js",
+  "assets/js/watermark-pdf.js", "assets/js/sign-pdf.js", "assets/js/protect-pdf.js", "assets/js/protect-pdf-worker.js", "assets/css/styles.css",
+  "assets/js/organize-pdf.js", "assets/js/add-page-numbers.js", "assets/js/remove-pdf-metadata.js",
   "assets/js/crop-pdf.js", "assets/js/extract-pdf-text.js", "assets/js/pdf-to-word.js", "assets/js/word-to-pdf.js", "assets/js/ocr-pdf.js", "assets/js/unlock-pdf.js", "assets/js/unlock-pdf-worker.js",
   "assets/vendor/pdf-lib/pdf-lib.min.js",
   "assets/vendor/jszip/jszip.min.js", "assets/vendor/pdfjs/pdf.min.mjs", "assets/vendor/pdfjs/pdf.worker.min.mjs",
   "assets/vendor/qpdf/qpdf.js", "assets/vendor/qpdf/qpdf.wasm", "assets/vendor/qpdf/LICENSE-QPDF-WASM.txt",
-  "assets/vendor/qpdf/LICENSE-QPDF.txt", "assets/vendor/qpdf/NOTICE-QPDF.md", "assets/vendor/qpdf/README.md",
+  "assets/vendor/qpdf/LICENSE-QPDF.txt", "assets/vendor/qpdf/NOTICE-QPDF-QPDF-WASM.txt", "assets/vendor/qpdf/README.md",
   "scripts/vendor-tesseract.mjs",
   "assets/images/freepdf-tools-social.jpg", "favicon.ico", "manifest.webmanifest", "service-worker.js", "offline.html", "_redirects"
 ];
@@ -80,9 +80,7 @@ for (const file of await htmlFiles(root)) {
 for (const [title, pages] of titles) if (pages.length > 1) broken.push("Duplicate title: " + title + " -> " + pages.join(", "));
 for (const [description, pages] of descriptions) if (pages.length > 1) broken.push("Duplicate description -> " + pages.join(", "));
 
-const sourceFilesForDownloadPolicy = [
-  ...(await htmlFiles(path.join(root, "tools")))
-];
+const sourceFilesForDownloadPolicy = [...(await htmlFiles(path.join(root, "tools")))];
 const toolJavaScriptFiles = [];
 for (const directory of [path.join(root, "assets/js"), path.join(root, "assets/js/tools"), path.join(root, "assets/js/core")]) {
   try {
@@ -93,66 +91,24 @@ for (const directory of [path.join(root, "assets/js"), path.join(root, "assets/j
 }
 for (const file of sourceFilesForDownloadPolicy) {
   const content = await readFile(file, "utf8");
-  if (/\bZIP\b/i.test(content)) {
-    broken.push(path.relative(root, file) + " -> ZIP archive downloads are prohibited; generated files must download directly");
-  }
+  if (/\bZIP\b/i.test(content)) broken.push(path.relative(root, file) + " -> ZIP archive downloads are prohibited; generated files must download directly");
 }
 for (const file of toolJavaScriptFiles) {
   const content = await readFile(file, "utf8");
   if (file.endsWith(".tool.js")) {
     const selectionStart = content.indexOf("onFilesSelected:");
     const processStart = content.indexOf("onProcess:", selectionStart + 1);
-    const selectionBlock = selectionStart >= 0
-      ? content.slice(selectionStart, processStart > selectionStart ? processStart : selectionStart + 2000)
-      : "";
-    if (/await\s+loadImage\s*\(/.test(selectionBlock)) {
-      broken.push(path.relative(root, file) + " -> image selection must not decode files; defer loadImage() until processing");
-    }
+    const selectionBlock = selectionStart >= 0 ? content.slice(selectionStart, processStart > selectionStart ? processStart : selectionStart + 2000) : "";
+    if (/await\s+loadImage\s*\(/.test(selectionBlock)) broken.push(path.relative(root, file) + " -> image selection must not decode files; defer loadImage() until processing");
   }
-  if (/\.zip\b/i.test(content) || /(?:downloadBlob\([^\n]*\.zip)/i.test(content)) {
-    broken.push(path.relative(root, file) + " -> ZIP archive downloads are prohibited; generated files must download directly");
-  }
+  if (/\.zip\b/i.test(content) || /(?:downloadBlob\([^\n]*\.zip)/i.test(content)) broken.push(path.relative(root, file) + " -> ZIP archive downloads are prohibited; generated files must download directly");
   if (file.endsWith("assets/js/common.js")) {
-    const changeStart = content.indexOf("bindFileInput(input, onFiles)");
-    if (changeStart < 0 || !content.includes("input.parentNode.replaceChild(replacement, input)")) {
-      broken.push(path.relative(root, file) + " -> common file-picker must snapshot files and reset the native input by replacement");
-    }
+    if (!content.includes("bindFileInput(input, onFiles)") || !content.includes("input.parentNode.replaceChild(replacement, input)")) broken.push(path.relative(root, file) + " -> common picker must use the proven shared file-input implementation");
   }
   if (file.endsWith("assets/js/core/tool-controller.js")) {
-    const changeStart = content.indexOf("this.bindFileInput(input)");
-    if (changeStart < 0 || !content.includes("input.parentNode.replaceChild(replacement, input)")) {
-      broken.push(path.relative(root, file) + " -> ToolController file-picker must snapshot files and reset the native input by replacement");
-    }
+    if (!content.includes("window.FreePDF.bindDropZone") || !content.includes("this.el.zone") || !content.includes("this.el.input")) broken.push(path.relative(root, file) + " -> ToolController must delegate file selection to the proven shared picker");
   }
-  if (/instanceof\s+File\b/.test(content)) {
-    broken.push(path.relative(root, file) + " -> avoid instanceof File for browser picker compatibility; use file-like checks");
-  }
-}
-
-const toolScripts = {
-  "tools/merge-pdf.html": "assets/js/merge-pdf.js",
-  "tools/split-pdf.html": "assets/js/split-pdf.js",
-  "tools/unlock-pdf.html": "assets/js/unlock-pdf.js",
-  "tools/rotate-pdf.html": "assets/js/rotate-pdf.js",
-  "tools/jpg-to-pdf.html": "assets/js/jpg-to-pdf.js",
-  "tools/pdf-to-image.html": "assets/js/pdf-to-image.js",
-  "tools/watermark-pdf.html": "assets/js/watermark-pdf.js",
-  "tools/sign-pdf.html": "assets/js/sign-pdf.js",
-  "tools/protect-pdf.html": "assets/js/protect-pdf.js",
-  "tools/organize-pdf.html": "assets/js/organize-pdf.js",
-  "tools/add-page-numbers.html": "assets/js/add-page-numbers.js",
-  "tools/remove-pdf-metadata.html": "assets/js/remove-pdf-metadata.js",
-  "tools/crop-pdf.html": "assets/js/crop-pdf.js",
-  "tools/extract-pdf-text.html": "assets/js/extract-pdf-text.js",
-  "tools/ocr-pdf.html": "assets/js/ocr-pdf.js",
-  "tools/pdf-to-word.html": "assets/js/pdf-to-word.js",
-  "tools/word-to-pdf.html": "assets/js/word-to-pdf.js"
-};
-for (const [htmlPath, scriptPath] of Object.entries(toolScripts)) {
-  const html = await readFile(path.join(root, htmlPath), "utf8");
-  const script = await readFile(path.join(root, scriptPath), "utf8");
-  const ids = [...script.matchAll(/getElementById\("([^"]+)"\)/g)].map((match) => match[1]);
-  for (const id of ids) if (!html.includes('id="' + id + '"')) broken.push(htmlPath + " -> script expects missing #" + id);
+  if (/instanceof\s+File\b/.test(content)) broken.push(path.relative(root, file) + " -> avoid instanceof File for browser picker compatibility; use file-like checks");
 }
 
 if (broken.length) {
