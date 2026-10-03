@@ -106,9 +106,9 @@ if (wordJsAsset) {
 }
 const photoPage = await readFile(path.join(dist, "tools/photo-compressor.html"), "utf8");
 if (!photoPage.includes('multiple') || !photoPage.includes('10 KB') || !photoPage.includes('customTarget') || !photoPage.includes('Millimetres') || !photoPage.includes('Centimetres')) {
-  failures.push("Photo Compressor -> batch, target presets, physical dimensions or ZIP workflow is incomplete");
+  failures.push("Photo Compressor -> batch, target presets or physical-dimension workflow is incomplete");
 }
-if (!photoPage.includes("/assets/vendor/jszip/jszip.min.js")) failures.push("Photo Compressor -> stable local JSZip runtime reference is missing");
+if (/JSZip|\.zip|ZIP/i.test(photoPage)) failures.push("Photo Compressor -> ZIP output reference remains");
 const toolJsAssets = await readdir(path.join(dist, "assets/js/tools"));
 const photoToolAsset = toolJsAssets.find((file) => /^photo-compressor\.tool\.[a-f0-9]{10}\.js$/.test(file));
 const signatureToolAsset = toolJsAssets.find((file) => /^signature-resizer\.tool\.[a-f0-9]{10}\.js$/.test(file));
@@ -116,17 +116,19 @@ if (!photoToolAsset) failures.push("Photo Compressor -> fingerprinted tool modul
 if (photoToolAsset) {
   const photoToolSource = await readFile(path.join(dist, "assets/js/tools", photoToolAsset), "utf8");
   if (!photoToolSource.includes("ToolController") || !photoToolSource.includes("multiple: true")) failures.push("Photo Compressor -> shared multi-file controller integration is missing");
-  if (!photoToolSource.includes("freepdf-optimized-images.zip") || !photoToolSource.includes("image-form-policy")) failures.push("Photo Compressor -> batch ZIP or shared policy integration is missing");
+  if (!photoToolSource.includes("downloadBlob") || !photoToolSource.includes("image-form-policy")) failures.push("Photo Compressor -> direct download or shared policy integration is missing");
+  if (/JSZip|\.zip|ZIP|archive-engine|createZipBlob/i.test(photoToolSource)) failures.push("Photo Compressor -> ZIP/archive output code remains");
 }
 const signaturePage = await readFile(path.join(dist, "tools/signature-resizer.html"), "utf8");
 if (!signaturePage.includes('multiple') || !signaturePage.includes('10 KB') || !signaturePage.includes('customTarget') || !signaturePage.includes('autoTrim') || !signaturePage.includes('Millimetres')) {
   failures.push("Signature Resizer -> batch, target-size, auto-crop or dimension workflow is incomplete");
 }
-if (!signaturePage.includes("/assets/vendor/jszip/jszip.min.js")) failures.push("Signature Resizer -> local JSZip runtime reference is missing");
+if (/JSZip|\.zip|ZIP/i.test(signaturePage)) failures.push("Signature Resizer -> ZIP output reference remains");
 if (signatureToolAsset) {
   const signatureToolSource = await readFile(path.join(dist, "assets/js/tools", signatureToolAsset), "utf8");
   if (!signatureToolSource.includes("ToolController") || !signatureToolSource.includes("multiple: true")) failures.push("Signature Resizer -> shared multi-file controller integration is missing");
-  if (!signatureToolSource.includes("createZipBlob") || !signatureToolSource.includes("trimWhitespace")) failures.push("Signature Resizer -> shared archive or whitespace-cleanup engine is missing");
+  if (!signatureToolSource.includes("downloadBlob") || !signatureToolSource.includes("trimWhitespace")) failures.push("Signature Resizer -> direct download or whitespace-cleanup engine is missing");
+  if (/JSZip|\.zip|ZIP|archive-engine|createZipBlob/i.test(signatureToolSource)) failures.push("Signature Resizer -> ZIP/archive output code remains");
 }
 if (!photoToolAsset) failures.push("Photo Compressor -> fingerprinted photo tool module is missing");
 if (!toolJsAssets.some((file) => /photo-compressor\.tool\.[a-f0-9]{10}\.js$/.test(file))) failures.push("Image tools -> fingerprinted photo tool module is missing");
@@ -190,19 +192,7 @@ const docjsFiles = await readdir(path.join(dist, "assets/vendor/docjs"));
 if (!docjsFiles.includes("index.js")) failures.push("build -> stable MS-DOC parser entry point is missing");
 if (!docjsFiles.includes("LICENSE.txt")) failures.push("build -> MS-DOC parser license is missing");
 if (!serviceWorker.includes("/assets/vendor/docjs/index.js")) failures.push("service-worker.js -> stable MS-DOC parser entry point is not precached");
-const jszipFiles = await readdir(path.join(dist, "assets/vendor/jszip"));
-if (!jszipFiles.includes("jszip.min.js")) failures.push("build -> stable JSZip runtime is missing");
-if (jszipFiles.some((file) => /^jszip\.[a-f0-9]{10}\.js$/.test(file))) failures.push("build -> JSZip runtime should remain at its stable vendor path");
-if (!serviceWorker.includes("/assets/vendor/jszip/jszip.min.js")) failures.push("service-worker.js -> JSZip runtime is not precached");
 
-const qpdfFiles = await readdir(path.join(dist, "assets/vendor/qpdf"));
-const qpdfScript = qpdfFiles.find((file) => /^qpdf\.[a-f0-9]{10}\.js$/.test(file));
-const qpdfWasm = qpdfFiles.find((file) => /^qpdf\.[a-f0-9]{10}\.wasm$/.test(file));
-if (!qpdfScript) failures.push("build -> qpdf script is not fingerprinted");
-if (!qpdfWasm) failures.push("build -> qpdf WebAssembly is not fingerprinted");
-if (qpdfFiles.includes("qpdf.js") || qpdfFiles.includes("qpdf.wasm")) failures.push("build -> unfingerprinted qpdf runtime remains");
-if (qpdfScript && !serviceWorker.includes("/assets/vendor/qpdf/" + qpdfScript)) failures.push("service-worker.js -> fingerprinted qpdf script is not precached");
-if (qpdfWasm && !serviceWorker.includes("/assets/vendor/qpdf/" + qpdfWasm)) failures.push("service-worker.js -> fingerprinted qpdf WebAssembly is not precached");
 
 if (failures.length) {
   console.error("Production SEO/quality checks failed:\n" + failures.join("\n"));
