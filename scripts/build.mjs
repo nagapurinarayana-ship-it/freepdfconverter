@@ -253,9 +253,8 @@ async function fingerprintAssets() {
   // and included in the service-worker precache.
   const docjsRoot = path.join(assetRoot, "vendor", "docjs") + path.sep;
   const tesseractRoot = path.join(assetRoot, "vendor", "tesseract") + path.sep;
-  const jszipRoot = path.join(assetRoot, "vendor", "jszip") + path.sep;
   const applicationTargets = (await walk(assetRoot)).filter((file) =>
-    /\.(?:css|js|mjs|wasm)$/i.test(file) && !file.startsWith(docjsRoot) && !file.startsWith(tesseractRoot) && !file.startsWith(jszipRoot)
+    /\.(?:css|js|mjs|wasm)$/i.test(file) && !file.startsWith(docjsRoot) && !file.startsWith(tesseractRoot)
   );
   return fingerprintGroup(applicationTargets);
 }
@@ -301,8 +300,6 @@ async function buildServiceWorker(mappings) {
     ...mappings.map((mapping) => "/" + mapping.newPath),
     ...(await walk(path.join(dist, "assets/vendor/docjs")))
       .map((file) => "/" + path.relative(dist, file).split(path.sep).join("/")),
-    ...(await walk(path.join(dist, "assets/vendor/jszip")))
-      .map((file) => "/" + path.relative(dist, file).split(path.sep).join("/"))
   ];
   const uniqueUrls = [...new Set(urls)];
   const version = createHash("sha256").update(JSON.stringify(uniqueUrls)).digest("hex").slice(0, 10);
