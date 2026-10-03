@@ -47,7 +47,7 @@ assets/js/tools/<tool>.tool.js
 Tool modules should not duplicate this plumbing.
 
 ### Core Engines
-Reusable algorithms live under `assets/js/core/`. Image processing is centralized in `image-tool-kit.js`, form-image policies in `image-form-policy.js`, target encoding in `image-form-engine.js`, and local batch archive creation in `archive-engine.js`. PDF-specific algorithms should follow the same pattern as PDF tools are migrated.
+Reusable algorithms live under `assets/js/core/`. Image processing is centralized in `image-tool-kit.js`, form-image policies in `image-form-policy.js`, target encoding in `image-form-engine.js`, and direct individual-download handling remains part of each tool module; batch tools must never package user outputs into ZIP archives. PDF-specific algorithms should follow the same pattern as PDF tools are migrated.
 
 ### Tool Modules
 Each tool gets one isolated module under `assets/js/tools/`. The runtime dynamically imports the module from the page's `data-tool` value. The runtime itself does not need to be edited when a new tool is added.
