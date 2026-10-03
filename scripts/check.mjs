@@ -22,7 +22,7 @@ const required = [
   , "assets/js/organize-pdf.js", "assets/js/add-page-numbers.js", "assets/js/remove-pdf-metadata.js",
   "assets/js/crop-pdf.js", "assets/js/extract-pdf-text.js", "assets/js/pdf-to-word.js", "assets/js/word-to-pdf.js", "assets/js/ocr-pdf.js", "assets/js/unlock-pdf.js", "assets/js/unlock-pdf-worker.js",
   "assets/vendor/pdf-lib/pdf-lib.min.js",
-  "assets/vendor/jszip/jszip.min.js", "assets/vendor/pdfjs/pdf.min.mjs", "assets/vendor/pdfjs/pdf.worker.min.mjs",
+  "assets/vendor/pdfjs/pdf.min.mjs", "assets/vendor/pdfjs/pdf.worker.min.mjs",
   "assets/vendor/qpdf/qpdf.js", "assets/vendor/qpdf/qpdf.wasm", "assets/vendor/qpdf/LICENSE-QPDF-WASM.txt",
   "assets/vendor/qpdf/LICENSE-QPDF.txt", "assets/vendor/qpdf/NOTICE-QPDF.md", "assets/vendor/qpdf/README.md",
   "scripts/vendor-tesseract.mjs",
@@ -79,6 +79,25 @@ for (const file of await htmlFiles(root)) {
 }
 for (const [title, pages] of titles) if (pages.length > 1) broken.push("Duplicate title: " + title + " -> " + pages.join(", "));
 for (const [description, pages] of descriptions) if (pages.length > 1) broken.push("Duplicate description -> " + pages.join(", "));
+
+const sourceFilesForDownloadPolicy = [
+  ...(await htmlFiles(path.join(root, "tools"))),
+  ...(await htmlFiles(path.join(root, "guides"))).filter((file) => false)
+];
+const toolJavaScriptFiles = [];
+for (const directory of [path.join(root, "assets/js"), path.join(root, "assets/js/tools"), path.join(root, "assets/js/core")]) {
+  try {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      if (entry.isFile() && /\\.js$/.test(entry.name)) toolJavaScriptFiles.push(path.join(directory, entry.name));
+    }
+  } catch { /* Directory may not exist in a partial checkout. */ }
+}
+for (const file of [...sourceFilesForDownloadPolicy, ...toolJavaScriptFiles]) {
+  const content = await readFile(file, "utf8");
+  if (/JSZip|createZipBlob|archive-engine|\\.zip|ZIP/i.test(content)) {
+    broken.push(path.relative(root, file) + " -> ZIP output is prohibited; download generated files directly");
+  }
+}
 
 const toolScripts = {
   "tools/merge-pdf.html": "assets/js/merge-pdf.js",
