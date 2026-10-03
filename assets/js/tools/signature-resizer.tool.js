@@ -1,7 +1,6 @@
 import { ToolController } from "../core/tool-controller.js";
 import { createCanvas, loadImage, makeBlob, removeNearWhite, trimWhitespace } from "../core/image-tool-kit.js";
 import { encodeBestUnderTarget } from "../core/image-form-engine.js";
-import { createZipBlob } from "../core/archive-engine.js";
 import {
   reductionPercent,
   resolveDimensions,
@@ -129,115 +128,7 @@ export function mount() {
       if (state.previewUrls[0]) renderPreview(state.previewUrls[0], el.inputPreview, files[0].name);
       el.batchCount.textContent = files.length + " selected";
       el.batchSize.textContent = window.FreePDF.formatBytes(files.reduce((sum, file) => sum + file.size, 0));
-      el.outputSummary.textContent = "Not processed yet";
-      el.resultList.textContent = "";
-    },
-    onReset: ({ state, el }) => {
-      revokeUrls(state.previewUrls || []);
-      revokeUrls(state.outputUrls || []);
-      if (state.archiveUrl) URL.revokeObjectURL(state.archiveUrl);
-
-      state.previewUrls = [];
-      state.outputUrls = [];
-      state.images = [];
-      state.archiveUrl = null;
-
-      el.batchCount.textContent = "0 selected";
-      el.batchSize.textContent = "0 B";
-      el.outputSummary.textContent = "Not processed yet";
-      el.resultList.textContent = "";
-      el.inputPreview.textContent = "";
-      el.outputPreview.textContent = "";
-      el.customTargetWrap.hidden = true;
-    },
-    onProcess: async ({ files, state, el, setProgress, setStatus, formatBytes, safeBaseName, downloadBlob }) => {
-      const targetBytes = targetBytesFromSelection(el.targetSize.value, el.customTarget.value);
-      const baseOptions = {
-        mode: el.dimensionMode.value,
-        width: Number(el.width.value || 600),
-        height: Number(el.height.value || 200),
-        unit: el.dimensionUnit.value,
-        dpi: Number(el.dpi.value || 96),
-        keepAspect: el.keepAspect.checked
-      };
-      const autoTrim = el.autoTrim.checked;
-      const transparent = el.background.value === "transparent";
-      const background = transparent ? "keep" : "white";
-      const mime = el.format.value;
-      const results = [];
-
-      revokeUrls(state.outputUrls || []);
-      if (state.archiveUrl) URL.revokeObjectURL(state.archiveUrl);
-      state.outputUrls = [];
-      state.archiveUrl = null;
-
-      for (let index = 0; index < files.length; index += 1) {
-        const file = files[index];
-        setStatus(
-          "Preparing " + (index + 1) + " of " + files.length + " — " + file.name,
-          "info"
-        );
-
-        const cached = state.images.find(function (entry) {
-          return entry.file === file;
-        });
-        const originalImage = cached?.image || await loadImage(file);
-        const preparedCanvas = await prepareSignatureSource(originalImage, autoTrim, transparent);
-        const preparedImage = await canvasToImage(preparedCanvas);
-
-        const dimensions = resolveDimensions({
-          ...baseOptions,
-          sourceWidth: preparedImage.naturalWidth,
-          sourceHeight: preparedImage.naturalHeight
-        });
-
-        const result = await encodeBestUnderTarget({
-          image: preparedImage,
-          dimensions,
-          mime,
-          targetBytes,
-          cropMode: el.dimensionMode.value === "exact" && !el.keepAspect.checked ? "fill" : "contain",
-          background,
-          setProgress,
-          progressStart: (index / files.length) * 75,
-          progressEnd: ((index + 1) / files.length) * 75
-        });
-
-        if (!result) throw new Error("encode-failed");
-
-        const outputUrl = URL.createObjectURL(result.blob);
-        state.outputUrls.push(outputUrl);
-
-        results.push({
-          file,
-          blob: result.blob,
-          url: outputUrl,
-          width: result.width,
-          height: result.height,
-          reached: result.reached,
-          reduction: reductionPercent(file.size, result.blob.size)
-        });
-
-        if (index === 0) {
-          renderPreview(outputUrl, el.outputPreview, "Prepared signature preview for " + file.name);
-        }
-      }
-
-      if (results.length > 1) {
-        setStatus("Packaging the prepared signatures into a ZIP…", "info");
-        setProgress(90);
-        const archive = await createZipBlob(
-          results.map(function (result) {
-            return {
-              name: safeBaseName(result.file.name) + "-signature." + chooseExtension(mime),
-              blob: result.blob
-            };
-          })
-        );
-        state.archiveUrl = URL.createObjectURL(archive);
-        downloadBlob(archive, "freepdf-signatures.zip");
-      } else {
-        const result = results[0];
+      for (const result of results) {
         downloadBlob(
           result.blob,
           safeBaseName(result.file.name) + "-signature." + chooseExtension(mime)
@@ -246,7 +137,7 @@ export function mount() {
 
       el.outputSummary.textContent =
         results.length + " file" + (results.length === 1 ? "" : "s") +
-        " prepared · target " + formatBytes(targetBytes);
+        " optimized individually · target " + formatBytes(targetBytes);
 
       el.resultList.textContent = "";
       for (const result of results) {
@@ -271,16 +162,14 @@ export function mount() {
       setProgress(100);
       setStatus(
         results.length > 1
-          ? "Done — prepared " + results.length + " signatures and started the ZIP download."
-          : "Done — prepared the signature and started the download.",
+          ? "Done — prepared " + results.length + " files. Individual downloads were started. Your browser may ask to allow multiple downloads."
+          : "Done — prepared the signature and started the direct download.",
         "success"
       );
     },
     onError: (error, { setStatus }) => {
       const message =
-        error?.message === "zip-engine-not-loaded"
-          ? "Batch ZIP support could not be loaded. Refresh the page and try again."
-          : error?.message === "encode-failed"
+        error?.message === "encode-failed"
             ? "The browser could not encode the signature. Try a larger target or a different output format."
             : "The selected signature images could not be prepared in your browser.";
       setStatus(message, "error");
