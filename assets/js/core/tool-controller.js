@@ -51,18 +51,17 @@ export class ToolController {
 
     zone.addEventListener("drop", (event) => this.select(event.dataTransfer.files));
 
-    // Clear before opening the native picker so choosing the same file again
-    // still produces a change event. Do not clear after change: some mobile
-    // browsers expose FileList as a transient native object while dispatching
-    // the event, and clearing it in that handler can make the selection vanish.
-    input.addEventListener("click", () => {
-      if (!this.busy) input.value = "";
-    });
-
+    // Do not clear the native input during click. On Android/mobile browsers,
+    // changing input.value while the native picker is opening can leave the
+    // picker showing the chosen filename while the subsequent change event
+    // exposes an empty FileList.
+    //
+    // The change handler snapshots the File objects first, then clears the
+    // native input from the already-snapshotted selection. This also means
+    // selecting the same file again reliably emits a usable selection.
     input.addEventListener("change", () => {
-      // Snapshot FileList synchronously before any async work and keep the
-      // native value intact while select() consumes the snapshot.
       const files = Array.from(input.files || []);
+      input.value = "";
       this.select(files);
     });
   }
