@@ -165,7 +165,6 @@ export function mount() {
 
       revokeUrls(state.outputUrls || []);
       state.outputUrls = [];
-      state.archiveUrl = null;
 
       for (let index = 0; index < files.length; index += 1) {
         const file = files[index];
