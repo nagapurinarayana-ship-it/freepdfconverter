@@ -102,15 +102,13 @@
     zone.addEventListener("drop", function (event) {
       onFiles(Array.from(event.dataTransfer.files || []));
     });
-    input.addEventListener("click", function () {
-      // Clear before opening the native picker so choosing the same file again
-      // still emits a change event on mobile and desktop browsers.
-      input.value = "";
-    });
     input.addEventListener("change", function () {
-      // Snapshot FileList synchronously. Some mobile browsers expose the native
-      // selection through a transient FileList that must not be cleared here.
-      onFiles(Array.from(input.files || []));
+      // Snapshot the File objects first. Clearing the native input after the
+      // snapshot supports same-file re-selection without breaking Android
+      // browsers that expose a transient FileList during change dispatch.
+      var files = Array.from(input.files || []);
+      input.value = "";
+      onFiles(files);
     });
   }
 
