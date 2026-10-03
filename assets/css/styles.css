@@ -76,6 +76,18 @@ h3 { font-size: 1.16rem; margin: 0 0 8px; }
 .tool-side { display: grid; gap: 16px; position: sticky; top: 88px; }
 .side-card { background: #fff; border: 1px solid var(--line); border-radius: 15px; padding: 18px; }
 .side-card p,.side-card ul { color: var(--muted); font-size: .93rem; margin-bottom: 0; }
+.file-input {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
 .drop-zone { position: relative; display: grid; place-items: center; min-height: 190px; padding: 26px; text-align: center; border: 2px dashed #adc2e4; border-radius: 16px; background: #f9fbff; transition: .16s ease; }
 .drop-zone.is-dragging { border-color: var(--brand); background: #eef4ff; transform: scale(1.005); }
 .check-row { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; padding: 13px 15px; border: 1px solid var(--line); border-radius: 12px; background: #f9fbff; cursor: pointer; }
