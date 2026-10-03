@@ -15,6 +15,7 @@ for (const tool of toolRegistry) {
 
   const sourcePath = path.join(root, tool.path);
   await access(sourcePath);
+  if (tool.guide) await access(path.join(root, tool.guide));
 
   const html = await readFile(sourcePath, "utf8");
   const declaredTool = (html.match(/<body[^>]*data-tool="([^"]+)"/i) || [])[1] || "";
