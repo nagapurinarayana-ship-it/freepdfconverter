@@ -99,6 +99,16 @@ for (const file of sourceFilesForDownloadPolicy) {
 }
 for (const file of toolJavaScriptFiles) {
   const content = await readFile(file, "utf8");
+  if (file.endsWith(".tool.js")) {
+    const selectionStart = content.indexOf("onFilesSelected:");
+    const processStart = content.indexOf("onProcess:", selectionStart + 1);
+    const selectionBlock = selectionStart >= 0
+      ? content.slice(selectionStart, processStart > selectionStart ? processStart : selectionStart + 2000)
+      : "";
+    if (/await\s+loadImage\s*\(/.test(selectionBlock)) {
+      broken.push(path.relative(root, file) + " -> image selection must not decode files; defer loadImage() until processing");
+    }
+  }
   if (/\.zip\b/i.test(content) || /(?:downloadBlob\([^\n]*\.zip)/i.test(content)) {
     broken.push(path.relative(root, file) + " -> ZIP archive downloads are prohibited; generated files must download directly");
   }

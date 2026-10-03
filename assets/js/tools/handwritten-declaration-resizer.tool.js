@@ -110,7 +110,7 @@ export function mount() {
     initialMessage: "Select one or more declaration images. Processing stays in your browser.",
     readyMessage: "Ready. Review the dimensions, cleanup and target size, then prepare the declaration file(s).",
     readErrorMessage: "One or more handwritten-declaration images could not be read by your browser.",
-    onFilesSelected: async ({ files, state, el }) => {
+    onFilesSelected: ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
       state.previewUrls = [];

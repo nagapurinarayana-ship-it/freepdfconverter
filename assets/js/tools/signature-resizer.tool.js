@@ -109,7 +109,7 @@ export function mount() {
     initialMessage: "Select one or more signature images. Processing stays in your browser.",
     readyMessage: "Ready. Review the dimensions, background and target size, then prepare the signature file(s).",
     readErrorMessage: "One or more signature images could not be read by your browser.",
-    onFilesSelected: async ({ files, state, el }) => {
+    onFilesSelected: ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
       state.previewUrls = [];

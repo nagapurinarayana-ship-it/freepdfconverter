@@ -108,7 +108,7 @@ export function mount() {
     initialMessage: "Choose a photo. Processing stays on your device.",
     readyMessage: "Ready. Choose the required photo size and framing, then create the image file(s).",
     readErrorMessage: "One or more selected images could not be read by your browser.",
-    onFilesSelected: async ({ files, state, el }) => {
+    onFilesSelected: ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
       state.previewUrls = [];

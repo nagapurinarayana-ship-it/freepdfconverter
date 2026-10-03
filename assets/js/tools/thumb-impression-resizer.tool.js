@@ -120,7 +120,7 @@ export function mount() {
     initialMessage: "Select a thumb-impression image. Processing stays in your browser.",
     readyMessage: "Ready. Choose the dimensions and file-size limit, then prepare the image file(s).",
     readErrorMessage: "One or more selected thumb-impression images could not be read.",
-    onFilesSelected: async ({ files, state, el }) => {
+    onFilesSelected: ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
       state.previewUrls = [];
