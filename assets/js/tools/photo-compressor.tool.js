@@ -108,6 +108,95 @@ export function mount() {
       el.batchSize.textContent = window.FreePDF.formatBytes(
         files.reduce((sum, file) => sum + file.size, 0)
       );
+      el.outputSummary.textContent = "Not processed yet";
+      el.resultList.textContent = "";
+    },
+    onReset: ({ state, el }) => {
+      revokeUrls(state.previewUrls || []);
+      revokeUrls(state.outputUrls || []);
+
+      state.previewUrls = [];
+      state.outputUrls = [];
+      state.images = [];
+
+      el.batchCount.textContent = "0 selected";
+      el.batchSize.textContent = "0 B";
+      el.outputSummary.textContent = "Not processed yet";
+      el.resultList.textContent = "";
+      el.inputPreview.textContent = "";
+      el.outputPreview.textContent = "";
+      el.customTargetWrap.hidden = true;
+    },
+    onProcess: async ({ files, state, el, setProgress, setStatus, formatBytes, safeBaseName, downloadBlob }) => {
+      const targetBytes = targetBytesFromSelection(el.targetSize.value, el.customTarget.value);
+      const baseOptions = {
+        mode: el.dimensionMode.value,
+        width: Number(el.width.value || 1600),
+        height: Number(el.height.value || 1200),
+        unit: el.dimensionUnit.value,
+        dpi: Number(el.dpi.value || 96),
+        keepAspect: el.keepAspect.checked
+      };
+      const cropMode = el.cropMode.value;
+      const background = el.background.value;
+      const mime = el.outputFormat.value;
+
+      revokeUrls(state.outputUrls || []);
+      state.outputUrls = [];
+      state.archiveUrl = null;
+
+      const results = [];
+
+      for (let index = 0; index < files.length; index += 1) {
+        const file = files[index];
+        setStatus(
+          "Optimizing " + (index + 1) + " of " + files.length + " — " + file.name,
+          "info"
+        );
+
+        const cached = state.images.find(function (entry) {
+          return entry.file === file;
+        });
+        const image = cached?.image || await loadImage(file);
+
+        const dimensions = resolveDimensions({
+          ...baseOptions,
+          sourceWidth: image.naturalWidth,
+          sourceHeight: image.naturalHeight
+        });
+
+        const result = await encodeBestUnderTarget({
+          image,
+          dimensions,
+          mime,
+          targetBytes,
+          cropMode,
+          background,
+          setProgress,
+          progressStart: (index / files.length) * 75,
+          progressEnd: ((index + 1) / files.length) * 75
+        });
+
+        if (!result) throw new Error("encode-failed");
+
+        const outputUrl = URL.createObjectURL(result.blob);
+        state.outputUrls.push(outputUrl);
+
+        results.push({
+          file,
+          blob: result.blob,
+          url: outputUrl,
+          width: result.width,
+          height: result.height,
+          reached: result.reached,
+          reduction: reductionPercent(file.size, result.blob.size)
+        });
+
+        if (index === 0) {
+          renderPreview(outputUrl, el.outputPreview, "Optimized preview for " + file.name);
+        }
+      }
+
       for (const result of results) {
         downloadBlob(
           result.blob,
@@ -117,7 +206,7 @@ export function mount() {
 
       el.outputSummary.textContent =
         results.length + " file" + (results.length === 1 ? "" : "s") +
-        " optimized individually · target " + formatBytes(targetBytes);
+        " optimized · target " + formatBytes(targetBytes);
 
       el.resultList.textContent = "";
       for (const result of results) {
@@ -145,13 +234,14 @@ export function mount() {
       setStatus(
         results.length > 1
           ? "Done — optimized " + results.length + " files. Individual downloads were started. Your browser may ask to allow multiple downloads."
-          : "Done — optimized the image and started the direct download.",
+          : "Done — optimized the image and started the download.",
         "success"
       );
     },
     onError: (error, { setStatus }) => {
       const message =
-        error?.message === "encode-failed"
+        error?.message === "zip-engine-not-loaded"
+error?.message === "encode-failed"
             ? "The browser could not encode one of the selected images. Try a smaller image or a different output format."
             : "The selected images could not be optimized in your browser.";
       setStatus(message, "error");
