@@ -119,6 +119,19 @@ if (photoToolAsset) {
   if (!photoToolSource.includes("downloadBlob") || !photoToolSource.includes("image-form-policy")) failures.push("Photo Compressor -> direct download or shared policy integration is missing");
   if (/JSZip|\.zip|ZIP|archive-engine|createZipBlob/i.test(photoToolSource)) failures.push("Photo Compressor -> ZIP/archive output code remains");
 }
+const passportPage = await readFile(path.join(dist, "tools/passport-id-photo-maker.html"), "utf8");
+if (!passportPage.includes('data-tool="passport-id-photo-maker"') || !passportPage.includes('35 × 45 mm') || !passportPage.includes('2 × 2 in') || !passportPage.includes('focusY') || !passportPage.includes('custom')) {
+  failures.push("Passport & ID Photo Maker -> preset, custom-size or framing workflow is incomplete");
+}
+if (!passportPage.includes("assets/js/tool-runtime")) failures.push("Passport & ID Photo Maker -> shared tool runtime is missing");
+if (/\bZIP\b/i.test(passportPage) || /\.zip\b/i.test(passportPage)) failures.push("Passport & ID Photo Maker -> ZIP output reference remains");
+const passportToolAsset = toolJsAssets.find((file) => /^passport-id-photo-maker\.tool\.[a-f0-9]{10}\.js$/.test(file));
+if (!passportToolAsset) failures.push("Passport & ID Photo Maker -> fingerprinted tool module is missing");
+if (passportToolAsset) {
+  const passportToolSource = await readFile(path.join(dist, "assets/js/tools", passportToolAsset), "utf8");
+  if (!passportToolSource.includes("encodeBestUnderTarget") || !passportToolSource.includes("cropFocusY") || !passportToolSource.includes("downloadBlob")) failures.push("Passport & ID Photo Maker -> shared encoder, framing or direct-download integration is missing");
+  if (/\.zip\b/i.test(passportToolSource)) failures.push("Passport & ID Photo Maker -> ZIP archive output code remains");
+}
 const signaturePage = await readFile(path.join(dist, "tools/signature-resizer.html"), "utf8");
 if (!signaturePage.includes('multiple') || !signaturePage.includes('10 KB') || !signaturePage.includes('customTarget') || !signaturePage.includes('autoTrim') || !signaturePage.includes('Millimetres')) {
   failures.push("Signature Resizer -> batch, target-size, auto-crop or dimension workflow is incomplete");
@@ -137,7 +150,8 @@ const directDownloadPages = [
   ["tools/photo-compressor.html", "Photo Compressor"],
   ["tools/signature-resizer.html", "Signature Resizer"],
   ["tools/split-pdf.html", "Split PDF"],
-  ["tools/pdf-to-image.html", "PDF to Image"]
+  ["tools/pdf-to-image.html", "PDF to Image"],
+  ["tools/passport-id-photo-maker.html", "Passport & ID Photo Maker"]
 ];
 for (const [relative, label] of directDownloadPages) {
   const html = await readFile(path.join(dist, relative), "utf8");
