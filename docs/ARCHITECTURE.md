@@ -30,7 +30,7 @@ assets/js/tools/<tool>.tool.js
 ## Patterns
 
 ### Tool Registry
-`scripts/tool-registry.mjs` is the single source of truth for public tool metadata. New public tools should be added there.
+`scripts/tool-registry.mjs` is the single source of truth for public tool metadata and optional guide relationships. New public tools should be added there. When a tool has a `guide` entry, the build automatically validates the guide and generates the tool↔guide link block.
 
 ### Tool Controller
 `assets/js/core/tool-controller.js` owns common page lifecycle concerns:
@@ -47,7 +47,7 @@ assets/js/tools/<tool>.tool.js
 Tool modules should not duplicate this plumbing.
 
 ### Core Engines
-Reusable algorithms live under `assets/js/core/`. Image processing is currently centralized in `image-tool-kit.js`. PDF-specific algorithms should follow the same pattern as PDF tools are migrated.
+Reusable algorithms live under `assets/js/core/`. Image processing is centralized in `image-tool-kit.js`, form-image policies in `image-form-policy.js`, target encoding in `image-form-engine.js`, and local batch archive creation in `archive-engine.js`. PDF-specific algorithms should follow the same pattern as PDF tools are migrated.
 
 ### Tool Modules
 Each tool gets one isolated module under `assets/js/tools/`. The runtime dynamically imports the module from the page's `data-tool` value. The runtime itself does not need to be edited when a new tool is added.
@@ -58,7 +58,8 @@ Each tool gets one isolated module under `assets/js/tools/`. The runtime dynamic
 2. Add `tools/<id>.html` with `data-tool="<id>"`.
 3. Add `assets/js/tools/<id>.tool.js`.
 4. Reuse `ToolController` and an appropriate core engine.
-5. Add tests/contracts when the tool introduces a new engine or format.
+5. Add a `guide`/`guideLabel` entry when the public tool has a dedicated guide; the build will wire the relationship automatically.
+6. Add tests/contracts when the tool introduces a new engine or format.
 
 The build automatically includes the tool in indexable pages, homepage cards, labels, SEO keywords and sitemap generation.
 
