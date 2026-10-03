@@ -140,6 +140,8 @@ if (origin) {
   await writeFile(path.join(dist, "robots.txt"), "User-agent: *\nAllow: /\n\nSitemap: " + origin + "/sitemap.xml\n", "utf8");
 }
 
+await injectToolRuntimeModuleMap();
+
 const fingerprintedAssets = await fingerprintAssets();
 await buildServiceWorker(fingerprintedAssets);
 
@@ -283,6 +285,29 @@ async function fingerprintGroup(targets) {
   }
   for (const mapping of mappings) await rename(mapping.file, mapping.fingerprinted);
   return mappings;
+}
+
+async function injectToolRuntimeModuleMap() {
+  const runtimePath = path.join(dist, "assets/js/tool-runtime.js");
+  let source = await readFile(runtimePath, "utf8");
+  const toolDirectory = path.join(dist, "assets/js/tools");
+  const entries = await readdir(toolDirectory);
+  const moduleMap = Object.fromEntries(
+    entries
+      .filter((file) => file.endsWith(".tool.js"))
+      .map((file) => [file.slice(0, -".tool.js".length), "/assets/js/tools/" + file])
+  );
+
+  const token = "/*__TOOL_MODULE_MAP__*/({})";
+  if (!source.includes(token)) {
+    throw new Error("tool-runtime module-map token is missing");
+  }
+
+  await writeFile(
+    runtimePath,
+    source.replace(token, JSON.stringify(moduleMap, null, 2)),
+    "utf8"
+  );
 }
 
 async function buildServiceWorker(mappings) {
