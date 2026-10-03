@@ -1,91 +1,304 @@
 import { ToolController } from "../core/tool-controller.js";
-import { createCanvas, drawContain, findClosestBlob, loadImage, makeBlob, removeNearWhite } from "../core/image-tool-kit.js";
+import { createCanvas, loadImage, makeBlob, removeNearWhite, trimWhitespace } from "../core/image-tool-kit.js";
+import { encodeBestUnderTarget } from "../core/image-form-engine.js";
+import { createZipBlob } from "../core/archive-engine.js";
+import {
+  reductionPercent,
+  resolveDimensions,
+  chooseExtension,
+  targetBytesFromSelection
+} from "../core/image-form-policy.js";
 
-const MAX_FILE = 15 * window.FreePDF.MB;
+const MB = window.FreePDF.MB;
+const MAX_FILE = 15 * MB;
+const MAX_FILES = 20;
+const MAX_TOTAL_BYTES = 100 * MB;
+
+function revokeUrls(urls = []) {
+  for (const url of urls) URL.revokeObjectURL(url);
+  urls.length = 0;
+}
+
+function escapeText(value) {
+  return String(value).replace(/[&<>"]/g, function (char) {
+    return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char];
+  });
+}
+
+async function canvasToImage(canvas) {
+  const blob = await makeBlob(canvas, "image/png");
+  if (!blob) throw new Error("encode-failed");
+
+  const url = URL.createObjectURL(blob);
+  try {
+    return await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = function () { resolve(image); };
+      image.onerror = function () { reject(new Error("image-load-failed")); };
+      image.src = url;
+    });
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+async function prepareSignatureSource(image, autoTrim, removeBackground) {
+  const { canvas, ctx } = createCanvas(image, {
+    width: image.naturalWidth,
+    height: image.naturalHeight,
+    alpha: true
+  });
+
+  ctx.drawImage(image, 0, 0);
+
+  if (removeBackground) removeNearWhite(canvas);
+
+  return autoTrim ? trimWhitespace(canvas, removeBackground ? 245 : 250, 10) : canvas;
+}
+
+function renderPreview(url, container, label) {
+  container.textContent = "";
+  const figure = document.createElement("figure");
+  figure.className = "image-preview-card";
+  const image = document.createElement("img");
+  image.alt = label;
+  image.loading = "lazy";
+  image.src = url;
+  figure.appendChild(image);
+  container.appendChild(figure);
+}
 
 export function mount() {
-  const tool = new ToolController({
+  const controller = new ToolController({
+    multiple: true,
+    maxFiles: MAX_FILES,
+    maxTotalFileBytes: MAX_TOTAL_BYTES,
+    maxTotalFileMessage: "Keep the batch below 100 MB for reliable browser processing.",
     selectors: {
       zone: "#dropZone",
       input: "#signatureFile",
       summary: "#fileSummary",
-      width: "#signatureWidth",
-      height: "#signatureHeight",
-      target: "#targetSize",
-      background: "#backgroundMode",
-      format: "#outputFormat",
       action: "#processButton",
       clear: "#clearButton",
       progress: "#progressBar",
       status: "#toolStatus",
       originalSize: "#originalSize",
-      outputSize: "#outputSize"
+      targetSize: "#targetSize",
+      customTargetWrap: "#customTargetWrap",
+      customTarget: "#customTarget",
+      width: "#signatureWidth",
+      height: "#signatureHeight",
+      dimensionMode: "#dimensionMode",
+      dimensionUnit: "#dimensionUnit",
+      dpi: "#dpi",
+      keepAspect: "#keepAspect",
+      autoTrim: "#autoTrim",
+      background: "#backgroundMode",
+      format: "#outputFormat",
+      inputPreview: "#inputPreview",
+      outputPreview: "#outputPreview",
+      outputSummary: "#outputSummary",
+      resultList: "#resultList",
+      batchCount: "#batchCount",
+      batchSize: "#batchSize"
     },
     maxFileBytes: MAX_FILE,
     accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type),
-    invalidTypeMessage: "Choose a JPG, PNG or WebP image.",
-    maxFileMessage: "Keep the signature image below 15 MB.",
-    emptySummary: "No signature image selected",
-    initialMessage: "Choose a signature image. You can resize it, clean a white background and keep the output under a target size.",
-    readyMessage: "Ready to create a clean signature image.",
-    readErrorMessage: "The signature image could not be read.",
-    onFileSelected: async ({ file, state, el }) => {
-      state.image = await loadImage(file);
-      el.outputSize.textContent = "—";
+    invalidTypeMessage: "Choose JPG, PNG or WebP signature images only.",
+    maxFileMessage: "Each signature image must be 15 MB or smaller.",
+    emptySummary: "No signatures selected",
+    initialMessage: "Select one or more signature images. Processing stays in your browser.",
+    readyMessage: "Ready. Review the dimensions, background and target size, then prepare the signature file(s).",
+    readErrorMessage: "One or more signature images could not be read by your browser.",
+    onFilesSelected: async ({ files, state, el }) => {
+      revokeUrls(state.previewUrls || []);
+      revokeUrls(state.outputUrls || []);
+      state.previewUrls = [];
+      state.outputUrls = [];
+      state.images = [];
+
+      const loaded = [];
+      for (const file of files.slice(0, 4)) {
+        loaded.push({ file, image: await loadImage(file) });
+      }
+      state.images = loaded;
+      state.previewUrls = loaded.map(function (entry) {
+        return URL.createObjectURL(entry.file);
+      });
+
+      if (state.previewUrls[0]) renderPreview(state.previewUrls[0], el.inputPreview, files[0].name);
+      el.batchCount.textContent = files.length + " selected";
+      el.batchSize.textContent = window.FreePDF.formatBytes(files.reduce((sum, file) => sum + file.size, 0));
+      el.outputSummary.textContent = "Not processed yet";
+      el.resultList.textContent = "";
     },
-    onReset: ({ el }) => {
-      el.outputSize.textContent = "—";
+    onReset: ({ state, el }) => {
+      revokeUrls(state.previewUrls || []);
+      revokeUrls(state.outputUrls || []);
+      if (state.archiveUrl) URL.revokeObjectURL(state.archiveUrl);
+
+      state.previewUrls = [];
+      state.outputUrls = [];
+      state.images = [];
+      state.archiveUrl = null;
+
+      el.batchCount.textContent = "0 selected";
+      el.batchSize.textContent = "0 B";
+      el.outputSummary.textContent = "Not processed yet";
+      el.resultList.textContent = "";
+      el.inputPreview.textContent = "";
+      el.outputPreview.textContent = "";
+      el.customTargetWrap.hidden = true;
     },
-    onProcess: async ({ file, state, el, setProgress, setStatus, formatBytes, safeBaseName, downloadBlob }) => {
-      const width = Math.max(50, Number(el.width.value || 600));
-      const height = Math.max(30, Number(el.height.value || 200));
-      const targetBytes = Math.max(5, Number(el.target.value || 100)) * 1024;
-      const mime = el.format.value;
+    onProcess: async ({ files, state, el, setProgress, setStatus, formatBytes, safeBaseName, downloadBlob }) => {
+      const targetBytes = targetBytesFromSelection(el.targetSize.value, el.customTarget.value);
+      const baseOptions = {
+        mode: el.dimensionMode.value,
+        width: Number(el.width.value || 600),
+        height: Number(el.height.value || 200),
+        unit: el.dimensionUnit.value,
+        dpi: Number(el.dpi.value || 96),
+        keepAspect: el.keepAspect.checked
+      };
+      const autoTrim = el.autoTrim.checked;
       const transparent = el.background.value === "transparent";
+      const background = transparent ? "keep" : "white";
+      const mime = el.format.value;
+      const results = [];
 
-      setProgress(20);
-      setStatus("Preparing the signature locally…", "info");
+      revokeUrls(state.outputUrls || []);
+      if (state.archiveUrl) URL.revokeObjectURL(state.archiveUrl);
+      state.outputUrls = [];
+      state.archiveUrl = null;
 
-      const buildCanvas = () => {
-        const { canvas, ctx } = createCanvas(state.image, {
-          width,
-          height,
-          alpha: transparent
+      for (let index = 0; index < files.length; index += 1) {
+        const file = files[index];
+        setStatus(
+          "Preparing " + (index + 1) + " of " + files.length + " — " + file.name,
+          "info"
+        );
+
+        const cached = state.images.find(function (entry) {
+          return entry.file === file;
+        });
+        const originalImage = cached?.image || await loadImage(file);
+        const preparedCanvas = await prepareSignatureSource(originalImage, autoTrim, transparent);
+        const preparedImage = await canvasToImage(preparedCanvas);
+
+        const dimensions = resolveDimensions({
+          ...baseOptions,
+          sourceWidth: preparedImage.naturalWidth,
+          sourceHeight: preparedImage.naturalHeight
         });
 
-        if (!transparent) {
-          ctx.fillStyle = "#ffffff";
-          ctx.fillRect(0, 0, width, height);
-        }
-
-        drawContain(state.image, ctx, width, height);
-
-        if (transparent) removeNearWhite(canvas);
-        return canvas;
-      };
-
-      let blob = await makeBlob(buildCanvas(), mime, 0.85);
-      if (!blob) throw new Error("encode-failed");
-
-      if (mime !== "image/png") {
-        blob = await findClosestBlob({
+        const result = await encodeBestUnderTarget({
+          image: preparedImage,
+          dimensions,
           mime,
           targetBytes,
-          createCanvasForAttempt: async () => buildCanvas(),
-          minQuality: 0.2,
-          maxQuality: 0.95,
-          iterations: 9
+          cropMode: el.dimensionMode.value === "exact" && !el.keepAspect.checked ? "fill" : "contain",
+          background,
+          setProgress,
+          progressStart: (index / files.length) * 75,
+          progressEnd: ((index + 1) / files.length) * 75
         });
+
+        if (!result) throw new Error("encode-failed");
+
+        const outputUrl = URL.createObjectURL(result.blob);
+        state.outputUrls.push(outputUrl);
+
+        results.push({
+          file,
+          blob: result.blob,
+          url: outputUrl,
+          width: result.width,
+          height: result.height,
+          reached: result.reached,
+          reduction: reductionPercent(file.size, result.blob.size)
+        });
+
+        if (index === 0) {
+          renderPreview(outputUrl, el.outputPreview, "Prepared signature preview for " + file.name);
+        }
       }
 
-      el.outputSize.textContent = formatBytes(blob.size);
-      const ext = mime === "image/png" ? "png" : mime === "image/webp" ? "webp" : "jpg";
+      if (results.length > 1) {
+        setStatus("Packaging the prepared signatures into a ZIP…", "info");
+        setProgress(90);
+        const archive = await createZipBlob(
+          results.map(function (result) {
+            return {
+              name: safeBaseName(result.file.name) + "-signature." + chooseExtension(mime),
+              blob: result.blob
+            };
+          })
+        );
+        state.archiveUrl = URL.createObjectURL(archive);
+        downloadBlob(archive, "freepdf-signatures.zip");
+      } else {
+        const result = results[0];
+        downloadBlob(
+          result.blob,
+          safeBaseName(result.file.name) + "-signature." + chooseExtension(mime)
+        );
+      }
 
-      downloadBlob(blob, safeBaseName(file.name) + "-signature." + ext);
+      el.outputSummary.textContent =
+        results.length + " file" + (results.length === 1 ? "" : "s") +
+        " prepared · target " + formatBytes(targetBytes);
+
+      el.resultList.textContent = "";
+      for (const result of results) {
+        const row = document.createElement("div");
+        row.className = "result-row";
+        row.innerHTML =
+          "<strong>" + escapeText(result.file.name) + "</strong>" +
+          "<span>" + formatBytes(result.file.size) + " → " + formatBytes(result.blob.size) +
+          " · " + result.width + "×" + result.height + " px · " +
+          result.reduction.toFixed(1) + "% smaller" +
+          (result.reached ? " · target met" : " · closest safe result") +
+          "</span>";
+
+        const link = document.createElement("a");
+        link.href = result.url;
+        link.download = safeBaseName(result.file.name) + "-signature." + chooseExtension(mime);
+        link.textContent = "Download";
+        row.appendChild(link);
+        el.resultList.appendChild(row);
+      }
+
       setProgress(100);
-      setStatus("Done — resized and prepared your signature locally. Output: " + formatBytes(blob.size) + ".", "success");
+      setStatus(
+        results.length > 1
+          ? "Done — prepared " + results.length + " signatures and started the ZIP download."
+          : "Done — prepared the signature and started the download.",
+        "success"
+      );
+    },
+    onError: (error, { setStatus }) => {
+      const message =
+        error?.message === "zip-engine-not-loaded"
+          ? "Batch ZIP support could not be loaded. Refresh the page and try again."
+          : error?.message === "encode-failed"
+            ? "The browser could not encode the signature. Try a larger target or a different output format."
+            : "The selected signature images could not be prepared in your browser.";
+      setStatus(message, "error");
     }
   });
 
-  tool.mount();
+  controller.mount();
+
+  controller.el.targetSize.addEventListener("change", function () {
+    controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
+  });
+
+  controller.el.dimensionMode.addEventListener("change", function () {
+    controller.el.dimensionUnit.disabled = controller.el.dimensionMode.value === "original";
+    controller.el.dpi.disabled = controller.el.dimensionMode.value !== "physical";
+  });
+
+  controller.el.dimensionUnit.addEventListener("change", function () {
+    controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
+  });
 }
