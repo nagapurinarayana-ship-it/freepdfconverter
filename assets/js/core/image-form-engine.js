@@ -39,7 +39,7 @@ export async function encodeBestUnderTarget({
 
     if (mime === "image/png") {
       const blob = await encodeImageAtQuality({
-        image, width, height, mime, quality: 1, cropMode, background
+        image, width, height, mime, quality: 1, cropMode, background, cropFocusX, cropFocusY
       });
 
       if (!best || blob.size < best.blob.size) {
@@ -83,7 +83,7 @@ export async function encodeBestUnderTarget({
     for (let iteration = 0; iteration < 5 && low < high; iteration += 1) {
       const quality = (low + high) / 2;
       const blob = await encodeImageAtQuality({
-        image, width, height, mime, quality, cropMode, background
+        image, width, height, mime, quality, cropMode, background, cropFocusX, cropFocusY
       });
 
       if (!bestAny || blob.size < bestAny.blob.size) {
