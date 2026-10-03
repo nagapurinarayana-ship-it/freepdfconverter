@@ -9,6 +9,12 @@
     zone: document.getElementById("dropZone"),
     input: document.getElementById("pdfFile"),
     summary: document.getElementById("fileSummary"),
+    mode: document.getElementById("compressionMode"),
+    target: document.getElementById("targetSize"),
+    customTargetField: document.getElementById("customTargetField"),
+    customTarget: document.getElementById("customTarget"),
+    targetField: document.getElementById("targetField"),
+    hint: document.getElementById("modeHint"),
     originalSize: document.getElementById("originalSize"),
     outputSize: document.getElementById("outputSize"),
     savings: document.getElementById("savings"),
@@ -18,12 +24,24 @@
     status: document.getElementById("toolStatus")
   };
 
+  function updateMode() {
+    var targetMode = el.mode.value === "target";
+    el.targetField.hidden = !targetMode;
+    el.customTargetField.hidden = !targetMode || el.target.value !== "custom";
+    el.hint.textContent = targetMode
+      ? "Target mode rebuilds pages as compressed images and tries several quality/resolution settings. Selectable text and vector structure may not be preserved."
+      : "Lossless mode recompresses supported PDF streams and objects without intentionally lowering embedded image quality.";
+  }
+
   function update() {
     el.summary.textContent = file ? file.name + " · " + U.formatBytes(file.size) : "No PDF selected";
     el.originalSize.textContent = file ? U.formatBytes(file.size) : "—";
     el.compress.disabled = busy || !file;
     el.clear.disabled = busy || !file;
     el.input.disabled = busy;
+    el.mode.disabled = busy;
+    el.target.disabled = busy;
+    el.customTarget.disabled = busy;
   }
 
   function reset() {
@@ -34,7 +52,8 @@
     el.outputSize.textContent = "—";
     el.savings.textContent = "—";
     U.setProgress(el.progress, 0);
-    U.setStatus(el.status, "Choose a PDF to reduce its file size without intentionally degrading embedded images.", "info");
+    U.setStatus(el.status, "Choose a PDF. Use Target size when an upload form has a maximum file-size limit.", "info");
+    updateMode();
     update();
   }
 
@@ -49,7 +68,7 @@
     el.outputSize.textContent = "—";
     el.savings.textContent = "—";
     U.setProgress(el.progress, 0);
-    U.setStatus(el.status, "Ready to compress. This lossless pass can reduce stream and object overhead; image-heavy PDFs may shrink less.", "success");
+    U.setStatus(el.status, "Ready. Choose Lossless for structure preservation or Target size for stronger image compression.", "success");
     update();
   }
 
@@ -62,9 +81,7 @@
         reject(error);
         return;
       }
-
       function finish() { worker.terminate(); }
-
       worker.onmessage = function (event) {
         var data = event.data || {};
         if (data.type === "progress") {
@@ -72,15 +89,13 @@
           return;
         }
         finish();
-        if (data.type === "result") {
-          resolve(data);
-          return;
+        if (data.type === "result") resolve(data);
+        else {
+          var error = new Error(data.code || "processing-failed");
+          error.code = data.code || "processing-failed";
+          reject(error);
         }
-        var error = new Error(data.code || "processing-failed");
-        error.code = data.code || "processing-failed";
-        reject(error);
       };
-
       worker.onerror = function (event) {
         event.preventDefault();
         finish();
@@ -88,51 +103,147 @@
         error.code = "worker-failed";
         reject(error);
       };
-
-      worker.postMessage({
-        id: U.createId(),
-        bytes: bytes,
-        inputSize: inputSize
-      }, [bytes]);
+      worker.postMessage({ id: U.createId(), bytes: bytes, inputSize: inputSize }, [bytes]);
     });
+  }
+
+  function getTargetBytes() {
+    if (el.target.value === "custom") {
+      var kb = Math.max(50, Math.min(50000, Number(el.customTarget.value) || 200));
+      return Math.round(kb * 1024);
+    }
+    return Number(el.target.value);
+  }
+
+  async function loadPdfJs() {
+    var module = await import("/assets/vendor/pdfjs/pdf.min.mjs");
+    module.GlobalWorkerOptions.workerSrc = "/assets/vendor/pdfjs/pdf.worker.min.mjs";
+    return module;
+  }
+
+  function canvasToJpeg(canvas, quality) {
+    return new Promise(function (resolve, reject) {
+      canvas.toBlob(function (blob) {
+        if (blob) resolve(blob);
+        else reject(new Error("jpeg-encode-failed"));
+      }, "image/jpeg", quality);
+    });
+  }
+
+  async function renderPdfCandidate(pdfjs, bytes, settings) {
+    var loadingTask = pdfjs.getDocument({ data: bytes.slice(0) });
+    var pdf = await loadingTask.promise;
+    var PDFDocument = window.PDFLib && window.PDFLib.PDFDocument;
+    if (!PDFDocument) throw new Error("pdf-lib-not-loaded");
+
+    var output = await PDFDocument.create({ addDefaultPage: false, updateMetadata: false });
+    var canvas = document.createElement("canvas");
+    var context = canvas.getContext("2d", { alpha: false });
+
+    try {
+      for (var pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+        var page = await pdf.getPage(pageNumber);
+        var viewport = page.getViewport({ scale: settings.scale });
+        canvas.width = Math.max(1, Math.floor(viewport.width));
+        canvas.height = Math.max(1, Math.floor(viewport.height));
+        context.fillStyle = "#ffffff";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+        var imageBlob = await canvasToJpeg(canvas, settings.quality);
+        var imageBytes = new Uint8Array(await imageBlob.arrayBuffer());
+        var image = await output.embedJpg(imageBytes);
+        var outPage = output.addPage([viewport.width / settings.dpiScale, viewport.height / settings.dpiScale]);
+        outPage.drawImage(image, {
+          x: 0,
+          y: 0,
+          width: outPage.getWidth(),
+          height: outPage.getHeight()
+        });
+        U.setProgress(el.progress, 20 + Math.round((pageNumber / pdf.numPages) * 45));
+      }
+      var saved = await output.save({ useObjectStreams: true, addDefaultPage: false });
+      return new Blob([saved], { type: "application/pdf" });
+    } finally {
+      canvas.width = 1;
+      canvas.height = 1;
+      if (pdf.cleanup) pdf.cleanup();
+      if (pdf.destroy) await pdf.destroy();
+    }
+  }
+
+  async function targetCompress(bytes, targetBytes) {
+    var pdfjs = await loadPdfJs();
+    var settings = [
+      { scale: 1.20, quality: 0.82, dpiScale: 1.0 },
+      { scale: 1.00, quality: 0.72, dpiScale: 1.0 },
+      { scale: 0.86, quality: 0.64, dpiScale: 1.0 },
+      { scale: 0.72, quality: 0.56, dpiScale: 1.0 },
+      { scale: 0.60, quality: 0.48, dpiScale: 1.0 },
+      { scale: 0.50, quality: 0.40, dpiScale: 1.0 },
+      { scale: 0.42, quality: 0.34, dpiScale: 1.0 }
+    ];
+    var best = null;
+    for (var i = 0; i < settings.length; i++) {
+      U.setStatus(el.status, "Trying target-size setting " + (i + 1) + " of " + settings.length + "…", "info");
+      var candidate = await renderPdfCandidate(pdfjs, bytes, settings[i]);
+      if (!best || candidate.size < best.size) best = candidate;
+      if (candidate.size <= targetBytes) return { blob: candidate, reached: true };
+    }
+    return { blob: best, reached: false };
   }
 
   async function compress() {
     if (busy || !file) return;
-
     busy = true;
     update();
-
     try {
       U.setProgress(el.progress, 4);
-      U.setStatus(el.status, "Reading the PDF locally…", "info");
-
       var bytes = await file.arrayBuffer();
-      U.setProgress(el.progress, 18);
+      U.setProgress(el.progress, 15);
 
-      U.setStatus(el.status, "Compressing PDF streams and objects locally…", "info");
-      var result = await processInWorker(bytes, file.size);
-      var outputBlob = new Blob([result.bytes], { type: "application/pdf" });
+      var outputBlob;
+      var targetReached = true;
+      if (el.mode.value === "target") {
+        var targetBytes = getTargetBytes();
+        if (targetBytes >= file.size) {
+          U.setStatus(el.status, "The selected target is already larger than the source file. Running a lossless pass instead.", "info");
+          var lossless = await processInWorker(bytes, file.size);
+          outputBlob = new Blob([lossless.bytes], { type: "application/pdf" });
+        } else {
+          var targetResult = await targetCompress(bytes, targetBytes);
+          outputBlob = targetResult.blob;
+          targetReached = targetResult.reached;
+        }
+      } else {
+        U.setStatus(el.status, "Compressing PDF streams and objects locally…", "info");
+        var result = await processInWorker(bytes, file.size);
+        outputBlob = new Blob([result.bytes], { type: "application/pdf" });
+      }
+
       var outputSize = outputBlob.size;
-      var reduction = file.size > 0 ? Math.max(0, (file.size - outputSize) / file.size * 100) : 0;
-
       el.outputSize.textContent = U.formatBytes(outputSize);
+      var reduction = file.size > 0 ? Math.max(0, (file.size - outputSize) / file.size * 100) : 0;
+      el.savings.textContent = reduction.toFixed(reduction >= 10 ? 0 : 1) + "%";
 
-      if (outputSize >= file.size) {
-        el.savings.textContent = "0%";
+      if (outputSize >= file.size && el.mode.value === "lossless") {
         U.setProgress(el.progress, 100);
-        U.setStatus(el.status, "This PDF was already efficiently compressed for this lossless pass. The original file is smaller, so no larger replacement was downloaded.", "info");
+        U.setStatus(el.status, "This PDF was already efficiently compressed for the lossless pass. No larger replacement was downloaded.", "info");
         return;
       }
 
-      el.savings.textContent = reduction.toFixed(reduction >= 10 ? 0 : 1) + "%";
       U.downloadBlob(outputBlob, U.safeBaseName(file.name) + "-compressed.pdf");
       U.setProgress(el.progress, 100);
-      U.setStatus(el.status, "Done — reduced the PDF from " + U.formatBytes(file.size) + " to " + U.formatBytes(outputSize) + " and started the download.", "success");
+      if (el.mode.value === "target" && !targetReached) {
+        U.setStatus(el.status, "Closest result: " + U.formatBytes(outputSize) + ". The requested target was not reached without more severe degradation, so the tool stopped at its safest tested setting.", "info");
+      } else {
+        U.setStatus(el.status, "Done — reduced the PDF from " + U.formatBytes(file.size) + " to " + U.formatBytes(outputSize) + " and started the download.", "success");
+      }
     } catch (error) {
       U.setProgress(el.progress, 0);
       if (error && error.code === "encrypted-pdf") {
         U.setStatus(el.status, "This PDF is password-protected. Unlock it first when you know the password, then compress the resulting copy.", "error");
+      } else if (error && error.message === "pdf-lib-not-loaded") {
+        U.setStatus(el.status, "The PDF compression engine could not be loaded. Refresh the page and try again.", "error");
       } else {
         U.setStatus(el.status, "The PDF could not be compressed in your browser. Try a smaller or valid PDF.", "error");
       }
@@ -143,6 +254,9 @@
   }
 
   U.bindDropZone(el.zone, el.input, select);
+  el.mode.addEventListener("change", updateMode);
+  el.target.addEventListener("change", updateMode);
+  el.customTarget.addEventListener("input", updateMode);
   el.compress.addEventListener("click", compress);
   el.clear.addEventListener("click", reset);
   reset();
