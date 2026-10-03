@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Passport & ID Photo Maker — Resize to 35×45 mm or 2×2 in | FreePDF Tools</title>
+<meta name="description" content="Create passport and ID-size JPG photos locally in your browser. Choose 35×45 mm, 2×2 in, 35×35 mm or a custom size, set a file-size limit, adjust vertical framing, and download each photo directly.">
+<meta name="theme-color" content="#1f67ff">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/css/styles.css">
+<link rel="canonical" href="https://freepdfconverter-all-in-one.pages.dev/tools/passport-id-photo-maker">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta property="og:type" content="website"><meta property="og:site_name" content="FreePDF Tools">
+<meta property="og:title" content="Passport & ID Photo Maker — 35×45 mm or 2×2 in | FreePDF Tools">
+<meta property="og:description" content="Create passport and ID-size JPG photos locally in your browser with preset or custom dimensions, file-size limits and adjustable vertical framing.">
+<meta property="og:url" content="https://freepdfconverter-all-in-one.pages.dev/tools/passport-id-photo-maker">
+<meta property="og:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg">
+<meta property="og:image:alt" content="FreePDF Tools — private browser-based document and image utilities">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Passport & ID Photo Maker — 35×45 mm or 2×2 in | FreePDF Tools">
+<meta name="twitter:description" content="Create passport and ID-size JPG photos locally in your browser with preset or custom dimensions, file-size limits and adjustable vertical framing.">
+<meta name="twitter:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg"><meta name="twitter:image:alt" content="FreePDF Tools — private browser-based document and image utilities">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Passport & ID Photo Maker — 35×45 mm or 2×2 in | FreePDF Tools","description":"Create passport and ID-size JPG photos locally in your browser with preset or custom dimensions, file-size limits and adjustable vertical framing.","url":"https://freepdfconverter-all-in-one.pages.dev/tools/passport-id-photo-maker","image":"https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg","isPartOf":{"@type":"WebSite","name":"FreePDF Tools","url":"https://freepdfconverter-all-in-one.pages.dev/"},"inLanguage":"en"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Passport & ID Photo Maker — 35×45 mm or 2×2 in | FreePDF Tools","description":"Create passport and ID-size JPG photos locally in your browser with preset or custom dimensions, file-size limits and adjustable vertical framing.","url":"https://freepdfconverter-all-in-one.pages.dev/tools/passport-id-photo-maker","applicationCategory":"UtilitiesApplication","operatingSystem":"Web browser","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}</script>
+</head>
+<body data-tool="passport-id-photo-maker">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="container header-inner"><a class="logo" href="../"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav" aria-label="Main navigation"><a href="../#tools">Tools</a><a href="../guides/">Guides</a><a href="../privacy">Privacy</a><a href="../about">About</a></nav></div></header>
+<main id="main">
+<section class="tool-hero"><div class="container"><div class="breadcrumbs"><a href="../">Home</a> / Passport &amp; ID Photo Maker</div><span class="eyebrow">Free · local processing · direct downloads</span>
+<h1>Passport &amp; ID Photo Maker</h1>
+<p class="lead">Create a clean JPG at a required photo ratio and pixel size. Choose a common preset, set a maximum file size, adjust vertical framing, and keep your source photo on your device.</p></div></section>
+<div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>
+<div class="container tool-shell">
+<section class="tool-panel" aria-labelledby="photo-title">
+<h2 id="photo-title">1. Select photo(s)</h2>
+<div class="drop-zone" id="dropZone"><div><strong>Drop photos here</strong><p>JPG, PNG or WebP · up to 20 MB each · up to 20 files · direct individual downloads</p><label class="file-picker" for="photoFile">Choose photo(s)</label><input class="file-input" id="photoFile" type="file" multiple accept="image/jpeg,image/png,image/webp"></div></div>
+<p id="fileSummary" class="selected-file" aria-live="polite">No photos selected</p>
+<div class="summary-strip"><span id="batchCount">0 selected</span><span id="batchSize">0 B</span></div>
+
+<div class="section-heading compact"><span class="eyebrow">2. Output size</span><h2>Use a preset or enter your own dimensions</h2></div>
+<div class="form-grid">
+<label class="field"><span>Photo size</span><select id="preset">
+<option value="35x45" selected>35 × 45 mm</option>
+<option value="2x2">2 × 2 in / 51 × 51 mm</option>
+<option value="35x35">35 × 35 mm</option>
+<option value="custom">Custom</option>
+</select></label>
+<label class="field"><span>Maximum file size</span><select id="targetSize">
+<option value="100" selected>100 KB</option><option value="200">200 KB</option><option value="500">500 KB</option><option value="1024">1 MB</option><option value="custom">Custom</option>
+</select></label>
+<div id="customTargetWrap" class="field" hidden><span>Custom maximum (KB)</span><input id="customTarget" type="number" min="10" max="50000" step="1" value="100"></div>
+</div>
+
+<div id="customFields" class="form-grid" hidden>
+<label class="field"><span>Width</span><input id="photoWidth" type="number" min="32" max="6000" value="35"></label>
+<label class="field"><span>Height</span><input id="photoHeight" type="number" min="32" max="6000" value="45"></label>
+<label class="field"><span>Unit</span><select id="photoUnit"><option value="mm" selected>Millimetres</option><option value="cm">Centimetres</option><option value="px">Pixels</option></select></label>
+<label class="field"><span>DPI</span><select id="photoDpi"><option value="150">150 DPI</option><option value="300" selected>300 DPI</option><option value="600">600 DPI</option></select></label>
+</div>
+<p id="dpiNote" class="muted">Preset uses 300 DPI to create a print-friendly pixel size. Always check the destination's current requirements.</p>
+
+<div class="section-heading compact"><span class="eyebrow">3. Framing</span><h2>Position the subject inside the crop</h2></div>
+<label class="field"><span>Vertical framing <output id="focusValue">50%</output></span><input id="focusY" type="range" min="0" max="100" value="50"></label>
+<p class="muted">Move the slider if the centered crop would cut off hair or leave too much space above the head. This tool does not automatically detect faces.</p>
+
+<div class="preview-grid">
+<div class="side-card"><h3>Source preview</h3><div id="inputPreview" class="preview-host"></div></div>
+<div class="side-card"><h3>Prepared preview</h3><div id="outputPreview" class="preview-host"></div></div>
+</div>
+
+<div class="card-grid">
+<div class="side-card"><h3>Total input size</h3><p id="originalSize">—</p></div>
+<div class="side-card"><h3>Result</h3><p id="outputSummary">Not processed yet</p></div>
+<div class="side-card"><h3>Privacy</h3><p>Your source photos and generated images stay in your browser. Nothing is uploaded for conversion.</p></div>
+</div>
+
+<div class="action-row"><button class="button" id="createButton" type="button" disabled>Create ID photo(s)</button><button class="button danger" id="clearButton" type="button" disabled>Clear</button></div>
+<div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+<p class="status" id="toolStatus" role="status" aria-live="polite"></p>
+<div class="result-list" id="resultList" aria-live="polite"></div>
+</section>
+
+<aside class="tool-side">
+<div class="side-card"><h3>Common presets</h3><ul><li>35 × 45 mm portrait</li><li>51 × 51 mm square</li><li>35 × 35 mm square</li><li>Custom pixels, mm or cm</li></ul></div>
+<div class="side-card"><h3>Before you submit</h3><p>Photo rules differ by passport office, visa, exam, employer and application. Check the destination's current instructions for exact dimensions, background, head position, file format and file size.</p></div>
+<div class="side-card"><h3>Best input photo</h3><p>Use a recent front-facing photo with even lighting and enough space around the head and shoulders. The crop tool cannot correct a photo that was captured too tightly.</p></div>
+</aside>
+</div>
+
+<section class="content-section"><div class="container content-narrow">
+<h2>Passport and ID photo sizing without uploading your photo</h2>
+<p>This tool converts a normal photo into a fixed JPG canvas using the dimensions you choose. For physical dimensions such as millimetres, the tool calculates the corresponding pixel canvas from the selected DPI. The receiving application is still the authority on what it accepts.</p>
+<h2>Why vertical framing matters</h2>
+<p>A standard center crop is not always the right crop for a portrait. Use the vertical framing slider to move the source image inside the fixed photo box before exporting.</p>
+<h2>Batch processing</h2>
+<p>When several photos need the same requirements, select them together. Each result is prepared independently and downloaded as its own JPG file.</p>
+<h2>Privacy</h2>
+<p>Processing happens locally in your browser. Your original photo is not sent to a conversion server by this tool.</p>
+</div></section>
+</main>
+<footer class="site-footer"><div class="container"><div class="footer-grid"><div><a class="logo" href="../"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a></div><div><h3>Popular tools</h3><ul class="footer-links"><li><a href="photo-compressor">Photo compressor</a></li><li><a href="signature-resizer">Signature resizer</a></li><li><a href="jpg-to-pdf">JPG to PDF</a></li></ul></div><div><h3>Information</h3><ul class="footer-links"><li><a href="../guides/">Guides</a></li><li><a href="../privacy">Privacy</a></li><li><a href="../terms">Terms</a></li><li><a href="../about">About</a></li></ul></div></div></div></footer>
+</body>
+</html>
