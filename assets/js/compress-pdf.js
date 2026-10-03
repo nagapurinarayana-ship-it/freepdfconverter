@@ -5,6 +5,7 @@
   var MAX_FILE = 120 * U.MB;
   var file = null;
   var busy = false;
+  var policyPromise = import("/assets/js/core/pdf-target-policy.js");
   var el = {
     zone: document.getElementById("dropZone"),
     input: document.getElementById("pdfFile"),
@@ -29,13 +30,12 @@
     el.targetField.hidden = !targetMode;
     el.customTargetField.hidden = !targetMode || el.target.value !== "custom";
     el.hint.textContent = targetMode
-      ? "Target mode rebuilds pages as compressed images and tries several quality/resolution settings. Selectable text and vector structure may not be preserved."
+      ? "Target mode rebuilds pages as compressed images and tries a bounded quality/resolution matrix. Selectable text and vector structure may not be preserved."
       : "Lossless mode recompresses supported PDF streams and objects without intentionally lowering embedded image quality.";
   }
 
   function update() {
     el.summary.textContent = file ? file.name + " · " + U.formatBytes(file.size) : "No PDF selected";
-    el.originalSize.textContent = file ? U.formatBytes(file.size) : "—";
     el.compress.disabled = busy || !file;
     el.clear.disabled = busy || !file;
     el.input.disabled = busy;
@@ -107,14 +107,6 @@
     });
   }
 
-  function getTargetBytes() {
-    if (el.target.value === "custom") {
-      var kb = Math.max(50, Math.min(50000, Number(el.customTarget.value) || 200));
-      return Math.round(kb * 1024);
-    }
-    return Number(el.target.value);
-  }
-
   async function loadPdfJs() {
     var module = await import("/assets/vendor/pdfjs/pdf.min.mjs");
     module.GlobalWorkerOptions.workerSrc = "/assets/vendor/pdfjs/pdf.worker.min.mjs";
@@ -152,7 +144,7 @@
         var imageBlob = await canvasToJpeg(canvas, settings.quality);
         var imageBytes = new Uint8Array(await imageBlob.arrayBuffer());
         var image = await output.embedJpg(imageBytes);
-        var outPage = output.addPage([viewport.width / settings.dpiScale, viewport.height / settings.dpiScale]);
+        var outPage = output.addPage([viewport.width, viewport.height]);
         outPage.drawImage(image, {
           x: 0,
           y: 0,
@@ -160,6 +152,7 @@
           height: outPage.getHeight()
         });
         U.setProgress(el.progress, 20 + Math.round((pageNumber / pdf.numPages) * 45));
+        page.cleanup();
       }
       var saved = await output.save({ useObjectStreams: true, addDefaultPage: false });
       return new Blob([saved], { type: "application/pdf" });
@@ -172,22 +165,15 @@
   }
 
   async function targetCompress(bytes, targetBytes) {
+    var policy = await policyPromise;
     var pdfjs = await loadPdfJs();
-    var settings = [
-      { scale: 1.20, quality: 0.82, dpiScale: 1.0 },
-      { scale: 1.00, quality: 0.72, dpiScale: 1.0 },
-      { scale: 0.86, quality: 0.64, dpiScale: 1.0 },
-      { scale: 0.72, quality: 0.56, dpiScale: 1.0 },
-      { scale: 0.60, quality: 0.48, dpiScale: 1.0 },
-      { scale: 0.50, quality: 0.40, dpiScale: 1.0 },
-      { scale: 0.42, quality: 0.34, dpiScale: 1.0 }
-    ];
     var best = null;
-    for (var i = 0; i < settings.length; i++) {
-      U.setStatus(el.status, "Trying target-size setting " + (i + 1) + " of " + settings.length + "…", "info");
-      var candidate = await renderPdfCandidate(pdfjs, bytes, settings[i]);
+    for (var i = 0; i < policy.TARGET_CANDIDATES.length; i++) {
+      var settings = policy.TARGET_CANDIDATES[i];
+      U.setStatus(el.status, "Trying target-size setting " + (i + 1) + " of " + policy.TARGET_CANDIDATES.length + "…", "info");
+      var candidate = await renderPdfCandidate(pdfjs, bytes, settings);
       if (!best || candidate.size < best.size) best = candidate;
-      if (candidate.size <= targetBytes) return { blob: candidate, reached: true };
+      if (policy.isTargetReached(candidate.size, targetBytes)) return { blob: candidate, reached: true };
     }
     return { blob: best, reached: false };
   }
@@ -197,6 +183,7 @@
     busy = true;
     update();
     try {
+      var policy = await policyPromise;
       U.setProgress(el.progress, 4);
       var bytes = await file.arrayBuffer();
       U.setProgress(el.progress, 15);
@@ -204,7 +191,7 @@
       var outputBlob;
       var targetReached = true;
       if (el.mode.value === "target") {
-        var targetBytes = getTargetBytes();
+        var targetBytes = policy.targetBytesFromSelection(el.target.value, el.customTarget.value);
         if (targetBytes >= file.size) {
           U.setStatus(el.status, "The selected target is already larger than the source file. Running a lossless pass instead.", "info");
           var lossless = await processInWorker(bytes, file.size);
@@ -220,9 +207,10 @@
         outputBlob = new Blob([result.bytes], { type: "application/pdf" });
       }
 
+      if (!outputBlob) throw new Error("empty-output");
       var outputSize = outputBlob.size;
       el.outputSize.textContent = U.formatBytes(outputSize);
-      var reduction = file.size > 0 ? Math.max(0, (file.size - outputSize) / file.size * 100) : 0;
+      var reduction = policy.reductionPercent(file.size, outputSize);
       el.savings.textContent = reduction.toFixed(reduction >= 10 ? 0 : 1) + "%";
 
       if (outputSize >= file.size && el.mode.value === "lossless") {
