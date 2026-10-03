@@ -8,7 +8,7 @@ import {
   isTargetReached,
   reductionPercent,
   targetBytesFromSelection
-} from "../assets/js/core/pdf-target-policy.js";
+} from "../assets/js/core/pdf-target-policy.mjs";
 
 assert.deepEqual(TARGET_PRESETS.map((item) => item.bytes), [102400, 204800, 512000, 1048576, 2097152]);
 assert.ok(TARGET_CANDIDATES.length >= 10, "target compression must have a bounded quality ladder");
