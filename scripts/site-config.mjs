@@ -1,3 +1,5 @@
+import { toolRegistry } from "./tool-registry.mjs";
+
 export const indexablePages = [
   "index.html",
   "pdf-converter-online.html",
@@ -10,24 +12,7 @@ export const indexablePages = [
   "rotate-pdf-online.html",
   "crop-pdf-online.html",
   "remove-pdf-metadata-online.html",
-  "tools/merge-pdf.html",
-  "tools/split-pdf.html",
-  "tools/unlock-pdf.html",
-  "tools/rotate-pdf.html",
-  "tools/jpg-to-pdf.html",
-  "tools/pdf-to-image.html",
-  "tools/watermark-pdf.html",
-  "tools/organize-pdf.html",
-  "tools/add-page-numbers.html",
-  "tools/remove-pdf-metadata.html",
-  "tools/crop-pdf.html",
-  "tools/extract-pdf-text.html",
-  "tools/pdf-to-word.html",
-  "tools/word-to-pdf.html",
-  "tools/compress-pdf.html",
-  "tools/ocr-pdf.html",
-  "tools/sign-pdf.html",
-  "tools/protect-pdf.html",
+  ...toolRegistry.map((tool) => tool.path),
   "guides/index.html",
   "guides/reduce-pdf-file-size-for-email.html",
   "guides/compress-pdf.html",
@@ -188,6 +173,10 @@ for (const relative of [
   "topics/private-pdf-converter.html"
 ]) pageDates[relative] = "2026-09-28";
 
+for (const tool of toolRegistry) {
+  if (tool.lastmod) pageDates[tool.path] = tool.lastmod;
+}
+
 export const articlePublishedDates = {
   "guides/reduce-pdf-file-size-for-email.html": "2026-08-31",
   "guides/merge-pdf-safely.html": "2026-08-09",
@@ -311,6 +300,8 @@ export const pageLabels = {
   "topics/pdf24-alternative.html": "PDF24 Alternative",
   "topics/cloud-vs-browser-pdf-converter.html": "Cloud vs Browser PDF Converter"
 };
+
+for (const tool of toolRegistry) pageLabels[tool.path] = tool.label;
 
 export function pagePathname(relative) {
   if (relative === "index.html") return "/";
