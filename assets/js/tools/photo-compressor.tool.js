@@ -143,7 +143,6 @@ export function mount() {
 
       revokeUrls(state.outputUrls || []);
       state.outputUrls = [];
-      state.archiveUrl = null;
 
       const results = [];
 
