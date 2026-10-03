@@ -25,7 +25,9 @@ const clusters = [
   ["tools/compress-pdf.html", "guides/compress-pdf.html", "Compress PDF", "How to Compress a PDF"],
   ["tools/ocr-pdf.html", "guides/ocr-pdf-to-word.html", "OCR PDF", "How to OCR a Scanned PDF into Word"],
   ["tools/sign-pdf.html", "guides/sign-pdf-online.html", "Sign PDF", "How to Sign a PDF Online Without Uploading It"],
-  ["tools/protect-pdf.html", "guides/password-protect-pdf.html", "Protect PDF", "How to Password Protect a PDF Safely"]
+  ["tools/protect-pdf.html", "guides/password-protect-pdf.html", "Protect PDF", "How to Password Protect a PDF Safely"],
+  ["tools/photo-compressor.html", "guides/compress-photo-to-20kb.html", "Photo Compressor", "How to Compress a Photo to 20KB, 50KB or 100KB"],
+  ["tools/signature-resizer.html", "guides/resize-signature-for-forms.html", "Signature Resizer", "How to Resize a Signature for Online Forms"]
 ];
 
 const files = [];
