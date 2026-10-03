@@ -130,6 +130,27 @@ async function encodeBestUnderTarget({
   return best ? { ...best, reached: false } : null;
 }
 
+async function ensureZip() {
+  if (window.JSZip) return window.JSZip;
+  await new Promise(function (resolve, reject) {
+    const existing = document.querySelector('script[data-freepdf-jszip="true"]');
+    if (existing) {
+      existing.addEventListener("load", resolve, { once: true });
+      existing.addEventListener("error", reject, { once: true });
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "/assets/vendor/jszip/jszip.min.js";
+    script.async = true;
+    script.dataset.freepdfJszip = "true";
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+  if (!window.JSZip) throw new Error("zip-engine-not-loaded");
+  return window.JSZip;
+}
+
 function renderPreview(url, container, label) {
   container.textContent = "";
   const figure = document.createElement("figure");
@@ -303,12 +324,11 @@ export function mount() {
       }
 
       if (results.length > 1) {
-        if (!window.JSZip) throw new Error("zip-engine-not-loaded");
-
+        const JSZip = await ensureZip();
         setStatus("Packaging the optimized images into a ZIP…", "info");
         setProgress(90);
 
-        const zip = new window.JSZip();
+        const zip = new JSZip();
         for (const result of results) {
           zip.file(
             safeBaseName(result.file.name) + "-optimized." + chooseExtension(mime),
