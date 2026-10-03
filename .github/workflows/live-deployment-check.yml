@@ -7,11 +7,40 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   verify-live:
     runs-on: ubuntu-latest
     steps:
+      - name: Require Production Quality success for this commit
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            response="$(curl -fsSL               -H "Accept: application/vnd.github+json"               -H "Authorization: Bearer ${GH_TOKEN}"               "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${EXPECTED_SHA}&event=push&per_page=20")"
+            conclusion="$(printf '%s' "$response" | jq -r --arg sha "$EXPECTED_SHA" '
+              [.workflow_runs[]
+                | select(.name == "Production Quality" and .head_sha == $sha and .status == "completed")]
+              | sort_by(.created_at)
+              | reverse
+              | .[0].conclusion // "pending"
+            ')"
+            echo "Attempt $attempt: Production Quality conclusion=$conclusion"
+            if [ "$conclusion" = "success" ]; then
+              exit 0
+            fi
+            if [ "$conclusion" != "pending" ] && [ "$conclusion" != "null" ]; then
+              echo "Production Quality did not pass for this commit."
+              exit 1
+            fi
+            sleep 15
+          done
+          echo "Production Quality did not complete successfully for this commit."
+          exit 1
+
       - name: Wait for Cloudflare Pages
         run: sleep 30
 
