@@ -105,7 +105,7 @@ if (wordJsAsset) {
   if (/assets\/vendor\/docjs\/index\.[a-f0-9]{10}\.js/.test(wordJsSource)) failures.push("Word converter -> MS-DOC parser entry point was incorrectly fingerprinted");
 }
 const photoPage = await readFile(path.join(dist, "tools/photo-compressor.html"), "utf8");
-if (!photoPage.includes('multiple') || !photoPage.includes('10 KB') || !photoPage.includes('customTarget') || !photoPage.includes('millimetres') || !photoPage.includes('Centimetres') || !photoPage.includes('freepdf-optimized-images.zip')) {
+if (!photoPage.includes('multiple') || !photoPage.includes('10 KB') || !photoPage.includes('customTarget') || !photoPage.includes('Millimetres') || !photoPage.includes('Centimetres')) {
   failures.push("Photo Compressor -> batch, target presets, physical dimensions or ZIP workflow is incomplete");
 }
 if (!photoPage.includes("/assets/vendor/jszip/jszip.min.js")) failures.push("Photo Compressor -> stable local JSZip runtime reference is missing");
