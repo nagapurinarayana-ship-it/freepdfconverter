@@ -288,6 +288,7 @@ export function mount() {
   });
 
   controller.mount();
+  controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
 
   controller.el.targetSize.addEventListener("change", function () {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
