@@ -24,7 +24,7 @@ const required = [
   "assets/vendor/pdf-lib/pdf-lib.min.js",
   "assets/vendor/jszip/jszip.min.js", "assets/vendor/pdfjs/pdf.min.mjs", "assets/vendor/pdfjs/pdf.worker.min.mjs",
   "assets/vendor/qpdf/qpdf.js", "assets/vendor/qpdf/qpdf.wasm", "assets/vendor/qpdf/LICENSE-QPDF-WASM.txt",
-  "assets/vendor/qpdf/LICENSE-QPDF.txt", "assets/vendor/qpdf/NOTICE-QPDF-QPDF-WASM.txt", "assets/vendor/qpdf/README.md",
+  "assets/vendor/qpdf/LICENSE-QPDF.txt", "assets/vendor/qpdf/NOTICE-QPDF.md", "assets/vendor/qpdf/README.md",
   "scripts/vendor-tesseract.mjs",
   "assets/images/freepdf-tools-social.jpg", "favicon.ico", "manifest.webmanifest", "service-worker.js", "offline.html", "_redirects"
 ];
@@ -109,6 +109,32 @@ for (const file of toolJavaScriptFiles) {
     if (!content.includes("window.FreePDF.bindDropZone") || !content.includes("this.el.zone") || !content.includes("this.el.input")) broken.push(path.relative(root, file) + " -> ToolController must delegate file selection to the proven shared picker");
   }
   if (/instanceof\s+File\b/.test(content)) broken.push(path.relative(root, file) + " -> avoid instanceof File for browser picker compatibility; use file-like checks");
+}
+
+const toolScripts = {
+  "tools/merge-pdf.html": "assets/js/merge-pdf.js",
+  "tools/split-pdf.html": "assets/js/split-pdf.js",
+  "tools/unlock-pdf.html": "assets/js/unlock-pdf.js",
+  "tools/rotate-pdf.html": "assets/js/rotate-pdf.js",
+  "tools/jpg-to-pdf.html": "assets/js/jpg-to-pdf.js",
+  "tools/pdf-to-image.html": "assets/js/pdf-to-image.js",
+  "tools/watermark-pdf.html": "assets/js/watermark-pdf.js",
+  "tools/sign-pdf.html": "assets/js/sign-pdf.js",
+  "tools/protect-pdf.html": "assets/js/protect-pdf.js",
+  "tools/organize-pdf.html": "assets/js/organize-pdf.js",
+  "tools/add-page-numbers.html": "assets/js/add-page-numbers.js",
+  "tools/remove-pdf-metadata.html": "assets/js/remove-pdf-metadata.js",
+  "tools/crop-pdf.html": "assets/js/crop-pdf.js",
+  "tools/extract-pdf-text.html": "assets/js/extract-pdf-text.js",
+  "tools/ocr-pdf.html": "assets/js/ocr-pdf.js",
+  "tools/pdf-to-word.html": "assets/js/pdf-to-word.js",
+  "tools/word-to-pdf.html": "assets/js/word-to-pdf.js"
+};
+for (const [htmlPath, scriptPath] of Object.entries(toolScripts)) {
+  const html = await readFile(path.join(root, htmlPath), "utf8");
+  const script = await readFile(path.join(root, scriptPath), "utf8");
+  const ids = [...script.matchAll(/getElementById\("([^"]+)"\)/g)].map((match) => match[1]);
+  for (const id of ids) if (!html.includes('id="' + id + '"')) broken.push(htmlPath + " -> script expects missing #" + id);
 }
 
 if (broken.length) {
