@@ -169,6 +169,17 @@ related["guides/sign-pdf-online.html"] = [
   ["guides/are-online-pdf-converters-safe.html", "Are online PDF converters safe?"],
   ["guides/word-to-pdf-converter.html", "Convert Word documents to PDF"]
 ];
+related["guides/compress-photo-to-20kb.html"] = [
+  ["guides/resize-signature-for-forms.html", "Resize a signature for online forms"],
+  ["guides/jpg-png-to-pdf.html", "Convert JPG or PNG to PDF"],
+  ["guides/convert-scanned-images-to-pdf.html", "Convert scanned images into PDF"]
+];
+related["guides/resize-signature-for-forms.html"] = [
+  ["guides/compress-photo-to-20kb.html", "Compress a photo to a target size"],
+  ["guides/convert-scanned-images-to-pdf.html", "Convert scanned images into PDF"],
+  ["guides/are-online-pdf-converters-safe.html", "Are online PDF converters safe?"]
+];
+
 related["guides/organize-pdf-pages-on-phone.html"] = [
   ["guides/organize-pdf-pages.html", "Organize PDF pages"],
   ["guides/merge-pdf-on-phone.html", "Merge PDFs on a phone"],
