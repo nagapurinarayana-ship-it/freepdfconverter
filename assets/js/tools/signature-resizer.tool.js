@@ -128,6 +128,97 @@ export function mount() {
       if (state.previewUrls[0]) renderPreview(state.previewUrls[0], el.inputPreview, files[0].name);
       el.batchCount.textContent = files.length + " selected";
       el.batchSize.textContent = window.FreePDF.formatBytes(files.reduce((sum, file) => sum + file.size, 0));
+      el.outputSummary.textContent = "Not processed yet";
+      el.resultList.textContent = "";
+    },
+    onReset: ({ state, el }) => {
+      revokeUrls(state.previewUrls || []);
+      revokeUrls(state.outputUrls || []);
+
+      state.previewUrls = [];
+      state.outputUrls = [];
+      state.images = [];
+
+      el.batchCount.textContent = "0 selected";
+      el.batchSize.textContent = "0 B";
+      el.outputSummary.textContent = "Not processed yet";
+      el.resultList.textContent = "";
+      el.inputPreview.textContent = "";
+      el.outputPreview.textContent = "";
+      el.customTargetWrap.hidden = true;
+    },
+    onProcess: async ({ files, state, el, setProgress, setStatus, formatBytes, safeBaseName, downloadBlob }) => {
+      const targetBytes = targetBytesFromSelection(el.targetSize.value, el.customTarget.value);
+      const baseOptions = {
+        mode: el.dimensionMode.value,
+        width: Number(el.width.value || 600),
+        height: Number(el.height.value || 200),
+        unit: el.dimensionUnit.value,
+        dpi: Number(el.dpi.value || 96),
+        keepAspect: el.keepAspect.checked
+      };
+      const autoTrim = el.autoTrim.checked;
+      const transparent = el.background.value === "transparent";
+      const background = transparent ? "keep" : "white";
+      const mime = el.format.value;
+      const results = [];
+
+      revokeUrls(state.outputUrls || []);
+      state.outputUrls = [];
+      state.archiveUrl = null;
+
+      for (let index = 0; index < files.length; index += 1) {
+        const file = files[index];
+        setStatus(
+          "Preparing " + (index + 1) + " of " + files.length + " — " + file.name,
+          "info"
+        );
+
+        const cached = state.images.find(function (entry) {
+          return entry.file === file;
+        });
+        const originalImage = cached?.image || await loadImage(file);
+        const preparedCanvas = await prepareSignatureSource(originalImage, autoTrim, transparent);
+        const preparedImage = await canvasToImage(preparedCanvas);
+
+        const dimensions = resolveDimensions({
+          ...baseOptions,
+          sourceWidth: preparedImage.naturalWidth,
+          sourceHeight: preparedImage.naturalHeight
+        });
+
+        const result = await encodeBestUnderTarget({
+          image: preparedImage,
+          dimensions,
+          mime,
+          targetBytes,
+          cropMode: el.dimensionMode.value === "exact" && !el.keepAspect.checked ? "fill" : "contain",
+          background,
+          setProgress,
+          progressStart: (index / files.length) * 75,
+          progressEnd: ((index + 1) / files.length) * 75
+        });
+
+        if (!result) throw new Error("encode-failed");
+
+        const outputUrl = URL.createObjectURL(result.blob);
+        state.outputUrls.push(outputUrl);
+
+        results.push({
+          file,
+          blob: result.blob,
+          url: outputUrl,
+          width: result.width,
+          height: result.height,
+          reached: result.reached,
+          reduction: reductionPercent(file.size, result.blob.size)
+        });
+
+        if (index === 0) {
+          renderPreview(outputUrl, el.outputPreview, "Prepared signature preview for " + file.name);
+        }
+      }
+
       for (const result of results) {
         downloadBlob(
           result.blob,
@@ -137,7 +228,7 @@ export function mount() {
 
       el.outputSummary.textContent =
         results.length + " file" + (results.length === 1 ? "" : "s") +
-        " optimized individually · target " + formatBytes(targetBytes);
+        " prepared · target " + formatBytes(targetBytes);
 
       el.resultList.textContent = "";
       for (const result of results) {
@@ -163,13 +254,14 @@ export function mount() {
       setStatus(
         results.length > 1
           ? "Done — prepared " + results.length + " files. Individual downloads were started. Your browser may ask to allow multiple downloads."
-          : "Done — prepared the signature and started the direct download.",
+          : "Done — prepared the signature and started the download.",
         "success"
       );
     },
     onError: (error, { setStatus }) => {
       const message =
-        error?.message === "encode-failed"
+        error?.message === "zip-engine-not-loaded"
+error?.message === "encode-failed"
             ? "The browser could not encode the signature. Try a larger target or a different output format."
             : "The selected signature images could not be prepared in your browser.";
       setStatus(message, "error");
