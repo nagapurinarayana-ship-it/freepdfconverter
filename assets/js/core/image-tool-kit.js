@@ -81,3 +81,16 @@ export function removeNearWhite(canvas, threshold = 238) {
   }
   ctx.putImageData(pixels, 0, 0);
 }
+
+export function drawCover(image, ctx, width, height, focusX = 0.5, focusY = 0.5) {
+  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+  const drawWidth = Math.max(1, Math.round(image.naturalWidth * scale));
+  const drawHeight = Math.max(1, Math.round(image.naturalHeight * scale));
+  const overflowX = Math.max(0, drawWidth - width);
+  const overflowY = Math.max(0, drawHeight - height);
+  const safeFocusX = Math.max(0, Math.min(1, Number(focusX) || 0.5));
+  const safeFocusY = Math.max(0, Math.min(1, Number(focusY) || 0.5));
+  const x = Math.round(-overflowX * safeFocusX);
+  const y = Math.round(-overflowY * safeFocusY);
+  ctx.drawImage(image, x, y, drawWidth, drawHeight);
+}
