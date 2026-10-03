@@ -106,21 +106,43 @@
   }
 
   function bindFileInput(input, onFiles) {
-    input.addEventListener("change", function (event) {
-      // Snapshot the File objects before touching the native input. Android
-      // file pickers can expose a transient FileList while the picker returns
-      // control to the page.
-      var files = Array.from(event.currentTarget.files || []);
-      if (!files.length) return;
+    var handled = false;
+    var retryDelays = [0, 40, 120, 300, 600];
 
-      // Keep the original input node. Replacing it during the native change
-      // event can cause mobile browsers to lose the selection event. Clear the
-      // value only after the callback has consumed the File objects so the same
-      // file can be selected again later without changing the DOM reference.
+    function readSelection() {
+      return Array.from(input.files || []);
+    }
+
+    function consume(files) {
+      if (handled || !files.length) return false;
+      handled = true;
+
+      // Pass a stable snapshot of File objects to the tool. Never make a tool
+      // read input.files later: mobile browser FileLists can be transient.
       onFiles(files);
+
+      // Reset only after delivery so selecting the same file again still emits
+      // a change event. Do not replace the input element; labels, focus and
+      // mobile picker state depend on that DOM node remaining stable.
       window.setTimeout(function () {
         try { input.value = ""; } catch (_) { /* Some browsers make file inputs immutable. */ }
       }, 0);
+      return true;
+    }
+
+    input.addEventListener("change", function () {
+      handled = false;
+
+      // Some Android/WebView file providers briefly expose an empty FileList
+      // while returning from the native picker. Read the native input again on
+      // a short bounded schedule instead of assuming the first change snapshot
+      // is complete. This preserves desktop behavior while fixing the mobile
+      // picker -> tool hand-off.
+      retryDelays.forEach(function (delay) {
+        window.setTimeout(function () {
+          consume(readSelection());
+        }, delay);
+      });
     });
   }
 
