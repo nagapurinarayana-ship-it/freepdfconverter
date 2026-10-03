@@ -1,6 +1,7 @@
 import { ToolController } from "../core/tool-controller.js";
 import { loadImage } from "../core/image-tool-kit.js";
 import { encodeBestUnderTarget } from "../core/image-form-engine.js";
+import { createZipBlob } from "../core/archive-engine.js";
 import {
   QUALITY_LADDER,
   WIDTH_LADDER,
@@ -201,23 +202,17 @@ export function mount() {
       }
 
       if (results.length > 1) {
-        const JSZip = await ensureZip();
         setStatus("Packaging the optimized images into a ZIP…", "info");
         setProgress(90);
 
-        const zip = new JSZip();
-        for (const result of results) {
-          zip.file(
-            safeBaseName(result.file.name) + "-optimized." + chooseExtension(mime),
-            result.blob
-          );
-        }
-
-        const archive = await zip.generateAsync({
-          type: "blob",
-          compression: "DEFLATE",
-          compressionOptions: { level: 6 }
-        });
+        const archive = await createZipBlob(
+          results.map(function (result) {
+            return {
+              name: safeBaseName(result.file.name) + "-optimized." + chooseExtension(mime),
+              blob: result.blob
+            };
+          })
+        );
         state.archiveUrl = URL.createObjectURL(archive);
         downloadBlob(archive, "freepdf-optimized-images.zip");
       } else {
