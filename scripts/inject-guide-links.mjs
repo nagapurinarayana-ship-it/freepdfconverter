@@ -1,5 +1,6 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { toolRegistry } from "./tool-registry.mjs";
 
 const dist = path.join(process.cwd(), "dist");
 const START = "<!-- freepdf-guide-links:start -->";
@@ -185,6 +186,14 @@ related["guides/organize-pdf-pages-on-phone.html"] = [
   ["guides/merge-pdf-on-phone.html", "Merge PDFs on a phone"],
   ["guides/split-pdf-into-separate-files.html", "Split a PDF into separate files"]
 ];
+
+for (const tool of toolRegistry) {
+  if (!tool.guide || related[tool.guide]) continue;
+  related[tool.guide] = [
+    [tool.path, "Use the " + tool.label + " tool"],
+    ["guides/index.html", "Browse all PDF and document guides"]
+  ];
+}
 
 const files = [];
 await collectHtml(dist);
