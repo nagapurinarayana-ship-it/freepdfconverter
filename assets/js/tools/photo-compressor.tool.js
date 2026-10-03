@@ -76,7 +76,7 @@ export function mount() {
       resultList: "#resultList"
     },
     maxFileBytes: MAX_FILE,
-    accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type),
+    accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name),
     invalidTypeMessage: "Choose JPG, PNG or WebP images only.",
     maxFileMessage: "Each image must be 25 MB or smaller.",
     emptySummary: "No images selected",

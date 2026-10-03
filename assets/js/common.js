@@ -59,12 +59,16 @@
     window.setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
   }
 
+  function isFileLike(file) {
+    return Boolean(file && typeof file.name === "string" && Number.isFinite(Number(file.size)));
+  }
+
   function isPdf(file) {
-    return file instanceof File && (file.type === "application/pdf" || /\.pdf$/i.test(file.name));
+    return isFileLike(file) && (file.type === "application/pdf" || /\.pdf$/i.test(file.name));
   }
 
   function isImage(file) {
-    return file instanceof File && (/^image\/(jpeg|png)$/i.test(file.type) || /\.(jpe?g|png)$/i.test(file.name));
+    return isFileLike(file) && (/^image\/(jpeg|png|webp)$/i.test(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name));
   }
 
   function totalSize(files) {
@@ -96,11 +100,17 @@
       });
     });
     zone.addEventListener("drop", function (event) {
-      onFiles(event.dataTransfer.files);
+      onFiles(Array.from(event.dataTransfer.files || []));
+    });
+    input.addEventListener("click", function () {
+      // Clear before opening the native picker so choosing the same file again
+      // still emits a change event on mobile and desktop browsers.
+      input.value = "";
     });
     input.addEventListener("change", function () {
-      onFiles(input.files);
-      input.value = "";
+      // Snapshot FileList synchronously. Some mobile browsers expose the native
+      // selection through a transient FileList that must not be cleared here.
+      onFiles(Array.from(input.files || []));
     });
   }
 

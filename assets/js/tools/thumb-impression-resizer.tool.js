@@ -113,7 +113,7 @@ export function mount() {
       batchSize: "#batchSize"
     },
     maxFileBytes: MAX_FILE,
-    accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type),
+    accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name),
     invalidTypeMessage: "Choose JPG, PNG or WebP thumb-impression images only.",
     maxFileMessage: "Each thumb-impression image must be 15 MB or smaller.",
     emptySummary: "No thumb impressions selected",

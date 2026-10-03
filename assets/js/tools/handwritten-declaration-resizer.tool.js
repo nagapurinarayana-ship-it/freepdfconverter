@@ -103,7 +103,7 @@ export function mount() {
       batchSize: "#batchSize"
     },
     maxFileBytes: MAX_FILE,
-    accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type),
+    accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name),
     invalidTypeMessage: "Choose JPG, PNG or WebP handwritten-declaration images only.",
     maxFileMessage: "Each declaration image must be 15 MB or smaller.",
     emptySummary: "No declarations selected",

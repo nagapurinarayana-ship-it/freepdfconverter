@@ -101,7 +101,7 @@ export function mount() {
       batchSize: "#batchSize"
     },
     maxFileBytes: MAX_FILE,
-    accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type),
+    accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name),
     invalidTypeMessage: "Choose JPG, PNG or WebP images only.",
     maxFileMessage: "Each source image must be 20 MB or smaller.",
     emptySummary: "No photos selected",

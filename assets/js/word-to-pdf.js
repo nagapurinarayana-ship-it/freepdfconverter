@@ -47,7 +47,7 @@
   }
 
   function supportedFile(next) {
-    return next instanceof File && SUPPORTED_EXTENSIONS.includes(extension(next.name));
+    return next && typeof next.name === "string" && Number.isFinite(Number(next.size)) && SUPPORTED_EXTENSIONS.includes(extension(next.name));
   }
 
   function cleanText(value) {
