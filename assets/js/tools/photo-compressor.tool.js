@@ -1,7 +1,6 @@
 import { ToolController } from "../core/tool-controller.js";
 import { loadImage } from "../core/image-tool-kit.js";
 import { encodeBestUnderTarget } from "../core/image-form-engine.js";
-import { createZipBlob } from "../core/archive-engine.js";
 import {
   QUALITY_LADDER,
   WIDTH_LADDER,
@@ -109,114 +108,7 @@ export function mount() {
       el.batchSize.textContent = window.FreePDF.formatBytes(
         files.reduce((sum, file) => sum + file.size, 0)
       );
-      el.outputSummary.textContent = "Not processed yet";
-      el.resultList.textContent = "";
-    },
-    onReset: ({ state, el }) => {
-      revokeUrls(state.previewUrls || []);
-      revokeUrls(state.outputUrls || []);
-      if (state.archiveUrl) URL.revokeObjectURL(state.archiveUrl);
-
-      state.previewUrls = [];
-      state.outputUrls = [];
-      state.images = [];
-      state.archiveUrl = null;
-
-      el.batchCount.textContent = "0 selected";
-      el.batchSize.textContent = "0 B";
-      el.outputSummary.textContent = "Not processed yet";
-      el.resultList.textContent = "";
-      el.inputPreview.textContent = "";
-      el.outputPreview.textContent = "";
-      el.customTargetWrap.hidden = true;
-    },
-    onProcess: async ({ files, state, el, setProgress, setStatus, formatBytes, safeBaseName, downloadBlob }) => {
-      const targetBytes = targetBytesFromSelection(el.targetSize.value, el.customTarget.value);
-      const baseOptions = {
-        mode: el.dimensionMode.value,
-        width: Number(el.width.value || 1600),
-        height: Number(el.height.value || 1200),
-        unit: el.dimensionUnit.value,
-        dpi: Number(el.dpi.value || 96),
-        keepAspect: el.keepAspect.checked
-      };
-      const cropMode = el.cropMode.value;
-      const background = el.background.value;
-      const mime = el.outputFormat.value;
-
-      revokeUrls(state.outputUrls || []);
-      if (state.archiveUrl) URL.revokeObjectURL(state.archiveUrl);
-      state.outputUrls = [];
-      state.archiveUrl = null;
-
-      const results = [];
-
-      for (let index = 0; index < files.length; index += 1) {
-        const file = files[index];
-        setStatus(
-          "Optimizing " + (index + 1) + " of " + files.length + " — " + file.name,
-          "info"
-        );
-
-        const cached = state.images.find(function (entry) {
-          return entry.file === file;
-        });
-        const image = cached?.image || await loadImage(file);
-
-        const dimensions = resolveDimensions({
-          ...baseOptions,
-          sourceWidth: image.naturalWidth,
-          sourceHeight: image.naturalHeight
-        });
-
-        const result = await encodeBestUnderTarget({
-          image,
-          dimensions,
-          mime,
-          targetBytes,
-          cropMode,
-          background,
-          setProgress,
-          progressStart: (index / files.length) * 75,
-          progressEnd: ((index + 1) / files.length) * 75
-        });
-
-        if (!result) throw new Error("encode-failed");
-
-        const outputUrl = URL.createObjectURL(result.blob);
-        state.outputUrls.push(outputUrl);
-
-        results.push({
-          file,
-          blob: result.blob,
-          url: outputUrl,
-          width: result.width,
-          height: result.height,
-          reached: result.reached,
-          reduction: reductionPercent(file.size, result.blob.size)
-        });
-
-        if (index === 0) {
-          renderPreview(outputUrl, el.outputPreview, "Optimized preview for " + file.name);
-        }
-      }
-
-      if (results.length > 1) {
-        setStatus("Packaging the optimized images into a ZIP…", "info");
-        setProgress(90);
-
-        const archive = await createZipBlob(
-          results.map(function (result) {
-            return {
-              name: safeBaseName(result.file.name) + "-optimized." + chooseExtension(mime),
-              blob: result.blob
-            };
-          })
-        );
-        state.archiveUrl = URL.createObjectURL(archive);
-        downloadBlob(archive, "freepdf-optimized-images.zip");
-      } else {
-        const result = results[0];
+      for (const result of results) {
         downloadBlob(
           result.blob,
           safeBaseName(result.file.name) + "-optimized." + chooseExtension(mime)
@@ -225,7 +117,7 @@ export function mount() {
 
       el.outputSummary.textContent =
         results.length + " file" + (results.length === 1 ? "" : "s") +
-        " optimized · target " + formatBytes(targetBytes);
+        " optimized individually · target " + formatBytes(targetBytes);
 
       el.resultList.textContent = "";
       for (const result of results) {
@@ -252,16 +144,14 @@ export function mount() {
       setProgress(100);
       setStatus(
         results.length > 1
-          ? "Done — optimized " + results.length + " images and started the ZIP download."
-          : "Done — optimized the image and started the download.",
+          ? "Done — optimized " + results.length + " files. Individual downloads were started. Your browser may ask to allow multiple downloads."
+          : "Done — optimized the image and started the direct download.",
         "success"
       );
     },
     onError: (error, { setStatus }) => {
       const message =
-        error?.message === "zip-engine-not-loaded"
-          ? "Batch ZIP support could not be loaded. Refresh the page and try again."
-          : error?.message === "encode-failed"
+        error?.message === "encode-failed"
             ? "The browser could not encode one of the selected images. Try a smaller image or a different output format."
             : "The selected images could not be optimized in your browser.";
       setStatus(message, "error");
