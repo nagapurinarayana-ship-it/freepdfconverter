@@ -118,7 +118,17 @@ if (photoToolAsset) {
   if (!photoToolSource.includes("ToolController") || !photoToolSource.includes("multiple: true")) failures.push("Photo Compressor -> shared multi-file controller integration is missing");
   if (!photoToolSource.includes("freepdf-optimized-images.zip") || !photoToolSource.includes("image-form-policy")) failures.push("Photo Compressor -> batch ZIP or shared policy integration is missing");
 }
-if (!signatureToolAsset) failures.push("Signature Resizer -> fingerprinted tool module is missing");
+const signaturePage = await readFile(path.join(dist, "tools/signature-resizer.html"), "utf8");
+if (!signaturePage.includes('multiple') || !signaturePage.includes('10 KB') || !signaturePage.includes('customTarget') || !signaturePage.includes('autoTrim') || !signaturePage.includes('Millimetres')) {
+  failures.push("Signature Resizer -> batch, target-size, auto-crop or dimension workflow is incomplete");
+}
+if (!signaturePage.includes("/assets/vendor/jszip/jszip.min.js")) failures.push("Signature Resizer -> local JSZip runtime reference is missing");
+if (signatureToolAsset) {
+  const signatureToolSource = await readFile(path.join(dist, "assets/js/tools", signatureToolAsset), "utf8");
+  if (!signatureToolSource.includes("ToolController") || !signatureToolSource.includes("multiple: true")) failures.push("Signature Resizer -> shared multi-file controller integration is missing");
+  if (!signatureToolSource.includes("createZipBlob") || !signatureToolSource.includes("trimWhitespace")) failures.push("Signature Resizer -> shared archive or whitespace-cleanup engine is missing");
+}
+if (!photoToolAsset) failures.push("Photo Compressor -> fingerprinted photo tool module is missing");
 if (!toolJsAssets.some((file) => /photo-compressor\.tool\.[a-f0-9]{10}\.js$/.test(file))) failures.push("Image tools -> fingerprinted photo tool module is missing");
 
 const compressPage = await readFile(path.join(dist, "tools/compress-pdf.html"), "utf8");
