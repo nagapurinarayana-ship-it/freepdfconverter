@@ -240,12 +240,11 @@ export function mount() {
     },
     onError: (error, { setStatus }) => {
       const message =
-        error?.message === "zip-engine-not-loaded"
-error?.message === "encode-failed"
-            ? "The browser could not encode one of the selected images. Try a smaller image or a different output format."
-            : "The selected images could not be optimized in your browser.";
+        error?.message === "encode-failed"
+          ? "The browser could not encode one of the selected images. Try a smaller image or a different output format."
+          : "The selected images could not be optimized in your browser.";
       setStatus(message, "error");
-    }
+    }}
   });
 
   controller.mount();
