@@ -133,6 +133,23 @@ if (signatureToolAsset) {
 if (!photoToolAsset) failures.push("Photo Compressor -> fingerprinted photo tool module is missing");
 if (!toolJsAssets.some((file) => /photo-compressor\.tool\.[a-f0-9]{10}\.js$/.test(file))) failures.push("Image tools -> fingerprinted photo tool module is missing");
 
+const directDownloadPages = [
+  ["tools/photo-compressor.html", "Photo Compressor"],
+  ["tools/signature-resizer.html", "Signature Resizer"],
+  ["tools/split-pdf.html", "Split PDF"],
+  ["tools/pdf-to-image.html", "PDF to Image"]
+];
+for (const [relative, label] of directDownloadPages) {
+  const html = await readFile(path.join(dist, relative), "utf8");
+  if (/\bZIP\b/i.test(html) || /\.zip\b/i.test(html)) failures.push(relative + " -> " + label + " still exposes ZIP output");
+}
+const splitJs = await readFile(path.join(dist, "assets/js/split-pdf.js"), "utf8");
+const pdfToImageJs = await readFile(path.join(dist, "assets/js/pdf-to-image.js"), "utf8");
+const photoJs = photoToolAsset ? await readFile(path.join(dist, "assets/js/tools", photoToolAsset), "utf8") : "";
+const signatureJs = signatureToolAsset ? await readFile(path.join(dist, "assets/js/tools", signatureToolAsset), "utf8") : "";
+for (const [source, label] of [[splitJs, "Split PDF"], [pdfToImageJs, "PDF to Image"], [photoJs, "Photo Compressor"], [signatureJs, "Signature Resizer"]]) {
+  if (/\.zip\b/i.test(source)) failures.push(label + " -> ZIP archive output code remains");
+}
 const compressPage = await readFile(path.join(dist, "tools/compress-pdf.html"), "utf8");
 if (!compressPage.includes("Compress PDF") || !compressPage.includes("lossless")) failures.push("Compress PDF -> tool page is missing core compression copy");
 if (!/assets\/js\/compress-pdf\.[a-f0-9]{10}\.js/.test(compressPage)) failures.push("Compress PDF -> fingerprinted browser script reference is missing");
@@ -192,6 +209,10 @@ const docjsFiles = await readdir(path.join(dist, "assets/vendor/docjs"));
 if (!docjsFiles.includes("index.js")) failures.push("build -> stable MS-DOC parser entry point is missing");
 if (!docjsFiles.includes("LICENSE.txt")) failures.push("build -> MS-DOC parser license is missing");
 if (!serviceWorker.includes("/assets/vendor/docjs/index.js")) failures.push("service-worker.js -> stable MS-DOC parser entry point is not precached");
+const jszipFiles = await readdir(path.join(dist, "assets/vendor/jszip"));
+if (!jszipFiles.includes("jszip.min.js")) failures.push("build -> stable JSZip runtime is missing");
+if (jszipFiles.some((file) => /^jszip\.[a-f0-9]{10}\.js$/.test(file))) failures.push("build -> JSZip runtime should remain at its stable vendor path");
+if (!serviceWorker.includes("/assets/vendor/jszip/jszip.min.js")) failures.push("service-worker.js -> JSZip runtime is not precached");
 
 
 if (failures.length) {
