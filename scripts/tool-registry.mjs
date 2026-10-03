@@ -1,0 +1,31 @@
+/**
+ * FreePDF Tools — single source of truth for public tools.
+ *
+ * Add a new tool here with its source page, label, description and keywords.
+ * The build uses this registry for homepage cards, indexable pages, labels,
+ * SEO keywords and the generated sitemap.
+ */
+export const toolRegistry = Object.freeze([
+  { id: "merge-pdf", path: "tools/merge-pdf.html", label: "Merge PDF", icon: "M", description: "Combine multiple PDFs into one file and arrange the pages in the order you want.", keywords: ["merge pdf", "merge pdf online", "combine pdf files", "pdf merger", "merge pdf free"] },
+  { id: "split-pdf", path: "tools/split-pdf.html", label: "Split PDF", icon: "S", description: "Extract a page range or split every page into separate PDF files.", keywords: ["split pdf", "split pdf online", "extract pdf pages", "pdf splitter", "separate pdf pages"] },
+  { id: "unlock-pdf", path: "tools/unlock-pdf.html", label: "Unlock PDF", icon: "U", description: "Remove a known PDF password locally and download an unencrypted copy.", keywords: ["unlock pdf", "unlock pdf online", "remove pdf password", "password protected pdf", "decrypt pdf"] },
+  { id: "protect-pdf", path: "tools/protect-pdf.html", label: "Protect PDF", icon: "P", description: "Add a password and encryption to protect a PDF before sharing it.", keywords: ["protect pdf", "password protect pdf", "encrypt pdf", "secure pdf", "pdf password protection"] },
+  { id: "rotate-pdf", path: "tools/rotate-pdf.html", label: "Rotate PDF", icon: "↻", description: "Rotate all pages or a selected page range by 90, 180 or 270 degrees.", keywords: ["rotate pdf", "rotate pdf online", "rotate pdf pages", "pdf page rotator", "fix sideways pdf"] },
+  { id: "jpg-to-pdf", path: "tools/jpg-to-pdf.html", label: "JPG / PNG to PDF", icon: "J", description: "Turn one or more images into a clean PDF with practical page-size options.", keywords: ["jpg to pdf", "png to pdf", "jpg to pdf online", "image to pdf", "convert images to pdf"] },
+  { id: "pdf-to-image", path: "tools/pdf-to-image.html", label: "PDF to JPG / PNG", icon: "I", description: "Render selected PDF pages as high-quality JPG or PNG images.", keywords: ["pdf to jpg", "pdf to png", "pdf to image", "convert pdf to jpg", "convert pdf pages to images"] },
+  { id: "pdf-to-word", path: "tools/pdf-to-word.html", label: "PDF to Word", icon: "W", description: "Turn selectable PDF text into an editable Word DOCX file.", keywords: ["pdf to word", "pdf to word converter", "convert pdf to word", "pdf to docx", "pdf word conversion"] },
+  { id: "word-to-pdf", path: "tools/word-to-pdf.html", label: "Word to PDF", icon: "D", description: "Convert supported Word documents into shareable PDFs in the browser.", keywords: ["word to pdf", "docx to pdf", "doc to pdf", "convert word to pdf", "word pdf converter"] },
+  { id: "watermark-pdf", path: "tools/watermark-pdf.html", label: "Watermark PDF", icon: "W", description: "Add a text watermark with adjustable size, opacity, colour and angle.", keywords: ["watermark pdf", "add watermark to pdf", "pdf watermark online", "watermark pdf free", "confidential pdf watermark"] },
+  { id: "organize-pdf", path: "tools/organize-pdf.html", label: "Organize PDF", icon: "O", description: "Reorder pages, remove pages and save a clean new PDF.", keywords: ["organize pdf", "reorder pdf pages", "delete pdf pages", "organize pdf online", "pdf page organizer"] },
+  { id: "add-page-numbers", path: "tools/add-page-numbers.html", label: "Add Page Numbers", icon: "#", description: "Number every page or a selected range with flexible placement and styling.", keywords: ["add page numbers to pdf", "pdf page numbers", "number pdf pages", "add pdf page numbers online", "pdf numbering"] },
+  { id: "remove-pdf-metadata", path: "tools/remove-pdf-metadata.html", label: "Remove PDF Metadata", icon: "X", description: "Clear common author, title, subject, keyword and metadata fields.", keywords: ["remove pdf metadata", "clean pdf metadata", "pdf metadata remover", "remove author from pdf", "pdf metadata cleaner"] },
+  { id: "crop-pdf", path: "tools/crop-pdf.html", label: "Crop PDF", icon: "C", description: "Hide unwanted page edges with precise crop margins.", keywords: ["crop pdf", "crop pdf pages", "crop pdf online", "trim pdf pages", "pdf cropper"] },
+  { id: "extract-pdf-text", path: "tools/extract-pdf-text.html", label: "Extract PDF Text", icon: "T", description: "Extract selectable PDF text without uploading the document.", keywords: ["extract text from pdf", "pdf text extractor", "extract pdf text online", "copy text from pdf", "pdf to text"] },
+  { id: "compress-pdf", path: "tools/compress-pdf.html", label: "Compress PDF", icon: "%", description: "Reduce PDF file size with a browser-local compression pass.", keywords: ["compress pdf", "pdf compressor", "reduce pdf size", "pdf size reducer", "compress pdf online"] },
+  { id: "ocr-pdf", path: "tools/ocr-pdf.html", label: "OCR Scanned PDF", icon: "O", description: "Recognize text in scanned PDF pages and export editable text or Word output.", keywords: ["ocr pdf", "pdf ocr", "scanned pdf to text", "scanned pdf to word", "ocr pdf to word"] },
+  { id: "sign-pdf", path: "tools/sign-pdf.html", label: "Sign PDF", icon: "✎", description: "Draw or type a signature, place it on a PDF page and download a signed copy.", keywords: ["sign pdf online", "sign pdf free", "add signature to pdf", "draw signature on pdf", "type signature on pdf"] },
+  { id: "photo-compressor", path: "tools/photo-compressor.html", label: "Photo Compressor", icon: "IMG", description: "Compress JPG, PNG or WebP photos to practical target sizes such as 20KB, 50KB or 100KB.", keywords: ["compress image", "photo compressor", "compress photo to 20kb", "compress image to 50kb", "compress jpg to 100kb"], lastmod: "2026-10-03" },
+  { id: "signature-resizer", path: "tools/signature-resizer.html", label: "Signature Resizer", icon: "✍", description: "Resize, clean and compress a signature image for online forms.", keywords: ["signature resize", "signature compressor", "signature 50kb", "signature 100kb", "resize signature image"], lastmod: "2026-10-03" }
+]);
+
+export const toolPaths = toolRegistry.map((tool) => tool.path);
