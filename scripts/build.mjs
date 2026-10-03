@@ -3,6 +3,8 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { articlePages, articlePublishedDates, indexablePages, pageDates, pageLabels, pagePathname, supplementalPages } from "./site-config.mjs";
 import { SEARCH_INTENT_PATHS, generateSearchIntentPages } from "./generate-search-intent-pages.mjs";
+import { toolRegistry } from "./tool-registry.mjs";
+import { injectToolRegistry } from "./inject-tool-registry.mjs";
 
 const root = process.cwd();
 const dist = path.join(root, "dist");
@@ -60,6 +62,8 @@ const pageKeywords = {
   "guides/ocr-pdf-to-word.html": ["ocr pdf", "scanned pdf to word", "convert scanned pdf to word", "ocr pdf to text", "scan pdf to word"]
 };
 
+for (const tool of toolRegistry) pageKeywords[tool.path] = tool.keywords;
+
 const appHead = [
   '<link rel="manifest" href="/manifest.webmanifest">',
   '<link rel="apple-touch-icon" href="/assets/icons/icon-192.png">'
@@ -80,6 +84,7 @@ for (const relative of copyCandidates) {
 }
 for (const directory of directories) await cp(path.join(root, directory), path.join(dist, directory), { recursive: true });
 await generateSearchIntentPages(dist, origin);
+await injectToolRegistry(path.join(dist, "index.html"));
 
 for (const relative of htmlFiles) {
   const file = path.join(dist, relative);
