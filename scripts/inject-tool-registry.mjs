@@ -1,4 +1,5 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { toolRegistry } from "./tool-registry.mjs";
 
@@ -38,6 +39,37 @@ export async function injectToolRegistry(targetFile = path.join(root, "index.htm
   );
 
   await writeFile(targetFile, html, "utf8");
+  await normalizeJavaScriptModuleImports(path.join(root, "dist", "assets", "js"));
+}
+
+async function normalizeJavaScriptModuleImports(directory) {
+  for (const file of await walk(directory)) {
+    if (!/\.(?:js|mjs)$/i.test(file)) continue;
+
+    const source = await readFile(file, "utf8");
+    const normalized = source.replace(
+      /(\bfrom\s*["']|\bimport\s*\(\s*["'])(\.\.?\/[^"']+)(["']\s*\)?)/g,
+      (full, prefix, specifier, suffix) => {
+        const target = path.resolve(path.dirname(file), specifier);
+        const relative = path.relative(root, target).split(path.sep).join("/");
+
+        if (!relative.startsWith("assets/js/") || !existsSync(target)) return full;
+        return prefix + "/" + relative + suffix;
+      }
+    );
+
+    if (normalized !== source) await writeFile(file, normalized, "utf8");
+  }
+}
+
+async function walk(directory) {
+  const result = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const full = path.join(directory, entry.name);
+    if (entry.isDirectory()) result.push(...await walk(full));
+    else if (entry.isFile()) result.push(full);
+  }
+  return result;
 }
 
 function escapeHtml(value) {
