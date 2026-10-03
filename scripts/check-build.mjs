@@ -143,11 +143,21 @@ for (const [relative, label] of directDownloadPages) {
   const html = await readFile(path.join(dist, relative), "utf8");
   if (/\bZIP\b/i.test(html) || /\.zip\b/i.test(html)) failures.push(relative + " -> " + label + " still exposes ZIP output");
 }
-const splitJs = await readFile(path.join(dist, "assets/js/split-pdf.js"), "utf8");
-const pdfToImageJs = await readFile(path.join(dist, "assets/js/pdf-to-image.js"), "utf8");
+const splitJsAsset = jsAssets.find((file) => /^split-pdf\.[a-f0-9]{10}\.js$/.test(file));
+const pdfToImageJsAsset = jsAssets.find((file) => /^pdf-to-image\.[a-f0-9]{10}\.js$/.test(file));
+if (!splitJsAsset) failures.push("Split PDF -> fingerprinted browser script is missing");
+if (!pdfToImageJsAsset) failures.push("PDF to Image -> fingerprinted browser script is missing");
+const sourceDownloadPolicyFiles = [
+  ["assets/js/split-pdf.js", "Split PDF"],
+  ["assets/js/pdf-to-image.js", "PDF to Image"]
+];
+for (const [relative, label] of sourceDownloadPolicyFiles) {
+  const source = await readFile(path.join(root, relative), "utf8");
+  if (/\.zip\b/i.test(source)) failures.push(label + " -> ZIP archive output code remains");
+}
 const photoJs = photoToolAsset ? await readFile(path.join(dist, "assets/js/tools", photoToolAsset), "utf8") : "";
 const signatureJs = signatureToolAsset ? await readFile(path.join(dist, "assets/js/tools", signatureToolAsset), "utf8") : "";
-for (const [source, label] of [[splitJs, "Split PDF"], [pdfToImageJs, "PDF to Image"], [photoJs, "Photo Compressor"], [signatureJs, "Signature Resizer"]]) {
+for (const [source, label] of [[photoJs, "Photo Compressor"], [signatureJs, "Signature Resizer"]]) {
   if (/\.zip\b/i.test(source)) failures.push(label + " -> ZIP archive output code remains");
 }
 const compressPage = await readFile(path.join(dist, "tools/compress-pdf.html"), "utf8");
