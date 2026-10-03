@@ -11,7 +11,8 @@
     "check:architecture": "node scripts/check-tool-registry.mjs",
     "test:pdf": "node scripts/test-pdf-operations.mjs && node scripts/test-unlock-pdf.mjs && node scripts/test-protect-pdf.mjs && node scripts/test-pdf-target-policy.mjs",
     "test:docs": "node scripts/test-document-operations.mjs",
-    "verify": "npm run check && npm run check:architecture && npm run test:pdf && npm run test:docs && npm run test:image && SITE_ORIGIN=https://freepdfconverter-all-in-one.pages.dev npm run build && node scripts/check-build.mjs && SITE_ORIGIN=https://freepdfconverter-all-in-one.pages.dev node scripts/check-localized-seo.mjs && node scripts/check-tool-schema.mjs && node scripts/check-search-intent-content.mjs && node scripts/check-local-processing.mjs && node scripts/check-accessibility-performance.mjs && node scripts/check-performance.mjs",
+    "test:modules": "node scripts/check-module-imports.mjs",
+    "verify": "npm run check && npm run check:architecture && npm run test:pdf && npm run test:docs && npm run test:image && SITE_ORIGIN=https://freepdfconverter-all-in-one.pages.dev npm run build && node scripts/check-build.mjs && npm run test:modules && SITE_ORIGIN=https://freepdfconverter-all-in-one.pages.dev node scripts/check-localized-seo.mjs && node scripts/check-tool-schema.mjs && node scripts/check-search-intent-content.mjs && node scripts/check-local-processing.mjs && node scripts/check-accessibility-performance.mjs && node scripts/check-performance.mjs",
     "seo:search-console": "node scripts/analyze-search-console.mjs",
     "test:image": "node scripts/test-image-form-policy.mjs"
   },
