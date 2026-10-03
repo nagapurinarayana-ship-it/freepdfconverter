@@ -52,7 +52,7 @@
       el.pages.textContent = String(count);
       el.from.value = "1"; el.to.value = String(count);
       U.setProgress(el.progress, 100);
-      U.setStatus(el.status, count + " pages loaded. Choose a range or split to ZIP.", "success");
+      U.setStatus(el.status, count + " pages loaded. Choose a range or split every page into separate PDF files.", "success");
     } catch (error) {
       console.error(error); reset();
       U.setStatus(el.status, "Could not open this PDF. It may be encrypted or invalid.", "error");
@@ -87,26 +87,33 @@
 
   async function splitAll() {
     if (busy || !doc || !file) return;
-    if (!window.JSZip) return U.setStatus(el.status, "The ZIP library did not load. Refresh and retry.", "error");
     busy = true; controls(); U.setProgress(el.progress, 2);
     try {
-      var zip = new window.JSZip();
       var total = doc.getPageCount();
       var base = U.safeBaseName(file.name);
+
       for (var i = 0; i < total; i += 1) {
-        U.setStatus(el.status, "Creating page " + (i + 1) + " of " + total + "…", "info");
+        U.setStatus(el.status, "Creating and downloading page " + (i + 1) + " of " + total + "…", "info");
+
         var out = await window.PDFLib.PDFDocument.create();
         var copied = await out.copyPages(doc, [i]);
         out.addPage(copied[0]);
-        zip.file(base + "-page-" + String(i + 1).padStart(3, "0") + ".pdf", await out.save({ useObjectStreams: true }));
-        U.setProgress(el.progress, ((i + 1) / total) * 90);
+
+        var bytes = await out.save({ useObjectStreams: true });
+        var blob = new Blob([bytes], { type: "application/pdf" });
+        U.downloadBlob(blob, base + "-page-" + String(i + 1).padStart(3, "0") + ".pdf");
+
+        U.setProgress(el.progress, ((i + 1) / total) * 100);
       }
-      U.setStatus(el.status, "Packaging ZIP…", "info");
-      var zipBlob = await zip.generateAsync({ type: "blob" }, function (metadata) { U.setProgress(el.progress, 90 + metadata.percent * .1); });
-      U.downloadBlob(zipBlob, base + "-pages.zip");
-      U.setProgress(el.progress, 100); U.setStatus(el.status, "All " + total + " pages are in one ZIP. Download started.", "success");
+
+      U.setStatus(
+        el.status,
+        "Done — " + total + " separate PDF files were generated and direct downloads were started. Your browser may ask to allow multiple downloads.",
+        "success"
+      );
     } catch (error) {
-      console.error(error); U.setProgress(el.progress, 0); U.setStatus(el.status, "Could not split this PDF. Try a smaller file.", "error");
+      console.error(error); U.setProgress(el.progress, 0);
+      U.setStatus(el.status, "Could not split this PDF. Try a smaller file.", "error");
     } finally { busy = false; controls(); }
   }
 
