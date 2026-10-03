@@ -90,14 +90,9 @@ export function mount() {
       state.outputUrls = [];
       state.images = [];
 
-      const loaded = [];
-      for (const file of files.slice(0, 4)) {
-        loaded.push({ file, image: await loadImage(file) });
-      }
-
-      state.images = loaded;
-      state.previewUrls = loaded.map(function (entry) {
-        return URL.createObjectURL(entry.file);
+      state.images = [];
+      state.previewUrls = files.map(function (file) {
+        return URL.createObjectURL(file);
       });
 
       if (state.previewUrls[0]) {
