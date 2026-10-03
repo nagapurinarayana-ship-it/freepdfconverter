@@ -48,6 +48,8 @@ export const indexablePages = [
   "guides/organize-pdf-pages-on-phone.html",
   "guides/sign-pdf-online.html",
   "guides/password-protect-pdf.html",
+  "guides/compress-photo-to-20kb.html",
+  "guides/resize-signature-for-forms.html",
   ...[
     "topics/index.html",
     "topics/pdf-to-word-without-upload.html",
@@ -107,7 +109,9 @@ export const articlePages = new Set([
   "guides/convert-old-doc-to-pdf.html",
   "guides/organize-pdf-pages-on-phone.html",
   "guides/sign-pdf-online.html",
-  "guides/password-protect-pdf.html"
+  "guides/password-protect-pdf.html",
+  "guides/compress-photo-to-20kb.html",
+  "guides/resize-signature-for-forms.html"
 ]);
 
 export const pageDates = Object.fromEntries(indexablePages.map((relative) => [relative, "2026-08-13"]));
@@ -208,7 +212,9 @@ export const articlePublishedDates = {
   "guides/pdf-page-size-a4-vs-letter.html": "2026-09-28",
   "guides/convert-old-doc-to-pdf.html": "2026-09-28",
   "guides/organize-pdf-pages-on-phone.html": "2026-09-28",
-  "guides/password-protect-pdf.html": "2026-10-02"
+  "guides/password-protect-pdf.html": "2026-10-02",
+  "guides/compress-photo-to-20kb.html": "2026-10-03",
+  "guides/resize-signature-for-forms.html": "2026-10-03"
 };
 
 export const pageLabels = {
@@ -278,6 +284,8 @@ export const pageLabels = {
   "guides/organize-pdf-pages-on-phone.html": "Organize PDF Pages on a Phone",
   "guides/sign-pdf-online.html": "How to Sign a PDF Online Without Uploading It",
   "guides/password-protect-pdf.html": "How to Password Protect a PDF Safely",
+  "guides/compress-photo-to-20kb.html": "How to Compress a Photo to 20KB, 50KB or 100KB",
+  "guides/resize-signature-for-forms.html": "How to Resize a Signature for Online Forms",
   "topics/index.html": "PDF Conversion Topics",
   "topics/pdf-to-word-without-upload.html": "PDF to Word Without Uploading",
   "topics/scanned-pdf-to-word.html": "Scanned PDF to Word",
