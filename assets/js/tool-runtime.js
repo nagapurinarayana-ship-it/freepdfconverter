@@ -7,6 +7,21 @@
 (async function () {
   "use strict";
 
+  function waitForCore() {
+    if (window.FreePDF) return Promise.resolve();
+    return new Promise((resolve) => {
+      const started = Date.now();
+      const timer = window.setInterval(() => {
+        if (window.FreePDF || Date.now() - started > 5000) {
+          window.clearInterval(timer);
+          resolve();
+        }
+      }, 16);
+    });
+  }
+
+  await waitForCore();
+
   const toolId = document.body?.dataset?.tool;
   if (!toolId) return;
 
