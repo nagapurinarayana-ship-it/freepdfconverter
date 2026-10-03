@@ -50,11 +50,19 @@ export class ToolController {
     });
 
     zone.addEventListener("drop", (event) => this.select(event.dataTransfer.files));
+
+    // Clear before opening the native picker so choosing the same file again
+    // still produces a change event. Do not clear after change: some mobile
+    // browsers expose FileList as a transient native object while dispatching
+    // the event, and clearing it in that handler can make the selection vanish.
+    input.addEventListener("click", () => {
+      if (!this.busy) input.value = "";
+    });
+
     input.addEventListener("change", () => {
-      // Snapshot FileList before clearing the native input. Some mobile browsers
-      // expose the FileList through a transient native object.
+      // Snapshot FileList synchronously before any async work and keep the
+      // native value intact while select() consumes the snapshot.
       const files = Array.from(input.files || []);
-      input.value = "";
       this.select(files);
     });
   }
@@ -133,9 +141,6 @@ export class ToolController {
   }
 
   validateFile(file) {
-    // Avoid relying only on instanceof File: mobile browsers, embedded webviews,
-    // and cross-realm file objects can expose a valid File-like object whose
-    // constructor is not the page's File constructor.
     const isFileLike = file && typeof file.name === "string" && Number.isFinite(Number(file.size));
     if (!isFileLike) return "Choose a supported file.";
     if (this.options.accept && !this.options.accept(file)) {
