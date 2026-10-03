@@ -81,20 +81,19 @@ for (const [title, pages] of titles) if (pages.length > 1) broken.push("Duplicat
 for (const [description, pages] of descriptions) if (pages.length > 1) broken.push("Duplicate description -> " + pages.join(", "));
 
 const sourceFilesForDownloadPolicy = [
-  ...(await htmlFiles(path.join(root, "tools"))),
-  ...(await htmlFiles(path.join(root, "guides"))).filter((file) => false)
+  ...(await htmlFiles(path.join(root, "tools")))
 ];
 const toolJavaScriptFiles = [];
 for (const directory of [path.join(root, "assets/js"), path.join(root, "assets/js/tools"), path.join(root, "assets/js/core")]) {
   try {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
-      if (entry.isFile() && /\\.js$/.test(entry.name)) toolJavaScriptFiles.push(path.join(directory, entry.name));
+      if (entry.isFile() && /\.js$/.test(entry.name)) toolJavaScriptFiles.push(path.join(directory, entry.name));
     }
   } catch { /* Directory may not exist in a partial checkout. */ }
 }
 for (const file of [...sourceFilesForDownloadPolicy, ...toolJavaScriptFiles]) {
   const content = await readFile(file, "utf8");
-  if (/JSZip|createZipBlob|archive-engine|\\.zip|ZIP/i.test(content)) {
+  if (/JSZip|createZipBlob|archive-engine|\.zip|ZIP/i.test(content)) {
     broken.push(path.relative(root, file) + " -> ZIP output is prohibited; download generated files directly");
   }
 }
