@@ -115,13 +115,8 @@ export function mount() {
       state.outputUrls = [];
       state.images = [];
 
-      const loaded = [];
-      for (const file of files.slice(0, 4)) {
-        loaded.push({ file, image: await loadImage(file) });
-      }
-
-      state.images = loaded;
-      state.previewUrls = loaded.map((entry) => URL.createObjectURL(entry.file));
+      state.images = [];
+      state.previewUrls = files.map((file) => URL.createObjectURL(file));
 
       if (state.previewUrls[0]) {
         renderPreview(state.previewUrls[0], el.inputPreview, files[0].name);
