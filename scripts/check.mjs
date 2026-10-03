@@ -105,11 +105,12 @@ for (const file of toolJavaScriptFiles) {
   if (file.endsWith("assets/js/common.js")) {
     const hasSharedPicker =
       content.includes("bindFileInput(input, onFiles)") &&
-      content.includes("event.currentTarget.files") &&
+      (content.includes("event.currentTarget.files") || content.includes("Array.from(input.files || [])")) &&
       content.includes("onFiles(files)") &&
       content.includes("input.value = \"\"");
-    if (!hasSharedPicker) {
-      broken.push(path.relative(root, file) + " -> common picker must snapshot the native FileList, deliver files before reset, and avoid replacing the input node");
+    const replacesInput = /input\.parentNode\.replaceChild\(replacement, input\)/.test(content);
+    if (!hasSharedPicker || replacesInput) {
+      broken.push(path.relative(root, file) + " -> common picker must snapshot the native FileList, deliver files before reset, keep the input node stable, and avoid replacing it");
     }
   }
   if (file.endsWith("assets/js/core/tool-controller.js")) {
