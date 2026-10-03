@@ -23,8 +23,8 @@ for (const tool of toolRegistry) {
     throw new Error(tool.path + " declares data-tool=" + declaredTool + " but registry id is " + tool.id);
   }
 
-  if (tool.id === "photo-compressor" || tool.id === "signature-resizer") {
-    if (declaredTool !== tool.id) throw new Error(tool.path + " must declare its tool id");
+  if (declaredTool) {
+    if (declaredTool !== tool.id) throw new Error(tool.path + " declares an incorrect data-tool id");
     if (!html.includes('src="../assets/js/tool-runtime.js"')) {
       throw new Error(tool.path + " must use the shared tool runtime");
     }
