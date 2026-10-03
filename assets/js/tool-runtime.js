@@ -7,12 +7,14 @@
 (async function () {
   "use strict";
 
+  const TOOL_MODULES = /*__TOOL_MODULE_MAP__*/({});
+
   function waitForCore() {
-    if (window.FreePDF) return Promise.resolve();
+    if (typeof window.FreePDF?.bindDropZone === "function") return Promise.resolve();
     return new Promise((resolve) => {
       const started = Date.now();
       const timer = window.setInterval(() => {
-        if (window.FreePDF || Date.now() - started > 5000) {
+        if (typeof window.FreePDF?.bindDropZone === "function" || Date.now() - started > 5000) {
           window.clearInterval(timer);
           resolve();
         }
