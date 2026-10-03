@@ -1,7 +1,7 @@
 import { clampPixels, isTargetReached, QUALITY_LADDER, WIDTH_LADDER } from "./image-form-policy.js";
 import { createCanvas, drawContain, drawCover, makeBlob } from "./image-tool-kit.js";
 
-export async function encodeImageAtQuality({ image, width, height, mime, quality, cropMode, background }) {
+export async function encodeImageAtQuality({ image, width, height, mime, quality, cropMode, background, cropFocusX = 0.5, cropFocusY = 0.5 }) {
   const alpha = mime !== "image/jpeg" && background !== "white";
   const result = createCanvas(image, { width, height, alpha });
   const ctx = result.ctx;
@@ -11,7 +11,7 @@ export async function encodeImageAtQuality({ image, width, height, mime, quality
     ctx.fillRect(0, 0, width, height);
   }
 
-  if (cropMode === "fill") drawCover(image, ctx, width, height);
+  if (cropMode === "fill") drawCover(image, ctx, width, height, cropFocusX, cropFocusY);
   else drawContain(image, ctx, width, height);
 
   return makeBlob(result.canvas, mime, mime === "image/png" ? undefined : quality);
@@ -26,7 +26,9 @@ export async function encodeBestUnderTarget({
   background,
   setProgress = () => {},
   progressStart = 0,
-  progressEnd = 100
+  progressEnd = 100,
+  cropFocusX = 0.5,
+  cropFocusY = 0.5
 }) {
   let best = null;
 
@@ -61,7 +63,7 @@ export async function encodeBestUnderTarget({
 
     for (const quality of QUALITY_LADDER) {
       const blob = await encodeImageAtQuality({
-        image, width, height, mime, quality, cropMode, background
+        image, width, height, mime, quality, cropMode, background, cropFocusX, cropFocusY
       });
 
       if (!bestAny || blob.size < bestAny.blob.size) {
