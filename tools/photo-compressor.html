@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Compress Image to 10KB, 20KB, 50KB, 100KB or Custom Size | FreePDF Tools</title>
-<meta name="description" content="Free browser-local image optimizer for JPG, PNG and WebP. Target 10KB, 20KB, 50KB, 100KB, 200KB, 500KB, 1MB or a custom limit, resize in pixels or mm/cm, crop and batch into ZIP.">
+<meta name="description" content="Free browser-local image optimizer for JPG, PNG and WebP. Target 10KB, 20KB, 50KB, 100KB, 200KB, 500KB, 1MB or a custom limit, resize in pixels or mm/cm, crop and batch-download individual files.">
 <meta name="theme-color" content="#1f67ff">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/css/styles.css">
 <script src="../assets/js/common.js" defer></script>
@@ -88,7 +88,7 @@
 <h2>Physical size: mm and cm</h2>
 <p>For forms that specify physical dimensions, choose millimetres or centimetres and select the requested DPI. The browser converts that physical measurement to pixels before encoding the image. Check the receiving application's exact specification because DPI and print size rules vary.</p>
 <h2>Batch processing</h2>
-<p>When several photographs need the same settings, select multiple files at once. Each image is processed independently and the results are packaged into a ZIP file. A per-file result list also shows the original size, output size, dimensions and whether the target was met.</p>
+<p>When several photographs need the same settings, select multiple files at once. Each image is processed independently and every result is downloaded as its own file. A per-file result list also shows the original size, output size, dimensions and whether the target was met.</p>
 <h2>How target compression works</h2>
 <ol><li>The browser reads each image locally.</li><li>The selected dimension policy creates candidate output sizes.</li><li>For JPG and WebP, the encoder searches quality values and then lower dimensions when necessary.</li><li>PNG is resized without pretending that a lossy quality slider exists.</li><li>The tool returns the highest-quality safe result that reaches the limit, or reports the closest tested result.</li></ol>
 <h2>Related guides</h2>
