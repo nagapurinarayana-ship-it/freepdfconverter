@@ -103,7 +103,14 @@ for (const file of toolJavaScriptFiles) {
   }
   if (/\.zip\b/i.test(content) || /(?:downloadBlob\([^\n]*\.zip)/i.test(content)) broken.push(path.relative(root, file) + " -> ZIP archive downloads are prohibited; generated files must download directly");
   if (file.endsWith("assets/js/common.js")) {
-    if (!content.includes("bindFileInput(input, onFiles)") || !content.includes("input.parentNode.replaceChild(replacement, input)")) broken.push(path.relative(root, file) + " -> common picker must use the proven shared file-input implementation");
+    const hasSharedPicker =
+      content.includes("bindFileInput(input, onFiles)") &&
+      content.includes("event.currentTarget.files") &&
+      content.includes("onFiles(files)") &&
+      content.includes("input.value = \"\"");
+    if (!hasSharedPicker) {
+      broken.push(path.relative(root, file) + " -> common picker must snapshot the native FileList, deliver files before reset, and avoid replacing the input node");
+    }
   }
   if (file.endsWith("assets/js/core/tool-controller.js")) {
     if (!content.includes("window.FreePDF.bindDropZone") || !content.includes("this.el.zone") || !content.includes("this.el.input")) broken.push(path.relative(root, file) + " -> ToolController must delegate file selection to the proven shared picker");
