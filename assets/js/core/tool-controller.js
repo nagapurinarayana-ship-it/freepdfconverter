@@ -65,7 +65,7 @@ export class ToolController {
       // This resets same-file selection without mutating the active FileList
       // during change dispatch.
       const replacement = input.cloneNode(true);
-      input.replaceWith(replacement);
+      input.parentNode.replaceChild(replacement, input);
       this.el.input = replacement;
       this.bindFileInput(replacement);
 
