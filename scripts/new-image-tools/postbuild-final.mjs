@@ -14,6 +14,11 @@ const NEW_IMAGE_TOOLS = [
   { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
 ];
 
+const NATIVE_PICKER_RECOVERY = new Map([
+  ["photo-compressor", { inputId: "imageFile", accept: "image/jpeg,image/png,image/webp" }],
+  ["signature-resizer", { inputId: "signatureFile", accept: "image/jpeg,image/png,image/webp" }]
+]);
+
 for (const tool of NEW_IMAGE_TOOLS) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
@@ -38,11 +43,13 @@ for (const tool of NEW_IMAGE_TOOLS) {
     await rm(path.join(toolsDir, oldModule), { force: true });
   }
 
-  // Every new image tool uses the same fingerprinted entry/module contract.
-  // No stable entry URL or tool-specific picker/recovery path is introduced.
-  const entrySource = `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
+  const affectedTool = NATIVE_PICKER_RECOVERY.has(tool.name);
+  const entrySource = affectedTool
+    ? `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\n\nfunction start() {\n  if (window.FreePDF) {\n    mount();\n    return;\n  }\n  window.setTimeout(start, 0);\n}\n\nif (document.readyState === "loading") {\n  document.addEventListener("DOMContentLoaded", start, { once: true });\n} else {\n  start();\n}\n`
+    : `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
+
   const entryHash = createHash("sha256").update(entrySource).digest("hex").slice(0, 10);
-  const entryName = `${tool.name}.entry.${entryHash}.js`;
+  const entryName = affectedTool ? `${tool.name}.entry.js` : `${tool.name}.entry.${entryHash}.js`;
   await writeFile(path.join(toolsDir, entryName), entrySource, "utf8");
 
   const entryFiles = (await readdir(toolsDir)).filter((file) =>
@@ -61,13 +68,25 @@ for (const tool of NEW_IMAGE_TOOLS) {
     `<script type="module" src="/assets/js/tools/${entryName}"></script>`
   );
 
-  // Restore the exact normal native file-input contract used by the working tools.
   html = html.replace(/\sdata-targeted-android-picker(?:=["'][^"']*["'])?/gi, "");
   html = html.replace(/\sdata-targeted-android-accept=["'][^"']*["']/gi, "");
   html = html.replace(/\sdata-new-tool-picker(?:=["'][^"']*["'])?/gi, "");
   html = html.replace(/\sdata-new-tool-accept=["'][^"']*["']/gi, "");
   html = html.replace(/<script id="new-tool-android-picker">[\s\S]*?<\/script>/gi, "");
   html = html.replace(/<script id="targeted-android-file-picker">[\s\S]*?<\/script>/gi, "");
+
+  const recovery = NATIVE_PICKER_RECOVERY.get(tool.name);
+  if (recovery) {
+    const inputPattern = new RegExp(
+      `<input\\b([^>]*\\bid=["']${recovery.inputId}["'][^>]*)>`,
+      "i"
+    );
+    html = html.replace(inputPattern, (match, attrs) => {
+      let nextAttrs = attrs.replace(/\saccept=["'][^"']*["']/i, "");
+      nextAttrs += ` accept="${recovery.accept}" data-new-tool-picker="1"`;
+      return `<input${nextAttrs}>`;
+    });
+  }
 
   if (!html.includes(`/assets/js/tools/${entryName}`)) {
     throw new Error(`${tool.name}: entry was not installed into the page`);
@@ -82,4 +101,4 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(pagePath, html, "utf8");
 }
 
-console.log("Final new-tool strategy applied uniformly to all five new image tools; all use the same fingerprinted entry/module and native file-input contract. Existing working tools remain unchanged.");
+console.log("Final new-tool strategy applied; Photo Compressor and Signature Resizer use the hardened stable bootstrap/native-picker recovery, while the other three image tools retain the existing fingerprinted entry contract. Existing working tools remain unchanged.");
