@@ -211,6 +211,7 @@ export class ToolController {
 
   updateFileSummary() {
     if (!this.el.summary) return;
+
     if (!this.multiple) {
       this.el.summary.textContent = this.file
         ? this.file.name + " · " + window.FreePDF.formatBytes(this.file.size)
@@ -224,8 +225,11 @@ export class ToolController {
     }
 
     const totalBytes = this.files.reduce((sum, file) => sum + file.size, 0);
+    const visibleNames = this.files.slice(0, 3).map((file) => file.name);
+    const extraCount = this.files.length - visibleNames.length;
+    const nameText = visibleNames.join(" · ") + (extraCount > 0 ? " · +" + extraCount + " more" : "");
     this.el.summary.textContent =
-      this.files.length + " file" + (this.files.length === 1 ? "" : "s") +
-      " selected · " + window.FreePDF.formatBytes(totalBytes);
+      nameText + " · " + window.FreePDF.formatBytes(totalBytes);
+    this.el.summary.title = this.files.map((file) => file.name).join("\n");
   }
 }
