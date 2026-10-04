@@ -13,13 +13,20 @@ const NEW_IMAGE_TOOLS = [
   { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
 ];
 
-const NEW_TOOL_PICKER_PAGES = [
-  { page: "tools/sign-pdf.html", inputId: "pdfFile" },
-  { page: "tools/photo-compressor.html", inputId: "imageFile" },
-  { page: "tools/signature-resizer.html", inputId: "signatureFile" },
-  { page: "tools/passport-id-photo-maker.html", inputId: "photoFile" },
-  { page: "tools/thumb-impression-resizer.html", inputId: "thumbFile" },
-  { page: "tools/handwritten-declaration-resizer.html", inputId: "declarationFile" }
+// Photo Compressor and Sign PDF need the Android File System Access picker.
+// The other four new image tools are left exactly on their currently working
+// native-input/recovery path.
+const TARGETED_ANDROID_PICKER_PAGES = [
+  {
+    page: "tools/sign-pdf.html",
+    inputId: "pdfFile",
+    accept: "application/pdf,.pdf"
+  },
+  {
+    page: "tools/photo-compressor.html",
+    inputId: "imageFile",
+    accept: "image/*"
+  }
 ];
 
 const serviceWorkerPath = path.join(dist, "service-worker.js");
@@ -90,30 +97,45 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(pagePath, html, "utf8");
 }
 
-for (const tool of NEW_TOOL_PICKER_PAGES) {
+// Android Chrome can return from DocumentsUI with an empty FileList for a
+// normal <input type=file> in these two affected flows. Use the same proven
+// File System Access picker handoff that previously fixed the mobile issue,
+// but keep it isolated to Photo Compressor and Sign PDF so the four currently
+// working new image tools are not changed.
+const pickerScript = `<script id="targeted-android-file-picker">(function(){"use strict";function init(){document.querySelectorAll('input[type="file"][data-targeted-android-picker]').forEach(function(input){if(input.dataset.targetedAndroidPickerBound)return;input.dataset.targetedAndroidPickerBound="1";var label=document.querySelector('label[for="'+input.id+'"]');var accept=input.getAttribute("data-targeted-android-accept")||"";var isPdf=/pdf/i.test(accept);if(!label||typeof window.showOpenFilePicker!=="function")return;label.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();(async function(){try{var options={multiple:input.hasAttribute("multiple"),excludeAcceptAllOption:true,types:[{description:isPdf?"PDF files":"Images",accept:isPdf?{"application/pdf":[".pdf"]}:{"image/jpeg":[".jpg",".jpeg"],"image/png":[".png"],"image/webp":[".webp"]}}]};var handles=await window.showOpenFilePicker(options);var files=await Promise.all(handles.map(function(handle){return handle.getFile();}));if(!files.length)return;var transfer=new DataTransfer();files.forEach(function(file){transfer.items.add(file);});input.files=transfer.files;input.dispatchEvent(new Event("change",{bubbles:true}));}catch(error){if(error&&error.name==="AbortError")return;console.error("FreePDF targeted Android picker failed",error);try{input.click();}catch(_){} }})();});});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();}());</script>`;
+
+for (const tool of TARGETED_ANDROID_PICKER_PAGES) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
+
   const inputPattern = new RegExp(
     `<input\\b([^>]*\\bid=["']${tool.inputId}["'][^>]*)>`,
     "i"
   );
+
   html = html.replace(inputPattern, (match, attrs) => {
-    let nextAttrs = attrs.replace(/\sdata-new-tool-picker(?:=["'][^"']*["'])?/i, "");
-    // Chrome Android can return from the native media picker without firing
-    // the input change event. Mark these inputs so common.js can recover the
-    // FileList on focus/visibility return. Tool-level validation remains the
-    // authority for supported file types.
-    nextAttrs = nextAttrs.replace(/\saccept=["'][^"']*["']/i, "");
-    nextAttrs += ' data-new-tool-picker="1"';
+    let nextAttrs = attrs.replace(/\\sdata-targeted-android-picker(?:=["'][^"']*["'])?/i, "");
+    nextAttrs = nextAttrs.replace(/\\sdata-targeted-android-accept=["'][^"']*["']/i, "");
+    nextAttrs = nextAttrs.replace(/\\sdata-new-tool-picker(?:=["'][^"']*["'])?/i, "");
+    nextAttrs = nextAttrs.replace(/\\sdata-new-tool-accept=["'][^"']*["']/i, "");
+    nextAttrs = nextAttrs.replace(/\\saccept=["'][^"']*["']/i, "");
+    nextAttrs += ` data-targeted-android-picker="1" data-targeted-android-accept="${tool.accept}" accept="${tool.accept}"`;
     return `<input${nextAttrs}>`;
   });
-  html = html.replace(
-    /<script id="new-tool-android-picker">[\s\S]*?<\/script>/gi,
-    ""
-  );
+
+  if (!html.includes(`id="${tool.inputId}"`) || !html.includes("data-targeted-android-picker")) {
+    throw new Error(`${tool.page}: targeted Android picker marker could not be installed`);
+  }
+
+  // Remove any older picker injected by an earlier build, then install only
+  // the targeted picker for this page.
+  html = html.replace(/<script id="new-tool-android-picker">[\\s\\S]*?<\\/script>/gi, "");
+  html = html.replace(/<script id="targeted-android-file-picker">[\\s\\S]*?<\\/script>/gi, "");
+  html = html.replace("</head>", pickerScript + "</head>");
+
   await writeFile(pagePath, html, "utf8");
 }
 
 console.log(
-  "Final new-tool strategy applied: one fingerprinted runtime entry per image tool plus native Android picker recovery. Existing working tools remain unchanged."
+  "Final new-tool strategy applied: fingerprinted runtime entries for all five image tools; targeted Android File System Access picker applied only to Photo Compressor and Sign PDF. Existing working tools remain unchanged."
 );
