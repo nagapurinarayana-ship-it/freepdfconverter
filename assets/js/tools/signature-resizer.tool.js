@@ -187,7 +187,7 @@ export function mount() {
           dimensions,
           mime,
           targetBytes,
-          cropMode: el.dimensionMode.value === "exact" && !el.keepAspect.checked ? "fill" : "contain",
+          cropMode: "contain",
           background,
           setProgress,
           progressStart: (index / files.length) * 75,
@@ -263,7 +263,13 @@ export function mount() {
   });
 
   controller.mount();
-  controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
+  updateDpiState();
+
+  const updateDpiState = () => {
+    const usesPhysicalUnits = controller.el.dimensionUnit.value === "mm" || controller.el.dimensionUnit.value === "cm";
+    controller.el.dpi.hidden = !usesPhysicalUnits;
+    controller.el.dpi.disabled = controller.el.dimensionMode.value === "original" || !usesPhysicalUnits;
+  };
 
   controller.el.targetSize.addEventListener("change", function () {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
@@ -271,10 +277,10 @@ export function mount() {
 
   controller.el.dimensionMode.addEventListener("change", function () {
     controller.el.dimensionUnit.disabled = controller.el.dimensionMode.value === "original";
-    controller.el.dpi.disabled = controller.el.dimensionMode.value !== "physical";
+    updateDpiState();
   });
 
   controller.el.dimensionUnit.addEventListener("change", function () {
-    controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
+    updateDpiState();
   });
 }
