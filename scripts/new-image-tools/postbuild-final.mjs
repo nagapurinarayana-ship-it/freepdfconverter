@@ -15,8 +15,8 @@ const NEW_IMAGE_TOOLS = [
 ];
 
 const NATIVE_PICKER_RECOVERY = new Map([
-  ["photo-compressor", { inputId: "imageFile", accept: "image/jpeg,image/png,image/webp" }],
-  ["signature-resizer", { inputId: "signatureFile", accept: "image/jpeg,image/png,image/webp" }]
+  ["photo-compressor", { inputId: "imageFile" }],
+  ["signature-resizer", { inputId: "signatureFile" }]
 ]);
 
 for (const tool of NEW_IMAGE_TOOLS) {
@@ -48,11 +48,6 @@ for (const tool of NEW_IMAGE_TOOLS) {
     ? `function start() {\n  if (!window.FreePDF) {\n    window.setTimeout(start, 0);\n    return;\n  }\n  import("/assets/js/tools/${fingerprintedModuleName}").then(function (module) {\n    module.mount();\n  }).catch(function (error) {\n    console.error("FreePDF tool bootstrap failed:", error);\n  });\n}\n\nif (document.readyState === "loading") {\n  document.addEventListener("DOMContentLoaded", start, { once: true });\n} else {\n  start();\n}\n`
     : `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
 
-  // Fingerprint the two affected entry files as well. They previously used a
-  // stable .entry.js URL, which allowed Android/Chrome/Cloudflare to reuse the
-  // old bootstrap from cache even after the runtime fix was deployed. A new
-  // entry URL on every source change guarantees the browser executes the new
-  // bootstrap. The other three tools keep their existing fingerprinted entry.
   const entryHash = createHash("sha256").update(entrySource).digest("hex").slice(0, 10);
   const entryName = `${tool.name}.entry.${entryHash}.js`;
   await writeFile(path.join(toolsDir, entryName), entrySource, "utf8");
@@ -87,8 +82,10 @@ for (const tool of NEW_IMAGE_TOOLS) {
       "i"
     );
     html = html.replace(inputPattern, (match, attrs) => {
-      let nextAttrs = attrs.replace(/\saccept=["'][^"']*["']/i, "");
-      nextAttrs += ` accept="${recovery.accept}" data-new-tool-picker="1"`;
+      // Android Chrome has been unreliable when these two new tools combine
+      // the native image accept filter with the picker. Keep the native input
+      // unrestricted and let ToolController perform the real file validation.
+      const nextAttrs = attrs.replace(/\saccept=["'][^"']*["']/i, "") + " data-new-tool-picker=\"1\"";
       return `<input${nextAttrs}>`;
     });
   }
