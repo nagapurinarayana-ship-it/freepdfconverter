@@ -54,13 +54,21 @@ if (entryMappings.length) {
 // import then reuses the failed module evaluation. Remove any eager tool-module
 // tags from the generated HTML; the stable entry loads the tool after
 // DOMContentLoaded, when the shared runtime is guaranteed to be initialized.
-const eagerToolModule = /\s*<script\s+type=["']module["']\s+src=["'][^"']*\/assets\/js\/tools\/[^"']+\.tool\.js["']><\/script>/gi;
-for (const file of await readdir(dist, { withFileTypes: true })) {
-  if (!file.isFile() || !file.name.endsWith(".html")) continue;
-  const full = path.join(dist, file.name);
-  const content = await readFile(full, "utf8");
-  const cleaned = content.replace(eagerToolModule, "");
-  if (cleaned !== content) await writeFile(full, cleaned, "utf8");
-}
+const eagerToolModule = /\s*<script\s+type=["']module["']\s+src=["'][^"']*assets\/js\/tools\/[^"']+\.tool\.js["']><\/script>/gi;
+let removedEagerToolModules = 0;
+const walkHtml = async (directory) => {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const full = path.join(directory, entry.name);
+    if (entry.isDirectory()) await walkHtml(full);
+    else if (entry.name.endsWith(".html")) {
+      const content = await readFile(full, "utf8");
+      const matches = content.match(eagerToolModule);
+      if (matches?.length) removedEagerToolModules += matches.length;
+      const cleaned = content.replace(eagerToolModule, "");
+      if (cleaned !== content) await writeFile(full, cleaned, "utf8");
+    }
+  }
+};
+await walkHtml(dist);
 
-console.log(`Added application-upload workflow cross-links and normalized ${entryMappings.length} image-tool entry scripts`);
+console.log(`Added application-upload workflow cross-links and normalized ${entryMappings.length} image-tool entry scripts; removed ${removedEagerToolModules} eager image-tool module tags`);
