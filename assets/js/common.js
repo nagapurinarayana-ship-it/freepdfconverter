@@ -118,6 +118,9 @@
     }
 
     function consume(files) {
+      // Do not mark the selection handled when Android/WebView temporarily
+      // reports an empty FileList. Later retry attempts must remain eligible
+      // to consume the real files returned by the native picker.
       if (handled || !files.length) return false;
       handled = true;
 
