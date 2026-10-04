@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const dist = path.join(process.cwd(), "dist");
@@ -13,4 +13,37 @@ if (!index.includes('id="application-upload-workflows"') && index.includes(marke
   await writeFile(indexPath, index, "utf8");
 }
 
-console.log("Added application-upload workflow cross-links to the production build");
+// Entry scripts are tiny stable bootstrap files. Keep their public URLs stable;
+// they dynamically import the fingerprinted tool module produced by the build.
+// This also keeps the generated HTML contract deterministic for the image tools.
+const toolsDir = path.join(dist, "assets/js/tools");
+const files = await readdir(toolsDir);
+const entryMappings = [];
+for (const file of files) {
+  const match = file.match(/^(.+)\.entry\.[a-f0-9]{10}\.js$/);
+  if (!match) continue;
+  const oldPath = `/assets/js/tools/${file}`;
+  const stableFile = `${match[1]}.entry.js`;
+  const stablePath = `/assets/js/tools/${stableFile}`;
+  await rename(path.join(toolsDir, file), path.join(toolsDir, stableFile));
+  entryMappings.push([oldPath, stablePath]);
+}
+
+if (entryMappings.length) {
+  const textFiles = [];
+  const walk = async (directory) => {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const full = path.join(directory, entry.name);
+      if (entry.isDirectory()) await walk(full);
+      else if (/\.(?:html|js|json|webmanifest)$/i.test(entry.name) || entry.name === "service-worker.js") textFiles.push(full);
+    }
+  };
+  await walk(dist);
+  for (const file of textFiles) {
+    let content = await readFile(file, "utf8");
+    for (const [oldPath, stablePath] of entryMappings) content = content.split(oldPath).join(stablePath);
+    await writeFile(file, content, "utf8");
+  }
+}
+
+console.log(`Added application-upload workflow cross-links and normalized ${entryMappings.length} image-tool entry scripts`);
