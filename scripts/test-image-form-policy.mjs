@@ -13,10 +13,7 @@ import {
   targetBytesFromSelection
 } from "../assets/js/core/image-form-policy.js";
 
-assert.deepEqual(
-  PHOTO_TARGET_PRESETS.map((item) => item.bytes),
-  [10240, 20480, 51200, 102400, 204800, 512000, 1048576, 2097152]
-);
+assert.deepEqual(PHOTO_TARGET_PRESETS.map((item) => item.bytes), [10240, 20480, 51200, 102400, 204800, 512000, 1048576, 2097152]);
 assert.equal(QUALITY_LADDER.length >= 10, true);
 assert.equal(WIDTH_LADDER.length >= 6, true);
 assert.equal(clampTargetKb("invalid"), 100);
@@ -33,58 +30,12 @@ assert.equal(reductionPercent(1000, 1200), 0);
 assert.equal(pixelsFromPhysical(35, "mm", 300), 413);
 assert.equal(pixelsFromPhysical(3.5, "cm", 300), 413);
 assert.equal(clampPixels(9000, 1600), 6000);
-assert.deepEqual(
-  resolveDimensions({
-    mode: "exact",
-    width: 35,
-    height: 45,
-    unit: "mm",
-    dpi: 300,
-    sourceWidth: 1200,
-    sourceHeight: 800,
-    keepAspect: true
-  }),
-  { width: 413, height: 531 }
-);
-assert.deepEqual(
-  resolveDimensions({
-    mode: "physical",
-    width: 2,
-    height: 2,
-    unit: "cm",
-    dpi: 300,
-    sourceWidth: 1200,
-    sourceHeight: 800,
-    keepAspect: true
-  }),
-  { width: 236, height: 236 }
-);
 
-assert.deepEqual(
-  resolveDimensions({
-    mode: "max-width",
-    width: 800,
-    height: 1200,
-    unit: "px",
-    dpi: 96,
-    sourceWidth: 1600,
-    sourceHeight: 1200,
-    keepAspect: true
-  }),
-  { width: 800, height: 600 }
-);
-assert.deepEqual(
-  resolveDimensions({
-    mode: "original",
-    width: 35,
-    height: 45,
-    unit: "mm",
-    dpi: 300,
-    sourceWidth: 1200,
-    sourceHeight: 800,
-    keepAspect: true
-  }),
-  { width: 1200, height: 800 }
-);
+assert.deepEqual(resolveDimensions({ mode: "exact", width: 35, height: 45, unit: "mm", dpi: 300, sourceWidth: 1200, sourceHeight: 800 }), { width: 413, height: 531 });
+assert.deepEqual(resolveDimensions({ mode: "exact", width: 35, height: 45, unit: "mm", dpi: 300, sourceWidth: 200, sourceHeight: 150 }), { width: 413, height: 531 });
+assert.deepEqual(resolveDimensions({ mode: "physical", width: 2, height: 2, unit: "cm", dpi: 300, sourceWidth: 1200, sourceHeight: 800 }), { width: 236, height: 236 });
+assert.deepEqual(resolveDimensions({ mode: "max-width", width: 800, height: 1200, unit: "px", dpi: 96, sourceWidth: 1600, sourceHeight: 1200 }), { width: 800, height: 600 });
+assert.deepEqual(resolveDimensions({ mode: "max-width", width: 800, height: 1200, unit: "px", dpi: 96, sourceWidth: 600, sourceHeight: 400 }), { width: 600, height: 400 });
+assert.deepEqual(resolveDimensions({ mode: "original", width: 35, height: 45, unit: "mm", dpi: 300, sourceWidth: 1200, sourceHeight: 800 }), { width: 1200, height: 800 });
 
-console.log("Image form policy tests passed: target presets, bounds, physical units, dimension resolution and compression math.");
+console.log("Image form policy tests passed: target presets, bounds, physical units, upscaling, dimension resolution and compression math.");
