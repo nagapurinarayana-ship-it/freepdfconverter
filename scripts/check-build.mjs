@@ -94,6 +94,11 @@ const wordPage = await readFile(path.join(dist, "tools/word-to-pdf.html"), "utf8
 if (!wordPage.includes(".doc") || !wordPage.includes(".docx")) failures.push("Word converter -> both legacy .doc and modern .docx inputs are not advertised");
 if (!wordPage.includes("Microsoft Word 97–2003")) failures.push("Word converter -> legacy Word 97-2003 support is missing");
 
+const coreAssets = await readdir(path.join(dist, "assets/js/core"));
+if (coreAssets.some((file) => /\.[a-f0-9]{10}\.(?:js|mjs)$/.test(file))) failures.push("build -> shared ESM core modules must remain at stable URLs");
+for (const coreFile of ["tool-controller.js", "image-tool-kit.js", "image-form-engine.js", "image-form-policy.js"]) {
+  if (!coreAssets.includes(coreFile)) failures.push("build -> stable shared ESM core module is missing: " + coreFile);
+}
 const jsAssets = await readdir(path.join(dist, "assets/js"));
 const wordJsAsset = jsAssets.find((file) => /^word-to-pdf\.[a-f0-9]{10}\.js$/.test(file));
 if (!wordJsAsset) failures.push("Word converter -> fingerprinted word-to-pdf script is missing");
