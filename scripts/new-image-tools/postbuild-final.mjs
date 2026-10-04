@@ -64,6 +64,14 @@ for (const tool of NEW_IMAGE_TOOLS) {
     await rm(path.join(toolsDir, entryFile), { force: true });
   }
 
+  // Source pages historically loaded both the tool module and the entry.
+  // After fingerprinting, keep exactly one runtime bootstrap to prevent stale
+  // direct-module requests and duplicate mounts.
+  html = html.replace(
+    new RegExp(`<script[^>]*src=["'][^"']*/${tool.name}\\.tool(?:\\.[a-f0-9]+)?\\.js["'][^>]*></script>`, "gi"),
+    ""
+  );
+
   html = html.replace(
     new RegExp(`<script[^>]*src=["'][^"']*/${tool.name}\\.entry(?:\\.[a-f0-9]+)?\\.js["'][^>]*></script>`, "gi"),
     `<script type="module" src="/assets/js/tools/${stableEntryName}"></script>`
@@ -91,11 +99,10 @@ for (const tool of NEW_TOOL_PICKER_PAGES) {
   );
   html = html.replace(inputPattern, (match, attrs) => {
     let nextAttrs = attrs.replace(/\sdata-new-tool-picker(?:=["'][^"']*["'])?/i, "");
-    // Chrome Android 142 had a production-only regression where the native
-    // media picker could return without firing the input change event. Keep
-    // these six new tools on the native input path, but mark them so common.js
-    // can recover the FileList on focus/visibility return. Remove accept from
-    // the native control; tool-level validation remains authoritative.
+    // Chrome Android can return from the native media picker without firing
+    // the input change event. Mark these inputs so common.js can recover the
+    // FileList on focus/visibility return. Tool-level validation remains the
+    // authority for supported file types.
     nextAttrs = nextAttrs.replace(/\saccept=["'][^"']*["']/i, "");
     nextAttrs += ' data-new-tool-picker="1"';
     return `<input${nextAttrs}>`;
@@ -108,5 +115,5 @@ for (const tool of NEW_TOOL_PICKER_PAGES) {
 }
 
 console.log(
-  "Final isolated strategy applied only to the five new image tools; native file-input handling preserved for the six new tools. Existing working tools remain unchanged."
+  "Final new-tool strategy applied: one fingerprinted runtime entry per image tool plus native Android picker recovery. Existing working tools remain unchanged."
 );
