@@ -73,7 +73,7 @@ for (const tool of NEW_IMAGE_TOOLS) {
     const imported = source.match(/from\\s*["']([^"']+)["']/)?.[1] || "";
     if (!new RegExp(`/${tool}\\\\.tool\\\\.[a-f0-9]{10}\\\\.js$`).test(imported)) {
       failures.push(`${tool}: fingerprinted entry does not statically import its fingerprinted tool module`);
-    } else if (!relativeFiles.includes(imported.replace(/^\\//, ""))) {
+    } else if (!relativeFiles.includes(imported.replace(/^\//, ""))) {
       failures.push(`${tool}: fingerprinted entry imports missing module ${imported}`);
     }
   }
