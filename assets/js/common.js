@@ -207,80 +207,6 @@
     };
   }
 
-  function appendPopularSearches() {
-    if (document.querySelector("[data-popular-pdf-searches]")) return;
-
-    var path = window.location.pathname;
-    var groups = {
-      organize: [
-        ["/tools/merge-pdf", "Merge PDF"],
-        ["/tools/split-pdf", "Split PDF"],
-        ["/tools/organize-pdf", "Organize PDF"],
-        ["/tools/rotate-pdf", "Rotate PDF"],
-        ["/tools/add-page-numbers", "Add page numbers"]
-      ],
-      convert: [
-        ["/tools/jpg-to-pdf", "JPG to PDF"],
-        ["/tools/pdf-to-image", "PDF to JPG / PNG"],
-        ["/tools/extract-pdf-text", "Extract PDF text"],
-        ["/tools/pdf-to-word", "PDF to Word"],
-        ["/tools/word-to-pdf", "Word to PDF"]
-      ],
-      privacy: [
-        ["/tools/unlock-pdf", "Unlock PDF"],
-        ["/tools/remove-pdf-metadata", "Remove PDF metadata"],
-        ["/guides/pdf-converter-without-upload", "PDF converter without upload"],
-        ["/guides/are-online-pdf-converters-safe", "Are online PDF converters safe?"],
-        ["/how-local-processing", "Local browser processing"]
-      ],
-      default: [
-        ["/tools/merge-pdf", "Merge PDF"],
-        ["/tools/split-pdf", "Split PDF"],
-        ["/tools/unlock-pdf", "Unlock PDF"],
-        ["/tools/jpg-to-pdf", "JPG to PDF"],
-        ["/tools/pdf-to-image", "PDF to JPG / PNG"],
-        ["/tools/pdf-to-word", "PDF to Word"],
-        ["/tools/word-to-pdf", "Word to PDF"],
-        ["/tools/organize-pdf", "Organize PDF"],
-        ["/tools/sign-pdf", "Sign PDF"],
-        ["/tools/protect-pdf", "Protect PDF"]
-      ]
-    };
-
-    var list = /merge|split|organize|rotate|page-numbers/.test(path)
-      ? groups.organize
-      : /jpg|image|extract-text/.test(path)
-        ? groups.convert
-        : /unlock|metadata|safe|without-upload|local-processing/.test(path)
-          ? groups.privacy
-          : groups.default;
-
-    var section = document.createElement("section");
-    section.className = "popular-searches-section";
-    section.dataset.popularPdfSearches = "1";
-    section.setAttribute("aria-labelledby", "popular-pdf-searches-title");
-
-    var links = list.map(function (item) {
-      return '<a class="popular-search-link" href="' + item[0] + '">' + item[1] + '<span aria-hidden="true">→</span></a>';
-    }).join("");
-
-    section.innerHTML =
-      '<div class="container content-narrow">' +
-        '<div class="search-links-card">' +
-          '<div class="search-links-head">' +
-            '<span class="eyebrow">Related workflows</span>' +
-            '<h2 id="popular-pdf-searches-title">Popular PDF tools &amp; guides</h2>' +
-            '<p>Jump directly to another common task without leaving the current workflow behind.</p>' +
-          '</div>' +
-          '<nav class="search-links-grid" aria-label="Related PDF tools and guides">' + links + '</nav>' +
-        '</div>' +
-      '</div>';
-
-    var footer = document.querySelector("footer");
-    if (footer && footer.parentNode) footer.parentNode.insertBefore(section, footer);
-    else document.body.appendChild(section);
-  }
-
   window.FreePDF = Object.freeze({
     MB: MB,
     formatBytes: formatBytes,
@@ -299,10 +225,6 @@
   document.querySelectorAll("[data-current-year]").forEach(function (node) {
     node.textContent = String(new Date().getFullYear());
   });
-
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", appendPopularSearches, { once: true });
-  else appendPopularSearches();
-
   if ("serviceWorker" in navigator && /^https?:$/.test(window.location.protocol)) {
     window.addEventListener("load", function () {
       navigator.serviceWorker.register("/service-worker.js").catch(function () {
