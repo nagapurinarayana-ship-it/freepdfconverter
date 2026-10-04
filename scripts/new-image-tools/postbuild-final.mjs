@@ -28,10 +28,6 @@ const files = await readdir(toolsDir);
 for (const tool of NEW_IMAGE_TOOLS) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
-
-  // The source page's direct tool module is removed by postbuild-image-tools.
-  // Keep the new-tool bootstrap isolated, but use a simple static module import
-  // rather than a second dynamic-import hop. This makes startup deterministic.
   const modulePath = path.join(toolsDir, `${tool.name}.tool.js`);
   const moduleSource = await readFile(modulePath, "utf8");
   const moduleHash = createHash("sha256").update(moduleSource).digest("hex").slice(0, 10);
@@ -81,11 +77,8 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(pagePath, html, "utf8");
 }
 
-// Do NOT override the native Android file picker here. Chrome Android has had
-// regressions around both media-picker filtering and File System Access API
-// flows. The six new tools should use the same proven native <input type=file>
-// contract as the existing working tools. Their controllers already receive a
-// stable File snapshot from common.js and perform their own type validation.
+// Preserve the native file-input contract for the six new tools. Do not install
+// Android-specific picker overrides or File System Access API bridges here.
 for (const tool of NEW_TOOL_PICKER_PAGES) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
@@ -94,11 +87,18 @@ for (const tool of NEW_TOOL_PICKER_PAGES) {
     "i"
   );
   html = html.replace(inputPattern, (match, attrs) => {
-    let nextAttrs = attrs.replace(/\\sdata-new-tool-picker(?:=["'][^"']*["'])?/i, "");
-    nextAttrs = nextAttrs.replace(/\\sdata-new-tool-accept=["'][^"']*["']/i, "");
+    let nextAttrs = attrs.replace(/\sdata-new-tool-picker(?:=["'][^"']*["'])?/i, "");
+    nextAttrs = nextAttrs.replace(/\sdata-new-tool-accept=["'][^"']*["']/i, "");
     return `<input${nextAttrs}>`;
   });
-  html = html.replace(/<script id="new-tool-android-picker">[\\s\\S]*?<\\/script>/gi, "");
+
+  // Remove any legacy picker bootstrap using a RegExp constructor so the
+  // postbuild script itself remains valid JavaScript under Node 22.
+  html = html.replace(
+    new RegExp('<script id="new-tool-android-picker">[\\s\\S]*?<\\/script>', "gi"),
+    ""
+  );
+
   await writeFile(pagePath, html, "utf8");
 }
 
