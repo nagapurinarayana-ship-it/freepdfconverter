@@ -44,16 +44,17 @@ for (const tool of NEW_IMAGE_TOOLS) {
   }
 
   const affectedTool = NATIVE_PICKER_RECOVERY.has(tool.name);
-  // IMPORTANT: the affected tools must use a dynamic import. A static import
-  // executes the tool module before this bootstrap's start() function runs,
-  // so waiting for window.FreePDF would not actually protect the module's
-  // top-level access to window.FreePDF on Android/slow loads.
   const entrySource = affectedTool
     ? `function start() {\n  if (!window.FreePDF) {\n    window.setTimeout(start, 0);\n    return;\n  }\n  import("/assets/js/tools/${fingerprintedModuleName}").then(function (module) {\n    module.mount();\n  }).catch(function (error) {\n    console.error("FreePDF tool bootstrap failed:", error);\n  });\n}\n\nif (document.readyState === "loading") {\n  document.addEventListener("DOMContentLoaded", start, { once: true });\n} else {\n  start();\n}\n`
     : `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
 
+  // Fingerprint the two affected entry files as well. They previously used a
+  // stable .entry.js URL, which allowed Android/Chrome/Cloudflare to reuse the
+  // old bootstrap from cache even after the runtime fix was deployed. A new
+  // entry URL on every source change guarantees the browser executes the new
+  // bootstrap. The other three tools keep their existing fingerprinted entry.
   const entryHash = createHash("sha256").update(entrySource).digest("hex").slice(0, 10);
-  const entryName = affectedTool ? `${tool.name}.entry.js` : `${tool.name}.entry.${entryHash}.js`;
+  const entryName = `${tool.name}.entry.${entryHash}.js`;
   await writeFile(path.join(toolsDir, entryName), entrySource, "utf8");
 
   const entryFiles = (await readdir(toolsDir)).filter((file) =>
@@ -105,4 +106,4 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(pagePath, html, "utf8");
 }
 
-console.log("Final new-tool strategy applied; Photo Compressor and Signature Resizer use dynamic bootstrap plus native picker recovery, while the other three image tools retain the existing entry contract. Existing working tools remain unchanged.");
+console.log("Final new-tool strategy applied; Photo Compressor and Signature Resizer use dynamic bootstrap plus native picker recovery with fingerprinted cache-busting entries, while the other three image tools retain the existing entry contract. Existing working tools remain unchanged.");
