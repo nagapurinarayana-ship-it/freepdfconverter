@@ -14,12 +14,12 @@ const NEW_IMAGE_TOOLS = [
 ];
 
 const NEW_TOOL_PICKER_PAGES = [
-  { page: "tools/sign-pdf.html", inputId: "pdfFile", accept: "application/pdf,.pdf" },
-  { page: "tools/photo-compressor.html", inputId: "imageFile", accept: "image/*" },
-  { page: "tools/signature-resizer.html", inputId: "signatureFile", accept: "image/*" },
-  { page: "tools/passport-id-photo-maker.html", inputId: "photoFile", accept: "image/*" },
-  { page: "tools/thumb-impression-resizer.html", inputId: "thumbFile", accept: "image/*" },
-  { page: "tools/handwritten-declaration-resizer.html", inputId: "declarationFile", accept: "image/*" }
+  { page: "tools/sign-pdf.html", inputId: "pdfFile", accept: "application/pdf,.pdf", description: "PDF files", mime: "application/pdf", extensions: [".pdf"] },
+  { page: "tools/photo-compressor.html", inputId: "imageFile", accept: "image/*", description: "Images", mime: "image/*", extensions: [".jpg", ".jpeg", ".png", ".webp"] },
+  { page: "tools/signature-resizer.html", inputId: "signatureFile", accept: "image/*", description: "Images", mime: "image/*", extensions: [".jpg", ".jpeg", ".png", ".webp"] },
+  { page: "tools/passport-id-photo-maker.html", inputId: "photoFile", accept: "image/*", description: "Images", mime: "image/*", extensions: [".jpg", ".jpeg", ".png", ".webp"] },
+  { page: "tools/thumb-impression-resizer.html", inputId: "thumbFile", accept: "image/*", description: "Images", mime: "image/*", extensions: [".jpg", ".jpeg", ".png", ".webp"] },
+  { page: "tools/handwritten-declaration-resizer.html", inputId: "declarationFile", accept: "image/*", description: "Images", mime: "image/*", extensions: [".jpg", ".jpeg", ".png", ".webp"] }
 ];
 
 const serviceWorkerPath = path.join(dist, "service-worker.js");
@@ -80,14 +80,17 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(pagePath, html, "utf8");
 }
 
-// Only the six new tools receive this mobile picker behavior. Existing tools
-// do not receive this marker or script and keep their proven picker unchanged.
-// IMPORTANT: do not remove accept on Android. Removing it routes Chromium to
-// the generic DocumentsUI, which can make image selection appear to succeed
-// visually but return no usable selection. Use a broad media accept instead:
-// image/* for image tools and application/pdf for Sign PDF. The tool's own
-// JavaScript validation remains authoritative for the supported formats.
-const pickerScript = `<script id="new-tool-android-picker">(function(){"use strict";var a=/Android/i.test(navigator.userAgent)&&/Chrome|Chromium|CriOS|EdgA|OPR/i.test(navigator.userAgent)&&!/Firefox|FxiOS/i.test(navigator.userAgent);if(!a)return;function f(){document.querySelectorAll('input[type="file"][data-new-tool-picker]').forEach(function(i){var t=i.getAttribute("data-new-tool-accept");if(t)i.setAttribute("accept",t);});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",f,{once:true});else f();}());</script>`;
+// Only the six new tools receive this picker behavior. Existing tools do not
+// receive this marker or script and keep their proven picker unchanged.
+// On browsers with File System Access support (including Chrome 132+ on
+// Android), use showOpenFilePicker() directly. This bypasses the Android
+// <input type=file> -> DocumentsUI FileList handoff that was returning an
+// empty FileList in the affected flow. The selected File objects are copied
+// into the existing input via DataTransfer and a normal change event is
+// dispatched, so the existing tool/controller validation remains unchanged.
+// Unsupported browsers keep the normal input picker as a fallback.
+const pickerScript = `<script id="new-tool-android-picker">(function(){"use strict";function init(){document.querySelectorAll('input[type="file"][data-new-tool-picker]').forEach(function(input){if(input.dataset.newToolPickerBound)return;input.dataset.newToolPickerBound="1";var label=document.querySelector('label[for="'+input.id+'"]');var accept=input.getAttribute("data-new-tool-accept")||input.getAttribute("accept")||"";var isPdf=/pdf/i.test(accept);var pickerSupported=typeof window.showOpenFilePicker==="function";if(accept)input.setAttribute("accept",accept);if(!pickerSupported||!label)return;label.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();(async function(){try{var options={multiple:input.hasAttribute("multiple"),excludeAcceptAllOption:true,types:[{description:isPdf?"PDF files":"Images",accept:isPdf?{"application/pdf":[".pdf"]}:{"image/jpeg":[".jpg",".jpeg"],"image/png":[".png"],"image/webp":[".webp"]}}]};var handles=await window.showOpenFilePicker(options);var files=await Promise.all(handles.map(function(handle){return handle.getFile();}));if(!files.length)return;var transfer=new DataTransfer();files.forEach(function(file){transfer.items.add(file);});input.files=transfer.files;input.dispatchEvent(new Event("change",{bubbles:true}));}catch(error){if(error&&error.name==="AbortError")return;console.error("FreePDF native file picker failed",error);try{input.click();}catch(_){} }})();});});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();}());</script>`;
+
 for (const tool of NEW_TOOL_PICKER_PAGES) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
@@ -119,5 +122,5 @@ for (const tool of NEW_TOOL_PICKER_PAGES) {
 }
 
 console.log(
-  "Final new-tool strategy applied to all five new image tools; Android-safe native file-picker handling applied only to the six new tools with broad media accept types. Existing working tools remain unchanged."
+  "Final new-tool strategy applied to all five new image tools; File System Access picker applied only to the six new tools. Existing working tools remain unchanged."
 );
