@@ -275,14 +275,14 @@ export function mount() {
     }
   });
 
-  controller.mount();
-  updateDpiState();
-
   const updateDpiState = () => {
     const usesPhysicalUnits = controller.el.dimensionUnit.value === "mm" || controller.el.dimensionUnit.value === "cm";
     controller.el.dpi.hidden = !usesPhysicalUnits;
     controller.el.dpi.disabled = controller.el.dimensionMode.value === "original" || !usesPhysicalUnits;
   };
+
+  controller.mount();
+  updateDpiState();
 
   controller.el.targetSize.addEventListener("change", () => {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
