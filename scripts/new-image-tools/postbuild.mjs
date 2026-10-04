@@ -37,12 +37,10 @@ for (const tool of NEW_IMAGE_TOOLS) {
 
   if (entryMatches.length !== 1) {
     throw new Error(
-      `${tool.name}: expected exactly one fingerprinted entry script in ${tool.page}, found ${entryMatches.length}`
+      `${tool.name}: expected exactly one fingerprinted entry module script in ${tool.page}, found ${entryMatches.length}`
     );
   }
 
-  const entrySrc = entryMatches[0][1];
-  html = html.replace(entryPattern, `<script src="${entrySrc}" defer></script>`);
   normalizedEntryScripts += 1;
 
   if (html.includes(`/assets/js/tools/${tool.name}.entry.js`) ||
