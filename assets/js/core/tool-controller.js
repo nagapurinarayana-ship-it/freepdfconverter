@@ -32,21 +32,28 @@ export class ToolController {
   }
 
   bindDropZone() {
-    // Keep all ToolController-based tools on the same shared picker contract
-    // as the proven Image → PDF tool. The shared picker owns native input
-    // quirks; ToolController only consumes the resulting File objects.
+    const zone = this.el.zone;
+    const input = this.el.input;
+
+    // Photo Compressor and Signature Resizer need an isolated Android picker
+    // lifecycle. Do not route these two inputs through the shared recovery
+    // implementation because Android Chrome can silently return from the native
+    // media picker without dispatching change. We keep the workaround scoped to
+    // these two new tools and leave every other ToolController tool untouched.
+    if (input && (input.id === "imageFile" || input.id === "signatureFile")) {
+      this.bindIsolatedAndroidPicker(zone, input);
+      return;
+    }
+
     if (typeof window.FreePDF?.bindDropZone === "function") {
       window.FreePDF.bindDropZone(
-        this.el.zone,
-        this.el.input,
+        zone,
+        input,
         (files) => this.select(files)
       );
       return;
     }
 
-    // Defensive fallback if common.js has not initialized yet.
-    const zone = this.el.zone;
-    const input = this.el.input;
     zone.addEventListener("drop", (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -55,6 +62,98 @@ export class ToolController {
     input.addEventListener("change", () => {
       const files = Array.from(input.files || []);
       if (files.length) this.select(files);
+    });
+  }
+
+  bindIsolatedAndroidPicker(zone, input) {
+    ["dragenter", "dragover"].forEach((name) => {
+      zone.addEventListener(name, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        zone.classList.add("is-dragging");
+      });
+    });
+
+    ["dragleave", "drop"].forEach((name) => {
+      zone.addEventListener(name, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        zone.classList.remove("is-dragging");
+      });
+    });
+
+    zone.addEventListener("drop", (event) => {
+      this.select(Array.from(event.dataTransfer?.files || []));
+    });
+
+    let handled = false;
+    let timer = null;
+    let startedAt = 0;
+
+    const readFiles = () => Array.from(input.files || []);
+
+    const stopPolling = () => {
+      if (timer !== null) {
+        window.clearTimeout(timer);
+        timer = null;
+      }
+    };
+
+    const consume = () => {
+      if (handled) return true;
+      const files = readFiles();
+      if (!files.length) return false;
+      handled = true;
+      stopPolling();
+      Promise.resolve(this.select(files)).catch(() => {});
+      return true;
+    };
+
+    const poll = () => {
+      timer = null;
+      if (handled) return;
+      if (consume()) return;
+      if (Date.now() - startedAt < 10000) {
+        timer = window.setTimeout(poll, 100);
+      }
+    };
+
+    const startPolling = () => {
+      stopPolling();
+      if (handled) return;
+      startedAt = Date.now();
+      poll();
+    };
+
+    const openPicker = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      handled = false;
+      stopPolling();
+      try { input.value = ""; } catch (_) {}
+      // Keep the native picker invocation directly inside the user gesture.
+      // This avoids label activation differences seen on Android Chrome.
+      input.click();
+      startPolling();
+    };
+
+    const trigger = document.querySelector('label[for="' + input.id + '"]');
+    if (trigger) trigger.addEventListener("click", openPicker);
+
+    input.addEventListener("change", () => {
+      consume();
+    });
+
+    window.addEventListener("focus", () => {
+      if (!handled) startPolling();
+    });
+
+    window.addEventListener("pageshow", () => {
+      if (!handled) startPolling();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible" && !handled) startPolling();
     });
   }
 
