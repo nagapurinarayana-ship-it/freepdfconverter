@@ -64,7 +64,7 @@ for (const tool of NEW_IMAGE_TOOLS) {
 
   const entryHtmlMatches = html.match(
     new RegExp(
-      String.raw`<script[^>]*${tool.name}\\.entry\\.[a-f0-9]{10}\\.js[^>]*></script>`,
+      "<script[^>]*" + tool.name + "\\.entry\\.[a-f0-9]{10}\\.js[^>]*></script>",
       "gi"
     )
   ) || [];
@@ -77,7 +77,7 @@ for (const tool of NEW_IMAGE_TOOLS) {
 
   const directHtmlMatches = html.match(
     new RegExp(
-      String.raw`<script[^>]*${tool.name}\\.tool\\.[a-f0-9]{10}\\.js[^>]*></script>`,
+      "<script[^>]*" + tool.name + "\\.tool\\.[a-f0-9]{10}\\.js[^>]*></script>",
       "gi"
     )
   ) || [];
