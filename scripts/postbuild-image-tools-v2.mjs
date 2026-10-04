@@ -13,15 +13,9 @@ if (!index.includes('id="application-upload-workflows"') && index.includes(marke
   await writeFile(indexPath, index, "utf8");
 }
 
-// V2 loading contract:
-// 1. Never rename a fingerprinted image-tool asset to a stable URL.
-// 2. HTML points to the fingerprinted entry bootstrap.
-// 3. The entry bootstrap dynamically imports the fingerprinted tool module.
-// 4. No HTML page may execute the tool module directly.
-// 5. Build fails if any of those invariants are broken.
-//
-// This intentionally does not depend on the previous stable-entry/service-worker
-// workaround. Every deployment gets a new immutable URL for both layers.
+// V2 is deliberately independent of the previous stable-entry workaround.
+// Every deployment keeps both image-tool layers immutable and fingerprinted:
+// HTML -> fingerprinted entry -> fingerprinted tool module.
 const imageTools = [
   "photo-compressor",
   "signature-resizer",
@@ -60,19 +54,25 @@ for (const file of htmlFiles) {
   let html = await readFile(file, "utf8");
 
   for (const tool of imageTools) {
-    const directModule = new RegExp('<script\\s+type=["\\']module["\\']\\s+src=["\\'][^"\\']*/' + tool.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&") + '\\.tool(?:\\.[a-f0-9]{10})?\\.js["\\']><\\/script>', "gi");
-    const matches = html.match(directModule);
-    if (matches?.length) {
-      removedDirectModules += matches.length;
+    const directModule = new RegExp(
+      `<script\\s+type=["']module["']\\s+src=["'][^"']*/${tool}\\.tool(?:\\.[a-f0-9]{10})?\\.js["']\\s*><\\/script>`,
+      "gi"
+    );
+    const directMatches = html.match(directModule);
+    if (directMatches?.length) {
+      removedDirectModules += directMatches.length;
       html = html.replace(directModule, "");
     }
 
-    const entryPattern = new RegExp('<script\\s+(?:type=["\\']module["\\']\\s+)?src=["\\']([^"\\']*/' + tool.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&") + '\\.entry\\.[a-f0-9]{10}\\.js)["\\'](?:\\s+defer)?\\s*><\\/script>', "gi");
+    const entryPattern = new RegExp(
+      `<script\\s+(?:type=["']module["']\\s+)?src=["']([^"']*/${tool}\\.entry\\.[a-f0-9]{10}\\.js)["'](?:\\s+defer)?\\s*><\\/script>`,
+      "gi"
+    );
     const entryMatches = [...html.matchAll(entryPattern)];
     if (entryMatches.length > 1) failures.push(`${relative(file)} contains multiple ${tool} fingerprinted entry scripts`);
     if (entryMatches.length === 1) {
       const src = entryMatches[0][1];
-      html = html.replace(entryPattern, '<script src="' + src + '" defer></script>');
+      html = html.replace(entryPattern, `<script src="${src}" defer></script>`);
       normalizedEntries += 1;
     }
   }
@@ -80,35 +80,29 @@ for (const file of htmlFiles) {
   await writeFile(file, html, "utf8");
 }
 
+const htmlText = await Promise.all(htmlFiles.map((file) => readFile(file, "utf8")));
+
 for (const tool of imageTools) {
-  const entrySuffix = `/assets/js/tools/${tool}.entry.`;
-  const moduleSuffix = `/assets/js/tools/${tool}.tool.`;
-  const entries = [...assetNames].filter((name) => name.startsWith(entrySuffix) && name.endsWith(".js"));
-  const modules = [...assetNames].filter((name) => name.startsWith(moduleSuffix) && name.endsWith(".js"));
+  const entries = [...assetNames].filter((name) => name.startsWith(`/assets/js/tools/${tool}.entry.`) && name.endsWith(".js"));
+  const modules = [...assetNames].filter((name) => name.startsWith(`/assets/js/tools/${tool}.tool.`) && name.endsWith(".js"));
 
   if (entries.length !== 1) failures.push(`${tool}: expected exactly one fingerprinted entry asset, found ${entries.length}`);
   if (modules.length !== 1) failures.push(`${tool}: expected exactly one fingerprinted tool asset, found ${modules.length}`);
 
-  const stableEntry = `/assets/js/tools/${tool}.entry.js`;
-  const stableModule = `/assets/js/tools/${tool}.tool.js`;
-  if (assetNames.has(stableEntry)) failures.push(`${tool}: stable entry asset still exists at ${stableEntry}`);
-  if (assetNames.has(stableModule)) failures.push(`${tool}: stable tool asset still exists at ${stableModule}`);
+  if (assetNames.has(`/assets/js/tools/${tool}.entry.js`)) failures.push(`${tool}: stable entry asset still exists`);
+  if (assetNames.has(`/assets/js/tools/${tool}.tool.js`)) failures.push(`${tool}: stable tool asset still exists`);
 
   if (entries.length === 1) {
     const entryPath = path.join(dist, entries[0].slice(1));
     const entry = await readFile(entryPath, "utf8");
-    const imported = entry.match(/import\\(["']([^"']+)["']\\)/)?.[1] || "";
-    if (!imported.includes(`${tool}.tool.`) || !/\\.tool\\.[a-f0-9]{10}\\.js$/.test(imported)) {
-      failures.push(`${tool}: fingerprinted entry does not import a fingerprinted tool module (got ${imported || "no dynamic import"})`);
+    const imported = entry.match(/import\(["']([^"']+)["']\)/)?.[1] || "";
+    if (!imported.endsWith(".js") || !imported.includes(`${tool}.tool.`) || !/\.tool\.[a-f0-9]{10}\.js$/.test(imported)) {
+      failures.push(`${tool}: entry does not dynamically import a fingerprinted tool module (got ${imported || "none"})`);
     }
   }
 
-  const escaped = tool.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&");
-  const htmlReference = new RegExp(`/assets/js/tools/${escaped}\\.entry\\.[a-f0-9]{10}\\.js`);
-  const referenced = htmlFiles.some(async () => false);
-  void referenced;
-  const htmlText = await Promise.all(htmlFiles.map((file) => readFile(file, "utf8")));
-  if (!htmlText.some((text) => htmlReference.test(text))) failures.push(`${tool}: no HTML page references the fingerprinted entry`);
+  const htmlReference = new RegExp(`/assets/js/tools/${tool}\\.entry\\.[a-f0-9]{10}\\.js`);
+  if (!htmlText.some((text) => htmlReference.test(text))) failures.push(`${tool}: no HTML page references its fingerprinted entry`);
 }
 
 if (failures.length) {
