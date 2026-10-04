@@ -14,6 +14,11 @@ const NEW_IMAGE_TOOLS = [
   { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
 ];
 
+// build.mjs creates the service-worker precache list and tool-runtime map
+// before this postbuild creates the final second-level tool-module hashes.
+// Reconcile those URL changes across every generated text asset at the end.
+const assetReplacements = [];
+
 for (const tool of NEW_IMAGE_TOOLS) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
