@@ -161,9 +161,30 @@ async function ensureGlobalUiAssets(rootDirectory) {
     if (!hasCommon) additions.push('<script src="/assets/js/common.js" defer></script>');
     if (!hasMonetization) additions.push('<script src="/assets/js/monetization-config.js" defer></script>');
     if (!hasAds) additions.push('<script src="/assets/js/ads.js" defer></script>');
-    if (!additions.length) continue;
     if (!/<head[\s\S]*<\/head>/i.test(html)) continue;
-    html = html.replace("</head>", additions.join("\n") + "\n</head>");
+    if (additions.length) html = html.replace("</head>", additions.join("\n") + "\n</head>");
+
+    // Standardize monetization placement without duplicating existing zones.
+    // Homepage and tool templates already contain their purpose-built ad slots.
+    // Smaller pages get a top banner after the shell and one native slot before
+    // the footer, keeping the page useful while preserving strong viewability.
+    const hasTopAd = /data-ad-zone=["']top["']/i.test(html);
+    const hasFooterAd = /data-ad-zone=["']footer["']/i.test(html);
+
+    if (!hasTopAd && /<\/header>/i.test(html)) {
+      html = html.replace(
+        /(<\/header>)/i,
+        '$1<div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>'
+      );
+    }
+
+    if (!hasFooterAd && /<\/main>/i.test(html)) {
+      html = html.replace(
+        /(<\/main>)/i,
+        '$1<div class="container"><div class="ad-container ad-container-footer" data-ad-zone="footer" aria-label="Advertisement"></div></div>'
+      );
+    }
+
     await writeFile(file, html, "utf8");
   }
 }
