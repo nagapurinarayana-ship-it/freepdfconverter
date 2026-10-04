@@ -76,7 +76,6 @@ for (const tool of NEW_IMAGE_TOOLS) {
     } else if (!relativeFiles.includes(imported.replace(/^\\//, ""))) {
       failures.push(`${tool}: fingerprinted entry imports missing module ${imported}`);
     }
-    }
   }
 }
 
@@ -85,7 +84,6 @@ for (const [page, inputId] of NEW_TOOL_PICKER_PAGES) {
   if (!html.includes(`id="${inputId}"`)) failures.push(`${page}: picker input missing`);
   if (/data-new-tool-picker|data-targeted-android-picker|id="new-tool-android-picker"|id="targeted-android-file-picker"/i.test(html)) {
     failures.push(`${page}: legacy/custom Android picker hook leaked into generated HTML`);
-  }
   }
 }
 
