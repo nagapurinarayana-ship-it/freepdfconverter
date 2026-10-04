@@ -15,7 +15,7 @@ const MAX_TOTAL_BYTES = 100 * MB;
 
 const PRESETS = Object.freeze({
   "35x45": { width: 35, height: 45, unit: "mm", dpi: 300, label: "35 × 45 mm" },
-  "2x2": { width: 51, height: 51, unit: "mm", dpi: 300, label: "2 × 2 in / 51 × 51 mm" },
+  "2x2": { width: 50.8, height: 50.8, unit: "mm", dpi: 300, label: "2 × 2 in / 50.8 × 50.8 mm" },
   "35x35": { width: 35, height: 35, unit: "mm", dpi: 300, label: "35 × 35 mm" }
 });
 
