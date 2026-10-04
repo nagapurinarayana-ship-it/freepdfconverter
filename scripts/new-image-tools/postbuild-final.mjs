@@ -91,7 +91,13 @@ for (const tool of NEW_TOOL_PICKER_PAGES) {
   );
   html = html.replace(inputPattern, (match, attrs) => {
     let nextAttrs = attrs.replace(/\sdata-new-tool-picker(?:=["'][^"']*["'])?/i, "");
-    nextAttrs = nextAttrs.replace(/\sdata-new-tool-accept=["'][^"']*["']/i, "");
+    // Chrome Android 142 had a production-only regression where the native
+    // media picker could return without firing the input change event. Keep
+    // these six new tools on the native input path, but mark them so common.js
+    // can recover the FileList on focus/visibility return. Remove accept from
+    // the native control; tool-level validation remains authoritative.
+    nextAttrs = nextAttrs.replace(/\saccept=["'][^"']*["']/i, "");
+    nextAttrs += ' data-new-tool-picker="1"';
     return `<input${nextAttrs}>`;
   });
   html = html.replace(
