@@ -256,8 +256,16 @@ async function fingerprintAssets() {
   const docjsRoot = path.join(assetRoot, "vendor", "docjs") + path.sep;
   const tesseractRoot = path.join(assetRoot, "vendor", "tesseract") + path.sep;
   const jszipRoot = path.join(assetRoot, "vendor", "jszip") + path.sep;
+  const coreRoot = path.join(assetRoot, "js", "core") + path.sep;
+  // Tool modules are fingerprinted, but their ESM dependency graph uses
+  // relative imports into the shared core. Keep that shared core at stable
+  // URLs so native browser module resolution remains valid after hashing.
   const applicationTargets = (await walk(assetRoot)).filter((file) =>
-    /\.(?:css|js|mjs|wasm)$/i.test(file) && !file.startsWith(docjsRoot) && !file.startsWith(tesseractRoot) && !file.startsWith(jszipRoot)
+    /\.(?:css|js|mjs|wasm)$/i.test(file) &&
+    !file.startsWith(docjsRoot) &&
+    !file.startsWith(tesseractRoot) &&
+    !file.startsWith(jszipRoot) &&
+    !file.startsWith(coreRoot)
   );
   return fingerprintGroup(applicationTargets);
 }
