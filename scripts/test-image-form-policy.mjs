@@ -22,7 +22,7 @@ assert.equal(WIDTH_LADDER.length >= 6, true);
 assert.equal(clampTargetKb("invalid"), 100);
 assert.equal(clampTargetKb(1), CUSTOM_TARGET_KB.min);
 assert.equal(clampTargetKb(60000), CUSTOM_TARGET_KB.max);
-assert.equal(targetBytesFromSelection("204800", 100), 204800);
+assert.equal(targetBytesFromSelection("200", 100), 200 * 1024);
 assert.equal(targetBytesFromSelection("custom", 25), 25 * 1024);
 assert.equal(isTargetReached(100000, 100000), true);
 assert.equal(isTargetReached(100001, 100000), false);
