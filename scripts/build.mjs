@@ -158,7 +158,7 @@ async function ensureGlobalUiAssets(rootDirectory) {
     if (!hasStyles) additions.push('<link rel="stylesheet" href="/assets/css/styles.css">');
     if (!hasCommon) additions.push('<script src="/assets/js/common.js" defer></script>');
     if (!additions.length) continue;
-    if (!/<head[\\s\\S]*<\\/head>/i.test(html)) continue;
+    if (!/<head[\s\S]*<\/head>/i.test(html)) continue;
     html = html.replace("</head>", additions.join("\n") + "\n</head>");
     await writeFile(file, html, "utf8");
   }
