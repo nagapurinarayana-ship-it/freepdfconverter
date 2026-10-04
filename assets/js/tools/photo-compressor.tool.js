@@ -247,8 +247,16 @@ export function mount() {
     controller.el.dpi.disabled = controller.el.dimensionMode.value === "original" || !usesPhysicalUnits;
   };
 
+  const syncBackgroundOption = () => {
+    const keepOption = Array.from(controller.el.background.options).find((option) => option.value === "keep");
+    const supportsAlpha = controller.el.outputFormat.value !== "image/jpeg";
+    if (keepOption) keepOption.disabled = !supportsAlpha;
+    if (!supportsAlpha && controller.el.background.value === "keep") controller.el.background.value = "white";
+  };
+
   controller.mount();
   updateDpiState();
+  syncBackgroundOption();
 
   controller.el.targetSize.addEventListener("change", function () {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
@@ -265,5 +273,8 @@ export function mount() {
 
   controller.el.dimensionUnit.addEventListener("change", function () {
     updateDpiState();
+  });
+  controller.el.outputFormat.addEventListener("change", function () {
+    syncBackgroundOption();
   });
 }
