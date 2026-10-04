@@ -4,18 +4,14 @@ import path from "node:path";
 const dist = path.join(process.cwd(), "dist");
 const toolsDir = path.join(dist, "assets/js/tools");
 
-// These six are NEW and must never be touched by the legacy compatibility path.
+// ONLY the three new image tools are excluded from legacy compatibility.
+// All existing/working tools keep the previous loader contract.
 const NEW_TOOLS = new Set([
   "photo-compressor",
   "signature-resizer",
-  "passport-id-photo-maker",
-  "thumb-impression-resizer",
-  "handwritten-declaration-resizer",
-  "sign-pdf"
+  "thumb-impression-resizer"
 ]);
 
-// Preserve the existing production behavior for every OTHER tool exactly as the
-// old postbuild did: stable entry URL + classic defer + direct module removal.
 const files = await readdir(toolsDir);
 const entryMappings = [];
 
@@ -26,6 +22,7 @@ for (const file of files) {
   const oldPath = `/assets/js/tools/${file}`;
   const stableFile = `${match[1]}.entry.js`;
   const stablePath = `/assets/js/tools/${stableFile}`;
+
   await rename(path.join(toolsDir, file), path.join(toolsDir, stableFile));
   entryMappings.push([oldPath, stablePath]);
 }
@@ -41,6 +38,7 @@ if (entryMappings.length) {
       }
     }
   };
+
   await walk(dist);
 
   for (const file of textFiles) {
@@ -50,13 +48,7 @@ if (entryMappings.length) {
     }
     await writeFile(file, content, "utf8");
   }
-}
 
-const legacyToolNames = entryMappings.map(([_, stablePath]) =>
-  path.basename(stablePath).replace(/\.entry\.js$/, "")
-);
-
-if (legacyToolNames.length) {
   const htmlFiles = [];
   const walkHtml = async (directory) => {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -66,6 +58,10 @@ if (legacyToolNames.length) {
     }
   };
   await walkHtml(dist);
+
+  const legacyToolNames = entryMappings.map(([_, stablePath]) =>
+    path.basename(stablePath).replace(/\.entry\.js$/, "")
+  );
 
   for (const file of htmlFiles) {
     let html = await readFile(file, "utf8");
@@ -99,5 +95,5 @@ if (legacyToolNames.length) {
 }
 
 console.log(
-  `Legacy loader compatibility preserved for ${legacyToolNames.length} non-new tools. New tools excluded: ${[...NEW_TOOLS].join(", ")}.`
+  `Legacy loader compatibility preserved for existing tools. New isolated tools excluded: ${[...NEW_TOOLS].join(", ")}.`
 );
