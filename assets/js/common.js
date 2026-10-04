@@ -9,12 +9,12 @@
     if (!nav || !logo) return;
 
     var path = window.location.pathname.replace(/\\/+$/, "") || "/";
-    var section = path === "/" || /^\\/(([^/]+)\\.html)?$/.test(path) ? "all" :
+    var section = path === "/" ? "all" :
       path.indexOf("/guides/") === 0 ? "guides" :
       path.indexOf("/topics/") === 0 ? "topics" :
       path === "/privacy" || path === "/privacy.html" ? "privacy" :
       path === "/about" || path === "/about.html" ? "about" :
-      path.indexOf("/tools/") === 0 ? "all" : "";
+      path.indexOf("/tools/") === 0 ? "all" : "all";
 
     logo.setAttribute("href", "/");
     logo.setAttribute("aria-label", "FreePDF Tools home");
