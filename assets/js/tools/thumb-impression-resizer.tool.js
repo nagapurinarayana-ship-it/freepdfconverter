@@ -291,11 +291,23 @@ export function mount() {
     }
   });
 
+  const syncBackgroundOption = () => {
+    const transparentOption = Array.from(controller.el.background.options).find((option) => option.value === "transparent");
+    const supportsAlpha = controller.el.format.value !== "image/jpeg";
+    if (transparentOption) transparentOption.disabled = !supportsAlpha;
+    if (!supportsAlpha && controller.el.background.value === "transparent") controller.el.background.value = "white";
+  };
+
   controller.mount();
+  syncBackgroundOption();
 
   controller.el.preset.addEventListener("change", () => updateCustomFields(controller.el));
   controller.el.targetSize.addEventListener("change", () => {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
   });
+  controller.el.format.addEventListener("change", () => {
+    syncBackgroundOption();
+  });
+
   updateCustomFields(controller.el);
 }
