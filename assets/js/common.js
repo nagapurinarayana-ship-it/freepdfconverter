@@ -108,7 +108,10 @@
   function bindFileInput(input, onFiles) {
     var handled = false;
     var retryDelays = [0, 40, 120, 300, 600];
-    var pickerRecoveryEnabled = input.hasAttribute("data-new-tool-picker");
+    // The two affected new image tools need the Android recovery path even
+    // when postbuild has removed the temporary picker marker. Keep this
+    // scoped by input id so proven tools retain their existing behaviour.
+    var pickerRecoveryEnabled = input.hasAttribute("data-new-tool-picker") || input.id === "imageFile" || input.id === "signatureFile";
     var recoveryTimer = null;
     var recoveryStartedAt = 0;
 
