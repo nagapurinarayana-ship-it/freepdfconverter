@@ -8,7 +8,7 @@
     var logo = header.querySelector(".logo");
     if (!nav || !logo) return;
 
-    var path = window.location.pathname.replace(/\\/+$/, "") || "/";
+    var path = window.location.pathname.replace(/\/+$/, "") || "/";
     var section = path === "/" ? "all" :
       path.indexOf("/guides/") === 0 ? "guides" :
       path.indexOf("/topics/") === 0 ? "topics" :
