@@ -31,8 +31,11 @@ export function clampTargetKb(value) {
 
 export function targetBytesFromSelection(value, customKb) {
   if (value === "custom") return clampTargetKb(customKb) * KB;
+
   const numeric = Number(value);
-  return Number.isFinite(numeric) && numeric > 0 ? Math.round(numeric) : 100 * KB;
+  // The UI values are expressed in KB, including 1024 = 1 MB and 2048 = 2 MB.
+  // Convert the selected KB value to bytes before handing it to the encoder.
+  return Number.isFinite(numeric) && numeric > 0 ? Math.round(numeric * KB) : 100 * KB;
 }
 
 export function reductionPercent(inputBytes, outputBytes) {
