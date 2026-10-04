@@ -16,9 +16,8 @@ const NEW_IMAGE_TOOLS = [
 
 // Keep the new tools isolated from the existing loader, but use the same
 // proven native <input type=file> flow as the working new tools.
-// Photo Compressor and Signature Resizer additionally use a stable bootstrap
-// URL because their bootstrap must never be served from an older service-worker
-// cache after deployment. Their actual tool modules remain fingerprinted.
+// Photo Compressor and Signature Resizer use a stable bootstrap so the
+// service worker cannot serve an obsolete entry point after deployment.
 for (const tool of NEW_IMAGE_TOOLS) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
@@ -47,9 +46,11 @@ for (const tool of NEW_IMAGE_TOOLS) {
     await rm(path.join(toolsDir, oldModule), { force: true });
   }
 
-  const entrySource = `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
-  const entryHash = createHash("sha256").update(entrySource).digest("hex").slice(0, 10);
   const useStableEntry = tool.name === "photo-compressor" || tool.name === "signature-resizer";
+  const entrySource = useStableEntry
+    ? `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\n\nfunction start() {\n  if (window.FreePDF && typeof window.FreePDF.bindDropZone === "function") {\n    mount();\n    return;\n  }\n  window.setTimeout(start, 0);\n}\n\nif (document.readyState === "loading") {\n  document.addEventListener("DOMContentLoaded", start, { once: true });\n} else {\n  start();\n}\n`
+    : `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
+  const entryHash = createHash("sha256").update(entrySource).digest("hex").slice(0, 10);
   const stableEntryName = useStableEntry
     ? `${tool.name}.entry.js`
     : `${tool.name}.entry.${entryHash}.js`;
@@ -96,5 +97,5 @@ for (const tool of NEW_IMAGE_TOOLS) {
 }
 
 console.log(
-  "Final isolated new-tool strategy applied to the five new image tools; Photo Compressor and Signature Resizer use stable network-first bootstraps, while the other new tools retain their existing fingerprinted entries. Existing working tools remain unchanged."
+  "Final isolated new-tool strategy applied to the five new image tools; Photo Compressor and Signature Resizer use stable guarded bootstraps, while the other new tools retain their existing fingerprinted entries. Existing working tools remain unchanged."
 );
