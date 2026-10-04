@@ -1,18 +1,15 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, rm } from "node:fs/promises";
 import path from "node:path";
 
 const dist = path.join(process.cwd(), "dist");
 
-// ONLY new image tools. Existing working tools are intentionally excluded.
+// New tools only. Existing working tools are intentionally excluded.
 const NEW_IMAGE_TOOLS = [
   { name: "photo-compressor", page: "tools/photo-compressor.html" },
   { name: "signature-resizer", page: "tools/signature-resizer.html" },
-  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" },
-  { name: "passport-id-photo-maker", page: "tools/passport-id-photo-maker.html" },
-  { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
+  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" }
 ];
 
-const fingerprint = "[a-f0-9]{10}";
 let verifiedEntryScripts = 0;
 let removedDirectModules = 0;
 
@@ -44,47 +41,56 @@ for (const tool of NEW_IMAGE_TOOLS) {
     );
   }
 
-  if (tool.name === "thumb-impression-resizer") {
-    const entrySrc = entryMatches[0][1];
-    const entryRelative = entrySrc.replace(/^\\//, "");
-    const entryFile = path.join(dist, entryRelative);
-    const entrySource = await readFile(entryFile, "utf8");
-    const moduleImport = entrySource.match(/import\\(["']([^"']+)[\"']\\)/)?.[1] || "";
-    if (!/thumb-impression-resizer\\.tool\\.[a-f0-9]{10}\\.js$/.test(moduleImport)) {
-      throw new Error(`thumb-impression-resizer: fingerprinted entry does not import the fingerprinted tool module (got ${moduleImport || "none"})`);
-    }
+  const entrySrc = entryMatches[0][1];
+  const entryFile = path.resolve(path.dirname(pagePath), entrySrc);
+  const entryRelative = path.relative(dist, entryFile).split(path.sep).join("/");
+  const entrySource = await readFile(entryFile, "utf8");
 
+  const moduleImport = entrySource.match(/import\(["']([^"']+)["']\)/)?.[1] || "";
+  const modulePattern = new RegExp(
+    `/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`
+  );
+  if (!modulePattern.test(moduleImport)) {
+    throw new Error(
+      `${tool.name}: fingerprinted entry does not import its fingerprinted tool module (got ${moduleImport || "none"})`
+    );
+  }
+
+  if (tool.name === "thumb-impression-resizer") {
     const stableEntryRelative = "assets/js/tools/thumb-impression-resizer.entry.js";
     const stableEntryFile = path.join(dist, stableEntryRelative);
-    const stableEntrySource = entrySource.replace(moduleImport, moduleImport);
-    await writeFile(stableEntryFile, stableEntrySource, "utf8");
-    await rename(entryFile, path.join(dist, "assets/js/tools/thumb-impression-resizer.entry.fingerprint.backup.js"));
 
-    const oldPublicPath = `/assets/js/tools/thumb-impression-resizer.entry.${entryRelative.match(/\\.entry\\.([a-f0-9]{10})\\.js$/)?.[1]}.js`;
-    html = html.replace(entryPattern, '<script type="module" src="../assets/js/tools/thumb-impression-resizer.entry.js"></script>');
-    html = html.replace(oldPublicPath, "/assets/js/tools/thumb-impression-resizer.entry.js");
+    await writeFile(stableEntryFile, entrySource, "utf8");
+    await rm(entryFile, { force: true });
+
+    const oldPublicPath = "/" + entryRelative;
+    html = html.replace(
+      entryPattern,
+      '<script type="module" src="../assets/js/tools/thumb-impression-resizer.entry.js"></script>'
+    );
 
     const serviceWorkerPath = path.join(dist, "service-worker.js");
     let serviceWorker = await readFile(serviceWorkerPath, "utf8");
-    serviceWorker = serviceWorker.split(entryRelative).join(stableEntryRelative);
+    serviceWorker = serviceWorker.split(oldPublicPath).join("/" + stableEntryRelative);
     await writeFile(serviceWorkerPath, serviceWorker, "utf8");
-    normalizedEntryScripts += 1;
-  } else {
-    normalizedEntryScripts += 1;
   }
 
-  if (html.includes(`/assets/js/tools/${tool.name}.tool.js`) ||
-      (tool.name !== "thumb-impression-resizer" && html.includes(`/assets/js/tools/${tool.name}.entry.js`))) {
-    throw new Error(`${tool.name}: stable image-tool URL leaked into generated HTML`);
+  if (html.includes(`/assets/js/tools/${tool.name}.tool.js`)) {
+    throw new Error(`${tool.name}: stable tool-module URL leaked into generated HTML`);
   }
 
-  if (tool.name === "thumb-impression-resizer" && !html.includes("assets/js/tools/thumb-impression-resizer.entry.js")) {
-    throw new Error("thumb-impression-resizer: stable entry bootstrap is missing");
+  if (tool.name === "thumb-impression-resizer") {
+    if (!html.includes("assets/js/tools/thumb-impression-resizer.entry.js")) {
+      throw new Error("thumb-impression-resizer: stable entry bootstrap is missing");
+    }
+  } else if (html.includes(`/assets/js/tools/${tool.name}.entry.js`)) {
+    throw new Error(`${tool.name}: stable entry URL leaked into generated HTML`);
   }
 
+  verifiedEntryScripts += 1;
   await writeFile(pagePath, html, "utf8");
 }
 
 console.log(
-  `New image-tools isolated loader: verified ${verifiedEntryScripts} fingerprinted entry modules; removed ${removedDirectModules} direct tool-module scripts. Existing working tools were not modified.`
+  `New image-tools isolated loader: verified ${verifiedEntryScripts} new-tool entry modules; removed ${removedDirectModules} direct tool-module scripts. Existing working tools were not modified.`
 );
