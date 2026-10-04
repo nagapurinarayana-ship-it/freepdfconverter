@@ -1,0 +1,29 @@
+name: New Image Tools Isolated
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [image-tools-isolated-v2]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-new-image-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --progress=false
+
+      - name: Full verification
+        run: npm run verify
