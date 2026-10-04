@@ -7,7 +7,6 @@
 <meta name="theme-color" content="#1f67ff">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/css/styles.css">
 <script src="../assets/js/common.js" defer></script>
-<script type="module" src="../assets/js/tools/photo-compressor.tool.js"></script>
 <script type="module" src="../assets/js/tools/photo-compressor.entry.js"></script>
 <script src="../assets/js/monetization-config.js" defer></script><script src="../assets/js/ads.js" defer></script>
 <link rel="canonical" href="https://freepdfconverter-all-in-one.pages.dev/tools/photo-compressor">
@@ -38,14 +37,12 @@
 <div class="drop-zone" id="dropZone"><div><strong>Drop images here</strong><p>JPG, PNG or WebP · up to 25 MB each · up to 20 files · direct individual downloads</p><label class="file-picker" for="imageFile">Choose image(s)</label><input class="file-input" id="imageFile" type="file" multiple accept="image/jpeg,image/png,image/webp"></div></div>
 <p id="fileSummary" class="selected-file" aria-live="polite">No images selected</p>
 <div class="summary-strip"><span id="batchCount">0 selected</span><span id="batchSize">0 B</span></div>
-
 <div class="section-heading compact"><span class="eyebrow">2. Target file size</span><h2>Choose the limit the form actually requires</h2></div>
 <div class="form-grid">
 <label class="field"><span>Target maximum size</span><select id="targetSize"><option value="10">10 KB</option><option value="20">20 KB</option><option value="50">50 KB</option><option value="100" selected>100 KB</option><option value="200">200 KB</option><option value="500">500 KB</option><option value="1024">1 MB</option><option value="2048">2 MB</option><option value="custom">Custom</option></select></label>
 <label class="field" id="customTargetWrap" hidden><span>Custom target (KB)</span><input id="customTarget" type="number" min="10" max="50000" step="1" value="100"></label>
 <label class="field"><span>Output format</span><select id="outputFormat"><option value="image/jpeg" selected>JPG — best for photographs</option><option value="image/webp">WebP — compact where supported</option><option value="image/png">PNG — preserves transparency</option></select></label>
 </div>
-
 <div class="section-heading compact"><span class="eyebrow">3. Dimensions</span><h2>Match pixels or physical form requirements</h2></div>
 <div class="form-grid">
 <label class="field"><span>Dimension mode</span><select id="dimensionMode"><option value="max-width" selected>Limit maximum width</option><option value="exact">Exact output box</option><option value="physical">Physical size</option><option value="original">Keep original dimensions</option></select></label>
@@ -55,51 +52,14 @@
 <label class="field"><span>DPI for mm/cm</span><select id="dpi"><option value="72">72 DPI</option><option value="96" selected>96 DPI</option><option value="150">150 DPI</option><option value="300">300 DPI</option></select></label>
 <label class="check-row"><input id="keepAspect" type="checkbox" checked><span><strong>Keep aspect ratio</strong><small>Prevents unexpected stretching when resizing.</small></span></label>
 </div>
-
-<div id="dimensionFields">
-<div class="form-grid">
-<label class="field"><span>Crop behavior</span><select id="cropMode"><option value="contain" selected>Fit inside — keep the whole image</option><option value="fill">Fill box — crop overflow</option></select></label>
-<label class="field"><span>Background</span><select id="background"><option value="white" selected>White</option><option value="keep">Keep transparency</option></select></label>
-</div>
-</div>
-
-<div class="preview-grid">
-<div class="side-card"><h3>Source preview</h3><div id="inputPreview" class="preview-host"></div></div>
-<div class="side-card"><h3>Optimized preview</h3><div id="outputPreview" class="preview-host"></div></div>
-</div>
-
-<div class="card-grid">
-<div class="side-card"><h3>Total input size</h3><p id="originalSize">—</p></div>
-<div class="side-card"><h3>Result</h3><p id="outputSummary">Not processed yet</p></div>
-<div class="side-card"><h3>Privacy</h3><p>Images are processed locally in your browser. No upload account or server-side conversion queue is required.</p></div>
-</div>
-
-<div class="action-row"><button class="button" id="compressButton" type="button" disabled>Optimize image(s)</button><button class="button danger" id="clearButton" type="button" disabled>Clear</button></div>
-<div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
-<p class="status" id="toolStatus" role="status" aria-live="polite"></p>
-<div class="result-list" id="resultList" aria-live="polite"></div>
+<div id="dimensionFields"><div class="form-grid"><label class="field"><span>Crop behavior</span><select id="cropMode"><option value="contain" selected>Fit inside — keep the whole image</option><option value="fill">Fill box — crop overflow</option></select></label><label class="field"><span>Background</span><select id="background"><option value="white" selected>White</option><option value="keep">Keep transparency</option></select></label></div></div>
+<div class="preview-grid"><div class="side-card"><h3>Source preview</h3><div id="inputPreview" class="preview-host"></div></div><div class="side-card"><h3>Optimized preview</h3><div id="outputPreview" class="preview-host"></div></div></div>
+<div class="card-grid"><div class="side-card"><h3>Total input size</h3><p id="originalSize">—</p></div><div class="side-card"><h3>Result</h3><p id="outputSummary">Not processed yet</p></div><div class="side-card"><h3>Privacy</h3><p>Images are processed locally in your browser. No upload account or server-side conversion queue is required.</p></div></div>
+<div class="action-row"><button class="button" id="compressButton" type="button" disabled>Optimize image(s)</button><button class="button danger" id="clearButton" type="button" disabled>Clear</button></div><div class="progress" aria-hidden="true"><span id="progressBar"></span></div><p class="status" id="toolStatus" role="status" aria-live="polite"></p><div class="result-list" id="resultList" aria-live="polite"></div>
 </section>
-
-<aside class="tool-side">
-<div class="side-card"><h3>What makes this useful</h3><ul><li>10KB to 2MB presets plus custom targets</li><li>Pixels or mm/cm with DPI conversion</li><li>Fit or crop-to-box behavior</li><li>Batch processing with individual downloads</li><li>Original files remain unchanged</li></ul></div>
-<div class="side-card"><h3>Important</h3><p>A target is a maximum goal. Some images cannot reach very small limits without becoming visibly poor, so the optimizer stops at its closest safe tested result instead of destroying detail just to hit a number.</p></div>
-<div class="side-card"><h3>Best format</h3><p>JPG is usually the most practical choice for photographs. PNG is better when transparency or sharp flat graphics matter. WebP can be smaller when the receiving form accepts it.</p></div>
-<div class="side-card"><h3>Need a signature?</h3><p><a href="signature-resizer">Resize and clean a signature →</a></p></div>
-</aside>
+<aside class="tool-side"><div class="side-card"><h3>What makes this useful</h3><ul><li>10KB to 2MB presets plus custom targets</li><li>Pixels or mm/cm with DPI conversion</li><li>Fit or crop-to-box behavior</li><li>Batch processing with individual downloads</li><li>Original files remain unchanged</li></ul></div><div class="side-card"><h3>Important</h3><p>A target is a maximum goal. Some images cannot reach very small limits without becoming visibly poor, so the optimizer stops at its closest safe tested result instead of destroying detail just to hit a number.</p></div><div class="side-card"><h3>Best format</h3><p>JPG is usually the most practical choice for photographs. PNG is better when transparency or sharp flat graphics matter. WebP can be smaller when the receiving form accepts it.</p></div><div class="side-card"><h3>Need a signature?</h3><p><a href="signature-resizer">Resize and clean a signature →</a></p></div></aside>
 </div>
-
-<section class="content-section"><div class="container content-narrow">
-<h2>Photo compressor for application upload limits</h2>
-<p>Use this tool when an application asks for a maximum image size such as 20KB, 50KB or 100KB. You can resize the image first, select an output format, and then let the optimizer search a bounded range of quality and dimensions.</p>
-<h2>Physical size: mm and cm</h2>
-<p>For forms that specify physical dimensions, choose millimetres or centimetres and select the requested DPI. The browser converts that physical measurement to pixels before encoding the image. Check the receiving application's exact specification because DPI and print size rules vary.</p>
-<h2>Batch processing</h2>
-<p>When several photographs need the same settings, select multiple files at once. Each image is processed independently and every result is downloaded as its own file. A per-file result list also shows the original size, output size, dimensions and whether the target was met.</p>
-<h2>How target compression works</h2>
-<ol><li>The browser reads each image locally.</li><li>The selected dimension policy creates candidate output sizes.</li><li>For JPG and WebP, the encoder searches quality values and then lower dimensions when necessary.</li><li>PNG is resized without pretending that a lossy quality slider exists.</li><li>The tool returns the highest-quality safe result that reaches the limit, or reports the closest tested result.</li></ol>
-<h2>Related guides</h2>
-<p><a href="../guides/compress-photo-to-20kb">How to compress a photo to 20KB, 50KB or 100KB →</a> · <a href="../guides/resize-signature-for-forms">How to resize a signature for online forms →</a></p>
-</div></section>
+<section class="content-section"><div class="container content-narrow"><h2>Photo compressor for application upload limits</h2><p>Use this tool when an application asks for a maximum image size such as 20KB, 50KB or 100KB. You can resize the image first, select an output format, and then let the optimizer search a bounded range of quality and dimensions.</p><h2>Physical size: mm and cm</h2><p>For forms that specify physical dimensions, choose millimetres or centimetres and select the requested DPI. The browser converts that physical measurement to pixels before encoding the image. Check the receiving application's exact specification because DPI and print size rules vary.</p><h2>Batch processing</h2><p>When several photographs need the same settings, select multiple files at once. Each image is processed independently and every result is downloaded as its own file.</p><h2>How target compression works</h2><ol><li>The browser reads each image locally.</li><li>The selected dimension policy creates candidate output sizes.</li><li>For JPG and WebP, the encoder searches quality values and then lower dimensions when necessary.</li><li>PNG is resized without pretending that a lossy quality slider exists.</li><li>The tool returns the highest-quality safe result that reaches the limit, or reports the closest tested result.</li></ol><h2>Related guides</h2><p><a href="../guides/compress-photo-to-20kb">How to compress a photo to 20KB, 50KB or 100KB →</a> · <a href="../guides/resize-signature-for-forms">How to resize a signature for online forms →</a></p></div></section>
 </main>
 <footer class="site-footer"><div class="container"><div class="footer-grid"><div><a class="logo" href="../"><span class="logo-mark">PDF</span><span>FreePDF Tools</span></a></div><div><h3>Popular tools</h3><ul class="footer-links"><li><a href="signature-resizer">Signature resizer</a></li><li><a href="jpg-to-pdf">JPG to PDF</a></li><li><a href="compress-pdf">Compress PDF</a></li></ul></div><div><h3>Information</h3><ul class="footer-links"><li><a href="../privacy">Privacy</a></li><li><a href="../terms">Terms</a></li><li><a href="../about">About</a></li></ul></div></div></div></footer>
 </body>
