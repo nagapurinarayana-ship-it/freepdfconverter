@@ -208,9 +208,16 @@
     }
   }
 
-  function init() {
-    loadGlobalAdsterraFormats();
+  function loadGlobalFormatsAfterLoad() {
+    var run = function () {
+      window.setTimeout(loadGlobalAdsterraFormats, 1200);
+    };
 
+    if (document.readyState === "complete") run();
+    else window.addEventListener("load", run, { once: true });
+  }
+
+  function init() {
     document.querySelectorAll('[data-ad-zone="top"]').forEach(function (zone) {
       mountBanner(zone);
     });
@@ -225,6 +232,8 @@
       if (footerSlot) mountAdSenseUnit(zone, footerSlot, "Advertisement");
       else if (zone) markUnfilled(zone);
     });
+
+    loadGlobalFormatsAfterLoad();
   }
 
   if (document.readyState === "loading") {
