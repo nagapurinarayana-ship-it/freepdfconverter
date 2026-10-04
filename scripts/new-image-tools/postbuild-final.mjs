@@ -13,6 +13,15 @@ const NEW_IMAGE_TOOLS = [
   { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
 ];
 
+const NEW_TOOL_PICKER_PAGES = [
+  { page: "tools/sign-pdf.html", inputId: "pdfFile" },
+  { page: "tools/photo-compressor.html", inputId: "imageFile" },
+  { page: "tools/signature-resizer.html", inputId: "signatureFile" },
+  { page: "tools/passport-id-photo-maker.html", inputId: "photoFile" },
+  { page: "tools/thumb-impression-resizer.html", inputId: "thumbFile" },
+  { page: "tools/handwritten-declaration-resizer.html", inputId: "declarationFile" }
+];
+
 const serviceWorkerPath = path.join(dist, "service-worker.js");
 const files = await readdir(toolsDir);
 
@@ -34,7 +43,6 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(path.join(toolsDir, fingerprintedName), entrySource, "utf8");
   await rm(stableEntryPath, { force: true });
 
-  // Remove stale fingerprinted entry variants for this tool.
   for (const oldEntry of files.filter((file) =>
     new RegExp(`^${tool.name}\\.entry\\.[a-f0-9]{10}\\.js$`).test(file) &&
     file !== fingerprintedName
@@ -72,6 +80,37 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(pagePath, html, "utf8");
 }
 
+// Only the six new tools receive this mobile picker behavior. Existing tools
+// do not receive this marker or script and keep their proven picker unchanged.
+const pickerScript = `<script id="new-tool-android-picker">(function(){"use strict";var a=/Android/i.test(navigator.userAgent)&&/Chrome|Chromium|CriOS|EdgA|OPR/i.test(navigator.userAgent)&&!/Firefox|FxiOS/i.test(navigator.userAgent);if(!a)return;document.querySelectorAll('input[type="file"][data-new-tool-picker]').forEach(function(i){i.removeAttribute("accept");});}());</script>`;
+for (const tool of NEW_TOOL_PICKER_PAGES) {
+  const pagePath = path.join(dist, tool.page);
+  let html = await readFile(pagePath, "utf8");
+
+  const inputPattern = new RegExp(
+    `<input\\b([^>]*\\bid=["']${tool.inputId}["'][^>]*)>`,
+    "i"
+  );
+  html = html.replace(inputPattern, (match, attrs) => {
+    if (/data-new-tool-picker(?:=["'][^"']*["'])?/i.test(attrs)) return match;
+    return `<input${attrs} data-new-tool-picker>`;
+  });
+
+  if (!html.includes(`id="${tool.inputId}"`) || !html.includes("data-new-tool-picker")) {
+    throw new Error(`${tool.page}: new-tool picker marker could not be installed`);
+  }
+
+  if (!html.includes('id="new-tool-android-picker"')) {
+    html = html.replace("</head>", pickerScript + "</head>");
+  }
+
+  if (!html.includes('id="new-tool-android-picker"')) {
+    throw new Error(`${tool.page}: Android picker script could not be installed`);
+  }
+
+  await writeFile(pagePath, html, "utf8");
+}
+
 console.log(
-  "Final isolated image strategy applied ONLY to the five new image tools: Photo Compressor, Signature Resizer, Passport & ID Photo Maker, Thumb Impression Resizer, and Handwritten Declaration Resizer. Existing working tools remain on their existing loader."
+  "Final new-tool strategy applied to all five new image tools; Android-safe native file-picker handling applied only to the six new tools: Sign PDF, Photo Compressor, Signature Resizer, Passport & ID Photo Maker, Thumb Impression Resizer, and Handwritten Declaration Resizer. Existing working tools remain unchanged."
 );
