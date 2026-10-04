@@ -7,7 +7,25 @@
 (async function () {
   "use strict";
 
-  const TOOL_MODULES = /*__TOOL_MODULE_MAP__*/({});
+  // Keep a checked-in fallback map as well as the build-generated map. This is
+  // important for deployments that serve the repository/static files directly
+  // instead of the generated dist/ directory. Without the fallback, every new
+  // .tool.js page renders but never mounts its controller, leaving the native
+  // file picker showing a filename while the application still says "No files
+  // selected".
+  const FALLBACK_TOOL_MODULES = Object.freeze({
+    "photo-compressor": "/assets/js/tools/photo-compressor.tool.js",
+    "signature-resizer": "/assets/js/tools/signature-resizer.tool.js",
+    "passport-id-photo-maker": "/assets/js/tools/passport-id-photo-maker.tool.js",
+    "thumb-impression-resizer": "/assets/js/tools/thumb-impression-resizer.tool.js",
+    "handwritten-declaration-resizer": "/assets/js/tools/handwritten-declaration-resizer.tool.js"
+  });
+
+  // The build replaces this token with the complete registry-derived map.
+  // Keeping the token preserves the normal dist build while the fallback above
+  // makes the source tree independently functional.
+  const BUILT_TOOL_MODULES = /*__TOOL_MODULE_MAP__*/({});
+  const TOOL_MODULES = Object.assign({}, FALLBACK_TOOL_MODULES, BUILT_TOOL_MODULES);
 
   function waitForCore() {
     if (typeof window.FreePDF?.bindDropZone === "function") return Promise.resolve();
