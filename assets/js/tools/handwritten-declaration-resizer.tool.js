@@ -276,6 +276,13 @@ export function mount() {
   });
 
   controller.mount();
+  updateDpiState();
+
+  const updateDpiState = () => {
+    const usesPhysicalUnits = controller.el.dimensionUnit.value === "mm" || controller.el.dimensionUnit.value === "cm";
+    controller.el.dpi.hidden = !usesPhysicalUnits;
+    controller.el.dpi.disabled = controller.el.dimensionMode.value === "original" || !usesPhysicalUnits;
+  };
 
   controller.el.targetSize.addEventListener("change", () => {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
@@ -284,11 +291,11 @@ export function mount() {
   controller.el.dimensionMode.addEventListener("change", () => {
     const mode = controller.el.dimensionMode.value;
     controller.el.dimensionUnit.disabled = mode === "original";
-    controller.el.dpi.disabled = mode !== "physical";
+    updateDpiState();
   });
 
   controller.el.dimensionUnit.addEventListener("change", () => {
-    controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
+    updateDpiState();
   });
 
   controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
