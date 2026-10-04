@@ -64,7 +64,7 @@ export async function injectToolRegistry(targetFile = path.join(root, "index.htm
     .join("\n");
 
   const pane = (id, title, kicker, tools, active) => [
-    '<section class="tool-pane' + (active ? ' is-active' : '') + '" id="pane-' + id + '" role="tabpanel" aria-labelledby="tab-' + id + '" data-tool-pane="' + id + '"' + (active ? '' : ' hidden') + '>',
+    '<section class="tool-pane' + (active ? ' is-active' : '') + '" id="pane-' + id + '" aria-labelledby="button-' + id + '" data-tool-pane="' + id + '"' + (active ? '' : ' hidden') + '>',
     '<div class="tool-pane-heading"><div><div class="tool-category-kicker">' + kicker + '</div><h3>' + title + '</h3></div><span>' + tools.length + ' tools</span></div>',
     '<div class="tool-card-grid">',
     cardsFor(tools),
@@ -73,16 +73,15 @@ export async function injectToolRegistry(targetFile = path.join(root, "index.htm
   ].join("\n");
 
   const popularTools = popularIds.map((id) => toolRegistry.find((tool) => tool.id === id)).filter(Boolean);
+  const allTools = toolRegistry.filter((tool) => tool.home !== false);
   const panes = [
-    pane("popular", "Popular tools", "Start here", popularTools, true),
+    pane("all", "All tools", "Complete library", allTools, true),
+    pane("popular", "Popular tools", "Start here", popularTools, false),
     ...categoryGroups.map((group) => {
       const tools = group.ids.map((id) => toolRegistry.find((tool) => tool.id === id)).filter(Boolean);
       return pane(group.id, group.title, group.kicker, tools, false);
     })
   ].join("\n");
-
-
-
 
   html = html.slice(0, startIndex + start.length) + "\n" + panes + "\n" + html.slice(endIndex);
 
