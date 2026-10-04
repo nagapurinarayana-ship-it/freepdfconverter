@@ -1,0 +1,139 @@
+name: Daily Product Quality Sweep
+
+on:
+  schedule:
+    - cron: "30 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-product-quality
+  cancel-in-progress: true
+
+jobs:
+  full-sweep:
+    name: UI · UX · Functionality · SEO · Performance · Ads
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SITE_ORIGIN: https://freepdfconverter-all-in-one.pages.dev
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Full production verification
+        run: npm run verify
+
+      - name: Dependency audit
+        run: npm audit --audit-level=high
+
+      - name: Verify key live pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          pages=(
+            "/"
+            "/tools/merge-pdf"
+            "/tools/compress-pdf"
+            "/tools/pdf-to-word"
+            "/tools/word-to-pdf"
+            "/tools/pdf-to-image"
+            "/tools/jpg-to-pdf"
+            "/tools/ocr-pdf"
+            "/tools/photo-compressor"
+            "/tools/signature-resizer"
+            "/tools/passport-id-photo-maker"
+            "/tools/thumb-impression-resizer"
+            "/tools/handwritten-declaration-resizer"
+            "/guides/"
+            "/topics/"
+            "/privacy"
+            "/terms"
+            "/contact"
+            "/robots.txt"
+            "/sitemap.xml"
+          )
+
+          for path in "${pages[@]}"; do
+            url="${SITE_ORIGIN}${path}"
+            status="$(curl -L -sS -o /tmp/page-body -w "%{http_code}" --max-time 20 "$url")"
+            if [[ "$status" != "200" ]]; then
+              echo "::error title=Live page failure::$url returned HTTP $status"
+              exit 1
+            fi
+            if [[ ! -s /tmp/page-body ]]; then
+              echo "::error title=Empty response::$url returned an empty body"
+              exit 1
+            fi
+          done
+
+      - name: Verify live homepage and ads contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          html="$(curl -L -sS --max-time 20 "$SITE_ORIGIN/")"
+
+          grep -qi "FreePDF Tools" <<<"$html"
+          grep -qi "All tools" <<<"$html"
+          grep -qi "Guides" <<<"$html"
+          grep -qi "Topics" <<<"$html"
+
+          # Adsterra/EffectiveCPM remains the primary monetization path.
+          grep -q "effectivecpmnetwork.com" <<<"$html"
+          grep -q "highperformanceformat.com" <<<"$html"
+
+          # Useful content must exist before the main workflow body; ad loading should not replace it.
+          first_main="$(grep -o "<main[^>]*>" <<<"$html" | head -n 1 || true)"
+          if [[ -z "$first_main" ]]; then
+            echo "::error title=Homepage structure failure::main element missing"
+            exit 1
+          fi
+
+      - name: Verify live SEO essentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in "/" "/tools/merge-pdf" "/tools/pdf-to-word" "/tools/ocr-pdf" "/guides/" "/topics/"; do
+            html="$(curl -L -sS --max-time 20 "${SITE_ORIGIN}${path}")"
+            grep -qi "<title>" <<<"$html"
+            grep -qi "name="description"" <<<"$html"
+            grep -qi "rel="canonical"" <<<"$html"
+            grep -qi "<h1" <<<"$html"
+            grep -qi "max-image-preview:large" <<<"$html"
+          done
+
+          robots="$(curl -L -sS --max-time 20 "${SITE_ORIGIN}/robots.txt")"
+          grep -q "Sitemap: https://freepdfconverter-all-in-one.pages.dev/sitemap.xml" <<<"$robots"
+
+      - name: Verify live service-worker safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          sw="$(curl -L -sS --max-time 20 "${SITE_ORIGIN}/service-worker.js")"
+          grep -q "skipWaiting" <<<"$sw"
+          grep -q "clients.claim" <<<"$sw"
+          grep -q "no-store" <<<"$sw"
+          grep -q "offline.html" <<<"$sw"
+
+      - name: Publish sweep summary
+        if: always()
+        run: |
+          {
+            echo "## Daily Product Quality Sweep"
+            echo
+            echo "- Commit: ${GITHUB_SHA}"
+            echo "- Scope: UI, UX, functionality, SEO, accessibility, performance, deployment, service worker, monetization"
+            echo "- Adsterra/EffectiveCPM: primary monetization contract checked"
+            echo "- Schedule: daily at 03:30 UTC"
+          } >> "$GITHUB_STEP_SUMMARY"
