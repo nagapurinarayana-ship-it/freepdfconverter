@@ -82,7 +82,9 @@ for (const tool of NEW_IMAGE_TOOLS) {
 
 // Only the six new tools receive this mobile picker behavior. Existing tools
 // do not receive this marker or script and keep their proven picker unchanged.
-const pickerScript = `<script id="new-tool-android-picker">(function(){"use strict";var a=/Android/i.test(navigator.userAgent)&&/Chrome|Chromium|CriOS|EdgA|OPR/i.test(navigator.userAgent)&&!/Firefox|FxiOS/i.test(navigator.userAgent);if(!a)return;document.querySelectorAll('input[type="file"][data-new-tool-picker]').forEach(function(i){i.removeAttribute("accept");});}());</script>`;
+// IMPORTANT: this script is injected into <head>, so the inputs do not exist yet.
+// Wait for DOMContentLoaded before changing their accept attributes.
+const pickerScript = `<script id="new-tool-android-picker">(function(){"use strict";var a=/Android/i.test(navigator.userAgent)&&/Chrome|Chromium|CriOS|EdgA|OPR/i.test(navigator.userAgent)&&!/Firefox|FxiOS/i.test(navigator.userAgent);if(!a)return;function f(){document.querySelectorAll('input[type="file"][data-new-tool-picker]').forEach(function(i){i.removeAttribute("accept");});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",f,{once:true});else f();}());</script>`;
 for (const tool of NEW_TOOL_PICKER_PAGES) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
