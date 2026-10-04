@@ -44,20 +44,10 @@ for (const tool of NEW_IMAGE_TOOLS) {
 
   // Fingerprinted module bootstrap: browser cache cannot reuse an old bootstrap URL.
   const entrySource = [
-    "(function () {",
-    '  "use strict";',
-    `  import("${modulePath}")`,
-    "    .then(function (module) { return module.mount(); })",
-    "    .catch(function (error) {",
-    `      console.error("FreePDF tool failed to initialize: ${tool}", error);`,
-    "      var status = document.querySelector('[role=\"status\"]');",
-    "      if (status && window.FreePDF?.setStatus) {",
-    '        window.FreePDF.setStatus(status, "This tool could not start correctly. Refresh the page and try again.", "error");',
-    "      }",
-    "    });",
-    "}());",
+    `import("${modulePath}").then(function (module) { return module.mount(); });`,
     ""
-  ].join("\n");
+  ].join("\\n");
+
 
   const hash = createHash("sha256").update(entrySource).digest("hex").slice(0, 10);
   const fingerprintedEntry = `${tool}.entry.${hash}.js`;
