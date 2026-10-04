@@ -85,13 +85,9 @@ for (const [page, inputId] of NEW_TOOL_PICKER_PAGES) {
   if (!html.includes(`id="${inputId}"`) || !html.includes("data-new-tool-picker")) {
     failures.push(`${page}: Android picker marker missing`);
   }
-  if (!html.includes("/assets/js/new-tool-mobile-picker.js")) {
-    failures.push(`${page}: Android picker script missing`);
+  if (!html.includes('id="new-tool-android-picker"')) {
+    failures.push(`${page}: inline Android picker script missing`);
   }
-}
-
-if (!relativeFiles.includes("assets/js/new-tool-mobile-picker.js")) {
-  failures.push("new-tool-mobile-picker.js: asset missing");
 }
 
 // Sign PDF is also new, but it uses the normal fingerprinted application-script
@@ -113,5 +109,5 @@ if (failures.length) {
 }
 
 console.log(
-  "New-tool isolated verification passed: all six new tools verified, including Android picker handling limited to the six new tool pages. Existing working tools are outside the new-tool strategy."
+  "New-tool isolated verification passed: all six new tools verified, including inline Android picker handling limited to the six new tool pages. Existing working tools are outside the new-tool strategy."
 );
