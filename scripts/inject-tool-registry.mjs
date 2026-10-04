@@ -24,8 +24,8 @@ export async function injectToolRegistry(targetFile = path.join(root, "index.htm
       ids: ["merge-pdf","split-pdf","unlock-pdf","protect-pdf","rotate-pdf","organize-pdf","add-page-numbers","remove-pdf-metadata","crop-pdf","extract-pdf-text","compress-pdf","ocr-pdf","sign-pdf","watermark-pdf"]
     },
     {
-      id: "converters",
-      title: "Converters",
+      id: "convert",
+      title: "Convert",
       kicker: "Change file formats",
       ids: ["jpg-to-pdf","pdf-to-image","pdf-to-word","word-to-pdf"]
     },
@@ -35,17 +35,6 @@ export async function injectToolRegistry(targetFile = path.join(root, "index.htm
       kicker: "Prepare photos for forms",
       ids: ["photo-compressor","signature-resizer","passport-id-photo-maker","thumb-impression-resizer","handwritten-declaration-resizer"]
     }
-  ];
-
-  const popularIds = [
-    "merge-pdf",
-    "split-pdf",
-    "compress-pdf",
-    "jpg-to-pdf",
-    "pdf-to-word",
-    "word-to-pdf",
-    "photo-compressor",
-    "signature-resizer"
   ];
 
   const cardsFor = (tools) => tools
@@ -72,11 +61,9 @@ export async function injectToolRegistry(targetFile = path.join(root, "index.htm
     '</section>'
   ].join("\n");
 
-  const popularTools = popularIds.map((id) => toolRegistry.find((tool) => tool.id === id)).filter(Boolean);
   const allTools = toolRegistry.filter((tool) => tool.home !== false);
   const panes = [
     pane("all", "All tools", "Complete library", allTools, true),
-    pane("popular", "Popular tools", "Start here", popularTools, false),
     ...categoryGroups.map((group) => {
       const tools = group.ids.map((id) => toolRegistry.find((tool) => tool.id === id)).filter(Boolean);
       return pane(group.id, group.title, group.kicker, tools, false);
