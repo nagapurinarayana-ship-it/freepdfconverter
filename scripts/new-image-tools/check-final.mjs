@@ -9,6 +9,14 @@ const NEW_IMAGE_TOOLS = [
   "thumb-impression-resizer",
   "handwritten-declaration-resizer"
 ];
+const NEW_TOOL_PICKER_PAGES = [
+  ["sign-pdf", "pdfFile"],
+  ["photo-compressor", "imageFile"],
+  ["signature-resizer", "signatureFile"],
+  ["passport-id-photo-maker", "photoFile"],
+  ["thumb-impression-resizer", "thumbFile"],
+  ["handwritten-declaration-resizer", "declarationFile"]
+];
 
 async function walk(directory) {
   const result = [];
@@ -71,6 +79,21 @@ for (const tool of NEW_IMAGE_TOOLS) {
   }
 }
 
+for (const [page, inputId] of NEW_TOOL_PICKER_PAGES) {
+  const html = await readFile(path.join(dist, `tools/${page}.html`), "utf8");
+  if (!html.includes(`id="${inputId}"`)) failures.push(`${page}: picker input missing`);
+  if (!html.includes(`id="${inputId}"`) || !html.includes("data-new-tool-picker")) {
+    failures.push(`${page}: Android picker marker missing`);
+  }
+  if (!html.includes("/assets/js/new-tool-mobile-picker.js")) {
+    failures.push(`${page}: Android picker script missing`);
+  }
+}
+
+if (!relativeFiles.includes("assets/js/new-tool-mobile-picker.js")) {
+  failures.push("new-tool-mobile-picker.js: asset missing");
+}
+
 // Sign PDF is also new, but it uses the normal fingerprinted application-script
 // contract rather than the image-tool entry/module bootstrap.
 try {
@@ -90,5 +113,5 @@ if (failures.length) {
 }
 
 console.log(
-  "New-tool isolated verification passed: all six new tools verified (five isolated image-tool bootstraps plus fingerprinted Sign PDF implementation). Existing working tools are outside the new-tool strategy."
+  "New-tool isolated verification passed: all six new tools verified, including Android picker handling limited to the six new tool pages. Existing working tools are outside the new-tool strategy."
 );
