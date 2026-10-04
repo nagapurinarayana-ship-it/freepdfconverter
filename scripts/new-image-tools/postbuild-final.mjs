@@ -14,12 +14,12 @@ const NEW_IMAGE_TOOLS = [
 ];
 
 const NEW_TOOL_PICKER_PAGES = [
-  { page: "tools/sign-pdf.html", inputId: "pdfFile" },
-  { page: "tools/photo-compressor.html", inputId: "imageFile" },
-  { page: "tools/signature-resizer.html", inputId: "signatureFile" },
-  { page: "tools/passport-id-photo-maker.html", inputId: "photoFile" },
-  { page: "tools/thumb-impression-resizer.html", inputId: "thumbFile" },
-  { page: "tools/handwritten-declaration-resizer.html", inputId: "declarationFile" }
+  { page: "tools/sign-pdf.html", inputId: "pdfFile", accept: "application/pdf,.pdf" },
+  { page: "tools/photo-compressor.html", inputId: "imageFile", accept: "image/*" },
+  { page: "tools/signature-resizer.html", inputId: "signatureFile", accept: "image/*" },
+  { page: "tools/passport-id-photo-maker.html", inputId: "photoFile", accept: "image/*" },
+  { page: "tools/thumb-impression-resizer.html", inputId: "thumbFile", accept: "image/*" },
+  { page: "tools/handwritten-declaration-resizer.html", inputId: "declarationFile", accept: "image/*" }
 ];
 
 const serviceWorkerPath = path.join(dist, "service-worker.js");
@@ -82,9 +82,12 @@ for (const tool of NEW_IMAGE_TOOLS) {
 
 // Only the six new tools receive this mobile picker behavior. Existing tools
 // do not receive this marker or script and keep their proven picker unchanged.
-// IMPORTANT: this script is injected into <head>, so the inputs do not exist yet.
-// Wait for DOMContentLoaded before changing their accept attributes.
-const pickerScript = `<script id="new-tool-android-picker">(function(){"use strict";var a=/Android/i.test(navigator.userAgent)&&/Chrome|Chromium|CriOS|EdgA|OPR/i.test(navigator.userAgent)&&!/Firefox|FxiOS/i.test(navigator.userAgent);if(!a)return;function f(){document.querySelectorAll('input[type="file"][data-new-tool-picker]').forEach(function(i){i.removeAttribute("accept");});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",f,{once:true});else f();}());</script>`;
+// IMPORTANT: do not remove accept on Android. Removing it routes Chromium to
+// the generic DocumentsUI, which can make image selection appear to succeed
+// visually but return no usable selection. Use a broad media accept instead:
+// image/* for image tools and application/pdf for Sign PDF. The tool's own
+// JavaScript validation remains authoritative for the supported formats.
+const pickerScript = `<script id="new-tool-android-picker">(function(){"use strict";var a=/Android/i.test(navigator.userAgent)&&/Chrome|Chromium|CriOS|EdgA|OPR/i.test(navigator.userAgent)&&!/Firefox|FxiOS/i.test(navigator.userAgent);if(!a)return;function f(){document.querySelectorAll('input[type="file"][data-new-tool-picker]').forEach(function(i){var t=i.getAttribute("data-new-tool-accept");if(t)i.setAttribute("accept",t);});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",f,{once:true});else f();}());</script>`;
 for (const tool of NEW_TOOL_PICKER_PAGES) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
@@ -94,8 +97,10 @@ for (const tool of NEW_TOOL_PICKER_PAGES) {
     "i"
   );
   html = html.replace(inputPattern, (match, attrs) => {
-    if (/data-new-tool-picker(?:=["'][^"']*["'])?/i.test(attrs)) return match;
-    return `<input${attrs} data-new-tool-picker>`;
+    let nextAttrs = attrs.replace(/\\sdata-new-tool-picker(?:=["'][^"']*["'])?/i, "");
+    nextAttrs = nextAttrs.replace(/\\sdata-new-tool-accept=["'][^"']*["']/i, "");
+    nextAttrs = nextAttrs.replace(/\\saccept=["'][^"']*["']/i, "");
+    return `<input${nextAttrs} data-new-tool-picker data-new-tool-accept="${tool.accept}">`;
   });
 
   if (!html.includes(`id="${tool.inputId}"`) || !html.includes("data-new-tool-picker")) {
@@ -114,5 +119,5 @@ for (const tool of NEW_TOOL_PICKER_PAGES) {
 }
 
 console.log(
-  "Final new-tool strategy applied to all five new image tools; Android-safe native file-picker handling applied only to the six new tools: Sign PDF, Photo Compressor, Signature Resizer, Passport & ID Photo Maker, Thumb Impression Resizer, and Handwritten Declaration Resizer. Existing working tools remain unchanged."
+  "Final new-tool strategy applied to all five new image tools; Android-safe native file-picker handling applied only to the six new tools with broad media accept types. Existing working tools remain unchanged."
 );
