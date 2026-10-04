@@ -125,7 +125,7 @@ if (photoToolAsset) {
   if (/JSZip|\.zip|ZIP|archive-engine|createZipBlob/i.test(photoToolSource)) failures.push("Photo Compressor -> ZIP/archive output code remains");
 }
 const thumbPage = await readFile(path.join(dist, "tools/thumb-impression-resizer.html"), "utf8");
-if (!thumbPage.includes('300 × 300 px') || !thumbPage.includes('600 × 600 px') || !thumbPage.includes('Auto-crop extra whitespace') || !thumbPage.includes('custom')) {
+if (!thumbPage.includes('240 × 240 px') || !thumbPage.includes('3.5 × 1.5 cm') || !thumbPage.includes('600 × 200 px') || !thumbPage.includes('Auto-crop extra whitespace') || !thumbPage.includes('custom')) {
   failures.push("Thumb Impression Resizer -> presets, cleanup or custom-size workflow is incomplete");
 }
 if (!thumbPage.includes("assets/js/tools/thumb-impression-resizer.entry.js")) failures.push("Thumb Impression Resizer -> direct entry script is missing");
