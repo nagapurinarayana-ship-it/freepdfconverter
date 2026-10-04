@@ -74,16 +74,12 @@ export function resolveDimensions({ mode, width, height, unit, dpi, sourceWidth,
     };
   }
 
-  let resolvedWidth = clampPixels(pixelsFromPhysical(width, unit, dpi), sourceWidth);
-  let resolvedHeight = clampPixels(pixelsFromPhysical(height, unit, dpi), sourceHeight);
-
-  if (keepAspect) {
-    const widthScale = resolvedWidth / sourceWidth;
-    const heightScale = resolvedHeight / sourceHeight;
-    const scale = Math.min(widthScale, heightScale);
-    resolvedWidth = clampPixels(sourceWidth * scale, resolvedWidth);
-    resolvedHeight = clampPixels(sourceHeight * scale, resolvedHeight);
-  }
+  // Exact and physical modes define the output canvas. Aspect preservation belongs
+  // to the drawing mode (contain/fill), not to the canvas dimensions themselves.
+  // This keeps requested pixel/physical dimensions exact while still allowing
+  // the caller to preserve the source aspect ratio without distortion.
+  const resolvedWidth = clampPixels(pixelsFromPhysical(width, unit, dpi), sourceWidth);
+  const resolvedHeight = clampPixels(pixelsFromPhysical(height, unit, dpi), sourceHeight);
 
   return { width: resolvedWidth, height: resolvedHeight };
 }
