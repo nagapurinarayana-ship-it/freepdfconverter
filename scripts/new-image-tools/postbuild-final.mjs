@@ -44,8 +44,12 @@ for (const tool of NEW_IMAGE_TOOLS) {
   }
 
   const affectedTool = NATIVE_PICKER_RECOVERY.has(tool.name);
+  // IMPORTANT: the affected tools must use a dynamic import. A static import
+  // executes the tool module before this bootstrap's start() function runs,
+  // so waiting for window.FreePDF would not actually protect the module's
+  // top-level access to window.FreePDF on Android/slow loads.
   const entrySource = affectedTool
-    ? `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\n\nfunction start() {\n  if (window.FreePDF) {\n    mount();\n    return;\n  }\n  window.setTimeout(start, 0);\n}\n\nif (document.readyState === "loading") {\n  document.addEventListener("DOMContentLoaded", start, { once: true });\n} else {\n  start();\n}\n`
+    ? `function start() {\n  if (!window.FreePDF) {\n    window.setTimeout(start, 0);\n    return;\n  }\n  import("/assets/js/tools/${fingerprintedModuleName}").then(function (module) {\n    module.mount();\n  }).catch(function (error) {\n    console.error("FreePDF tool bootstrap failed:", error);\n  });\n}\n\nif (document.readyState === "loading") {\n  document.addEventListener("DOMContentLoaded", start, { once: true });\n} else {\n  start();\n}\n`
     : `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
 
   const entryHash = createHash("sha256").update(entrySource).digest("hex").slice(0, 10);
@@ -101,4 +105,4 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(pagePath, html, "utf8");
 }
 
-console.log("Final new-tool strategy applied; Photo Compressor and Signature Resizer use the hardened stable bootstrap/native-picker recovery, while the other three image tools retain the existing fingerprinted entry contract. Existing working tools remain unchanged.");
+console.log("Final new-tool strategy applied; Photo Compressor and Signature Resizer use dynamic bootstrap plus native picker recovery, while the other three image tools retain the existing entry contract. Existing working tools remain unchanged.");
