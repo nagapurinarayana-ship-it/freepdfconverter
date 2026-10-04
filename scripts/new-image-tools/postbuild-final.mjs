@@ -28,6 +28,10 @@ for (const tool of NEW_IMAGE_TOOLS) {
   const moduleSource = await readFile(path.join(toolsDir, sourceFile), "utf8");
   const moduleHash = createHash("sha256").update(moduleSource).digest("hex").slice(0, 10);
   const fingerprintedModuleName = `${tool.name}.tool.${moduleHash}.js`;
+  assetReplacements.push([
+    `/assets/js/tools/${sourceFile}`,
+    `/assets/js/tools/${fingerprintedModuleName}`
+  ]);
 
   if (sourceFile !== fingerprintedModuleName) {
     await writeFile(path.join(toolsDir, fingerprintedModuleName), moduleSource, "utf8");
@@ -79,6 +83,11 @@ for (const tool of NEW_IMAGE_TOOLS) {
     throw new Error(`${tool.name}: entry was not installed into the page`);
   }
 
+  assetReplacements.push([
+    `/assets/js/tools/${tool.name}.entry.js`,
+    `/assets/js/tools/${entryName}`
+  ]);
+
   let serviceWorker = await readFile(serviceWorkerPath, "utf8");
   serviceWorker = serviceWorker.replace(
     new RegExp(`/assets/js/tools/${tool.name}\\.entry(?:\\.[a-f0-9]+)?\\.js`, "g"),
@@ -88,4 +97,32 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(pagePath, html, "utf8");
 }
 
-console.log("Final new-tool strategy applied uniformly to all five image tools: static fingerprinted entry imports with the shared native file-picker lifecycle. Existing working tools remain unchanged.");
+// Reconcile every generated text reference after the final asset hashes are known.
+// This is critical because build.mjs already generated service-worker precache URLs
+// and the tool-runtime module map before this postbuild step. Without this pass,
+// those files can still reference deleted pre-final tool-module hashes, causing the
+// new service worker install to fail and leaving browsers on an older cached worker.
+if (assetReplacements.length) {
+  const uniqueReplacements = [...new Map(assetReplacements.map(([oldPath, newPath]) => [oldPath, newPath])).entries()];
+  const textFiles = [];
+
+  const walk = async (directory) => {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const full = path.join(directory, entry.name);
+      if (entry.isDirectory()) await walk(full);
+      else if (/\.(?:html|js|mjs|json|webmanifest)$/i.test(entry.name) || entry.name === "service-worker.js") textFiles.push(full);
+    }
+  };
+
+  await walk(dist);
+  for (const file of textFiles) {
+    let content = await readFile(file, "utf8");
+    const original = content;
+    for (const [oldPath, newPath] of uniqueReplacements) {
+      content = content.split(oldPath).join(newPath);
+    }
+    if (content !== original) await writeFile(file, content, "utf8");
+  }
+}
+
+console.log("Final new-tool strategy applied uniformly to all five image tools: static fingerprinted entry imports with the shared native file-picker lifecycle, with generated asset references reconciled after final hashing. Existing working tools remain unchanged.");
