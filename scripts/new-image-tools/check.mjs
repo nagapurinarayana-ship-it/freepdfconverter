@@ -63,15 +63,23 @@ for (const tool of NEW_IMAGE_TOOLS) {
   }
 
   const entryHtmlMatches = html.match(
-    new RegExp(String.raw`<script\s+src=["'][^"']*/${tool.name}\.entry\.[a-f0-9]{10}\.js["']\s+defer></script>`, "gi")
+    new RegExp(
+      String.raw`<script\\b[^>]*\\bsrc=["'][^"']*/${tool.name}\\.entry\\.[a-f0-9]{10}\\.js["'][^>]*></script>`,
+      "gi"
+    )
   ) || [];
 
   if (entryHtmlMatches.length !== 1) {
-    failures.push(`${tool.name}: page must contain exactly one fingerprinted entry module script, found ${entryHtmlMatches.length}`);
+    failures.push(`${tool.name}: page must contain exactly one fingerprinted entry script, found ${entryHtmlMatches.length}`);
+  } else if (!/\\btype=["']module["']/i.test(entryHtmlMatches[0])) {
+    failures.push(`${tool.name}: fingerprinted entry must remain a module script`);
   }
 
   const directHtmlMatches = html.match(
-    new RegExp(String.raw`<script\s+type=["']module["']\s+src=["'][^"']*/${tool.name}\.tool\.[a-f0-9]{10}\.js["']\s*></script>`, "gi")
+    new RegExp(
+      String.raw`<script\\b[^>]*\\bsrc=["'][^"']*/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js["'][^>]*></script>`,
+      "gi"
+    )
   ) || [];
 
   if (directHtmlMatches.length) {
