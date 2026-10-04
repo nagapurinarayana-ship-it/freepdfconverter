@@ -208,7 +208,7 @@ export function mount() {
           dimensions,
           mime,
           targetBytes,
-          cropMode: "fill",
+          cropMode: "contain",
           background,
           cropFocusX: 0.5,
           cropFocusY: 0.5,
