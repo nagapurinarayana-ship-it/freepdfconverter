@@ -4,6 +4,7 @@ import path from "node:path";
 
 const dist = path.join(process.cwd(), "dist");
 const toolsDir = path.join(dist, "assets/js/tools");
+const serviceWorkerPath = path.join(dist, "service-worker.js");
 
 const NEW_IMAGE_TOOLS = [
   { name: "photo-compressor", page: "tools/photo-compressor.html" },
@@ -13,15 +14,11 @@ const NEW_IMAGE_TOOLS = [
   { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
 ];
 
-// Only these two affected flows get the Android File System Access picker.
-// The other four currently working new image tools keep their existing path.
-const TARGETED_ANDROID_PICKER_PAGES = [
-  { page: "tools/sign-pdf.html", inputId: "pdfFile", accept: "application/pdf,.pdf" },
-  { page: "tools/photo-compressor.html", inputId: "imageFile", accept: "image/*" }
-];
-
-const serviceWorkerPath = path.join(dist, "service-worker.js");
-
+// Keep the new tools isolated from the existing loader, but use the same
+// proven native <input type=file> flow as the four working new tools.
+// Do not replace the browser's native Android file picker with a custom
+// showOpenFilePicker handoff: that was the failure mode affecting Photo
+// Compressor and Signature Resizer on Android.
 for (const tool of NEW_IMAGE_TOOLS) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
@@ -62,7 +59,8 @@ for (const tool of NEW_IMAGE_TOOLS) {
     await rm(path.join(toolsDir, entryFile), { force: true });
   }
 
-  // Keep exactly one runtime bootstrap after fingerprinting.
+  // Remove old direct module tags and install exactly one fingerprinted
+  // static module entry. Existing tools are never touched here.
   html = html.replace(
     new RegExp(`<script[^>]*src=["'][^"']*/${tool.name}\\.tool(?:\\.[a-f0-9]+)?\\.js["'][^>]*></script>`, "gi"),
     ""
@@ -71,6 +69,15 @@ for (const tool of NEW_IMAGE_TOOLS) {
     new RegExp(`<script[^>]*src=["'][^"']*/${tool.name}\\.entry(?:\\.[a-f0-9]+)?\\.js["'][^>]*></script>`, "gi"),
     `<script type="module" src="/assets/js/tools/${stableEntryName}"></script>`
   );
+
+  // Remove any legacy custom-picker markers/scripts. The native file input
+  // remains untouched so Android Chrome handles file selection normally.
+  html = html.replace(/\sdata-targeted-android-picker(?:=["'][^"']*["'])?/gi, "");
+  html = html.replace(/\sdata-targeted-android-accept=["'][^"']*["']/gi, "");
+  html = html.replace(/\sdata-new-tool-picker(?:=["'][^"']*["'])?/gi, "");
+  html = html.replace(/\sdata-new-tool-accept=["'][^"']*["']/gi, "");
+  html = html.replace(/<script id="new-tool-android-picker">[\s\S]*?<\/script>/gi, "");
+  html = html.replace(/<script id="targeted-android-file-picker">[\s\S]*?<\/script>/gi, "");
 
   if (!html.includes(stableEntryName)) {
     throw new Error(`${tool.name}: fingerprinted static entry was not installed into the page`);
@@ -85,43 +92,6 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(pagePath, html, "utf8");
 }
 
-// Android Chrome can return from DocumentsUI with an empty FileList in these
-// two affected flows. Use the proven File System Access picker handoff here,
-// while leaving the four currently working image tools untouched.
-const pickerScript = `<script id="targeted-android-file-picker">(function(){"use strict";function init(){document.querySelectorAll('input[type="file"][data-targeted-android-picker]').forEach(function(input){if(input.dataset.targetedAndroidPickerBound)return;input.dataset.targetedAndroidPickerBound="1";var label=document.querySelector('label[for="'+input.id+'"]');var accept=input.getAttribute("data-targeted-android-accept")||"";var isPdf=/pdf/i.test(accept);if(!label||typeof window.showOpenFilePicker!=="function")return;label.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();(async function(){try{var options={multiple:input.hasAttribute("multiple"),excludeAcceptAllOption:true,types:[{description:isPdf?"PDF files":"Images",accept:isPdf?{"application/pdf":[".pdf"]}:{"image/jpeg":[".jpg",".jpeg"],"image/png":[".png"],"image/webp":[".webp"]}}]};var handles=await window.showOpenFilePicker(options);var files=await Promise.all(handles.map(function(handle){return handle.getFile();}));if(!files.length)return;var transfer=new DataTransfer();files.forEach(function(file){transfer.items.add(file);});input.files=transfer.files;input.dispatchEvent(new Event("change",{bubbles:true}));}catch(error){if(error&&error.name==="AbortError")return;console.error("FreePDF targeted Android picker failed",error);try{input.click();}catch(_){} }})();});});}if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();}());</script>`;
-
-for (const tool of TARGETED_ANDROID_PICKER_PAGES) {
-  const pagePath = path.join(dist, tool.page);
-  let html = await readFile(pagePath, "utf8");
-
-  const inputPattern = new RegExp(
-    `<input\\b([^>]*\\bid=["']${tool.inputId}["'][^>]*)>`,
-    "i"
-  );
-
-  html = html.replace(inputPattern, (match, attrs) => {
-    let nextAttrs = attrs.replace(/\sdata-targeted-android-picker(?:=["'][^"']*["'])?/i, "");
-    nextAttrs = nextAttrs.replace(/\sdata-targeted-android-accept=["'][^"']*["']/i, "");
-    nextAttrs = nextAttrs.replace(/\sdata-new-tool-picker(?:=["'][^"']*["'])?/i, "");
-    nextAttrs = nextAttrs.replace(/\sdata-new-tool-accept=["'][^"']*["']/i, "");
-    nextAttrs = nextAttrs.replace(/\saccept=["'][^"']*["']/i, "");
-    nextAttrs += ` data-targeted-android-picker="1" data-targeted-android-accept="${tool.accept}" accept="${tool.accept}"`;
-    return `<input${nextAttrs}>`;
-  });
-
-  if (!html.includes(`id="${tool.inputId}"`) || !html.includes("data-targeted-android-picker")) {
-    throw new Error(`${tool.page}: targeted Android picker marker could not be installed`);
-  }
-
-  // Remove any previous picker injected by an earlier build, then install the
-  // targeted picker for this page.
-  html = html.replace(/<script id="new-tool-android-picker">[\s\S]*?<\/script>/gi, "");
-  html = html.replace(/<script id="targeted-android-file-picker">[\s\S]*?<\/script>/gi, "");
-  html = html.replace("</head>", pickerScript + "</head>");
-
-  await writeFile(pagePath, html, "utf8");
-}
-
 console.log(
-  "Final new-tool strategy applied: fingerprinted runtime entries for all five image tools; targeted Android File System Access picker applied only to Photo Compressor and Sign PDF. Existing working tools remain unchanged."
+  "Final isolated new-tool strategy applied to the five new image tools; all use fingerprinted static entries and the native browser file input. Existing working tools remain unchanged."
 );
