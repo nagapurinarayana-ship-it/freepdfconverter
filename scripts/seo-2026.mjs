@@ -4,7 +4,7 @@ import { join } from 'node:path'
 const dist = 'dist'
 const overrides = {
   'index.html': [
-    'Free PDF Tools Online — Merge, Split, Compress & Convert | FreePDF Tools',
+    'Free PDF Tools — Merge, Split, Compress & Convert | FreePDF Tools',
     'Free online PDF tools to merge, split, compress, convert, sign, OCR and manage documents and images. Supported browser processing keeps source files on your device.'
   ],
   'pdf-converter-online.html': [
