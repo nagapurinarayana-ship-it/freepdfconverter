@@ -18,26 +18,34 @@ export async function injectToolRegistry(targetFile = path.join(root, "index.htm
 
   const categoryGroups = [
     {
-      id: "pdf-tools",
-      kicker: "PDF essentials",
-      title: "Work with PDFs",
-      description: "Merge, split, edit, secure, clean and organize PDF files.",
+      id: "pdf",
+      title: "PDF tools",
+      kicker: "Everything for PDFs",
       ids: ["merge-pdf","split-pdf","unlock-pdf","protect-pdf","rotate-pdf","organize-pdf","add-page-numbers","remove-pdf-metadata","crop-pdf","extract-pdf-text","compress-pdf","ocr-pdf","sign-pdf","watermark-pdf"]
     },
     {
-      id: "converter-tools",
-      kicker: "Conversions",
-      title: "Convert between formats",
-      description: "Move between PDF, Word and image formats in a few clicks.",
+      id: "converters",
+      title: "Converters",
+      kicker: "Change file formats",
       ids: ["jpg-to-pdf","pdf-to-image","pdf-to-word","word-to-pdf"]
     },
     {
-      id: "image-tools",
-      kicker: "Images & forms",
-      title: "Prepare photos and form images",
-      description: "Compress, resize and prepare the image files common forms ask for.",
+      id: "images",
+      title: "Images & forms",
+      kicker: "Prepare photos for forms",
       ids: ["photo-compressor","signature-resizer","passport-id-photo-maker","thumb-impression-resizer","handwritten-declaration-resizer"]
     }
+  ];
+
+  const popularIds = [
+    "merge-pdf",
+    "split-pdf",
+    "compress-pdf",
+    "jpg-to-pdf",
+    "pdf-to-word",
+    "word-to-pdf",
+    "photo-compressor",
+    "signature-resizer"
   ];
 
   const cardsFor = (tools) => tools
@@ -55,21 +63,28 @@ export async function injectToolRegistry(targetFile = path.join(root, "index.htm
     })
     .join("\n");
 
-  const cards = categoryGroups.map((group) => {
-    const tools = group.ids.map((id) => toolRegistry.find((tool) => tool.id === id)).filter(Boolean);
-    return [
-      '<section class="tool-category" id="' + group.id + '">',
-      '<div class="tool-category-head"><div><div class="tool-category-kicker">' + group.kicker + '</div><h3>' + group.title + '</h3></div><p>' + tools.length + ' tools</p></div>',
-      '<div class="tool-card-grid">',
-      cardsFor(tools),
-      '</div>',
-      '</section>'
-    ].join("\n");
-  }).join("\n");
+  const pane = (id, title, kicker, tools, active) => [
+    '<section class="tool-pane' + (active ? ' is-active' : '') + '" id="pane-' + id + '" role="tabpanel" aria-labelledby="tab-' + id + '" data-tool-pane="' + id + '"' + (active ? '' : ' hidden') + '>',
+    '<div class="tool-pane-heading"><div><div class="tool-category-kicker">' + kicker + '</div><h3>' + title + '</h3></div><span>' + tools.length + ' tools</span></div>',
+    '<div class="tool-card-grid">',
+    cardsFor(tools),
+    '</div>',
+    '</section>'
+  ].join("\n");
+
+  const popularTools = popularIds.map((id) => toolRegistry.find((tool) => tool.id === id)).filter(Boolean);
+  const panes = [
+    pane("popular", "Popular tools", "Start here", popularTools, true),
+    ...categoryGroups.map((group) => {
+      const tools = group.ids.map((id) => toolRegistry.find((tool) => tool.id === id)).filter(Boolean);
+      return pane(group.id, group.title, group.kicker, tools, false);
+    })
+  ].join("\n");
 
 
 
-  html = html.slice(0, startIndex + start.length) + "\n" + cards + "\n" + html.slice(endIndex);
+
+  html = html.slice(0, startIndex + start.length) + "\n" + panes + "\n" + html.slice(endIndex);
 
   html = html.replace(
     /<span class="badge" data-tool-count>.*?<\/span>/,
