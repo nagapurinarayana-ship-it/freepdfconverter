@@ -110,6 +110,7 @@
     var retryDelays = [0, 40, 120, 300, 600];
     var pickerRecoveryEnabled = input.hasAttribute("data-new-tool-picker");
     var recoveryTimer = null;
+    var recoveryStartedAt = 0;
 
     function readSelection() {
       return Array.from(input.files || []);
@@ -133,10 +134,21 @@
       }
     }
 
-    function recoverNativePickerSelection() {
-      if (!pickerRecoveryEnabled || recoveryTimer || handled) return;
+    function stopRecovery() {
+      if (recoveryTimer) {
+        window.clearTimeout(recoveryTimer);
+        recoveryTimer = null;
+      }
+    }
 
-      var startedAt = Date.now();
+    function startRecovery() {
+      if (!pickerRecoveryEnabled) return;
+
+      stopRecovery();
+      if (handled) return;
+
+      recoveryStartedAt = Date.now();
+
       function probe() {
         recoveryTimer = null;
         if (handled) return;
@@ -147,7 +159,9 @@
           return;
         }
 
-        if (Date.now() - startedAt < 5000) {
+        // Android can return from the media picker without dispatching change.
+        // Keep probing for a full 10 seconds after focus/visibility returns.
+        if (Date.now() - recoveryStartedAt < 10000) {
           recoveryTimer = window.setTimeout(probe, 100);
         }
       }
@@ -157,19 +171,20 @@
 
     input.addEventListener("click", function () {
       handled = false;
-      recoverNativePickerSelection();
+      stopRecovery();
     });
 
     if (pickerRecoveryEnabled) {
-      window.addEventListener("focus", recoverNativePickerSelection);
-      window.addEventListener("pageshow", recoverNativePickerSelection);
+      window.addEventListener("focus", startRecovery);
+      window.addEventListener("pageshow", startRecovery);
       document.addEventListener("visibilitychange", function () {
-        if (document.visibilityState === "visible") recoverNativePickerSelection();
+        if (document.visibilityState === "visible") startRecovery();
       });
     }
 
     input.addEventListener("change", function () {
       handled = false;
+      stopRecovery();
       retryDelays.forEach(function (delay) {
         window.setTimeout(function () {
           consume(readSelection());
