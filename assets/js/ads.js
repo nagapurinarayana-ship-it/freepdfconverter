@@ -24,7 +24,7 @@
     var started = Date.now();
     var timer = window.setInterval(function () {
       var frame = zone.querySelector("iframe");
-      var bodyContent = zone.querySelector("iframe, ins, [id*='container'], [class*='ad-']");
+      var bodyContent = zone.querySelector("iframe, ins, [id*=\'container\'] > *, [class*=\'ad-\']");
       if (frame || bodyContent) {
         zone.dataset.adStatus = "filled";
         zone.classList.add("is-active");
