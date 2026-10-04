@@ -15,7 +15,7 @@
 <span class="eyebrow">Free forever · No account · Private in your browser</span>
 <h1>Everything you need to work with PDFs, images &amp; documents.</h1>
 <p class="lead">Pick the job. Choose your file. Get the result. FreePDF Tools keeps the experience simple while your supported files stay on your device.</p>
-<div class="hero-actions hero-actions-center"><a class="button button-large" href="#tools">Browse all tools</a><a class="button secondary button-large" href="tools/compress-pdf">Compress a PDF</a></div>
+<div class="hero-actions hero-actions-center"><a class="button button-large" href="#tools">All tools</a><a class="button secondary button-large" href="tools/compress-pdf">Compress a PDF</a></div>
 <div class="hero-proof"><span>⚡ Instant start</span><span>🔒 Supported files stay local</span><span>📱 Mobile friendly</span><span>💯 No sign-up</span></div>
 </div></section>
 <div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>
@@ -23,11 +23,12 @@
 <div class="section-heading section-heading-wide"><span class="badge" data-tool-count>23 free tools</span><h2>All the tools. Nothing important hidden.</h2><p>Everything is grouped by the job you are trying to finish, so you can scan the library quickly and jump straight in.</p></div>
 <div class="tool-directory" id="tool-directory" aria-live="polite">
 <div class="tool-tabs-wrap">
-<div class="tool-tabs" role="tablist" aria-label="Tool categories">
-<button class="tool-tab is-active" id="tab-popular" type="button" role="tab" aria-selected="true" aria-controls="pane-popular" tabindex="0" data-tool-tab="popular">Popular</button>
-<button class="tool-tab" id="tab-pdf" type="button" role="tab" aria-selected="false" aria-controls="pane-pdf" tabindex="-1" data-tool-tab="pdf">PDF <span data-tool-count="pdf">14</span></button>
-<button class="tool-tab" id="tab-converters" type="button" role="tab" aria-selected="false" aria-controls="pane-converters" tabindex="-1" data-tool-tab="converters">Converters <span data-tool-count="converters">4</span></button>
-<button class="tool-tab" id="tab-images" type="button" role="tab" aria-selected="false" aria-controls="pane-images" tabindex="-1" data-tool-tab="images">Images &amp; Forms <span data-tool-count="images">5</span></button>
+<div class="tool-tabs" aria-label="Tool categories">
+<button class="tool-tab is-active" id="button-all" type="button" aria-pressed="true" data-tool-tab="all">All tools</button>
+<button class="tool-tab" id="button-popular" type="button" aria-pressed="false" data-tool-tab="popular">Popular</button>
+<button class="tool-tab" id="button-pdf" type="button" aria-pressed="false" data-tool-tab="pdf">PDF <span data-tool-count="pdf">14</span></button>
+<button class="tool-tab" id="button-converters" type="button" aria-pressed="false" data-tool-tab="converters">Converters <span data-tool-count="converters">4</span></button>
+<button class="tool-tab" id="button-images" type="button" aria-pressed="false" data-tool-tab="images">Images &amp; Forms <span data-tool-count="images">5</span></button>
 </div>
 </div>
 <!-- TOOL-REGISTRY:START -->
@@ -48,16 +49,15 @@
 (function () {
   "use strict";
 
-  function activateTab(name) {
-    var tabs = document.querySelectorAll("[data-tool-tab]");
+  function activateButton(name) {
+    var buttons = document.querySelectorAll("[data-tool-tab]");
     var panes = document.querySelectorAll("[data-tool-pane]");
     var found = false;
 
-    tabs.forEach(function (tab) {
-      var active = tab.getAttribute("data-tool-tab") === name;
-      tab.setAttribute("aria-selected", active ? "true" : "false");
-      tab.tabIndex = active ? 0 : -1;
-      tab.classList.toggle("is-active", active);
+    buttons.forEach(function (button) {
+      var active = button.getAttribute("data-tool-tab") === name;
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.classList.toggle("is-active", active);
       if (active) found = true;
     });
 
@@ -67,35 +67,17 @@
       pane.classList.toggle("is-active", active);
     });
 
-    if (!found) activateTab("popular");
+    if (!found) activateButton("all");
   }
 
   function init() {
-    document.querySelectorAll("[data-tool-tab]").forEach(function (tab) {
-      tab.addEventListener("click", function () {
-        activateTab(tab.getAttribute("data-tool-tab"));
-      });
-
-      tab.addEventListener("keydown", function (event) {
-        var tabs = Array.from(document.querySelectorAll("[data-tool-tab]"));
-        var index = tabs.indexOf(tab);
-        var nextIndex = index;
-
-        if (event.key === "ArrowRight") nextIndex = (index + 1) % tabs.length;
-        if (event.key === "ArrowLeft") nextIndex = (index - 1 + tabs.length) % tabs.length;
-        if (event.key === "Home") nextIndex = 0;
-        if (event.key === "End") nextIndex = tabs.length - 1;
-
-        if (nextIndex !== index) {
-          event.preventDefault();
-          var next = tabs[nextIndex];
-          activateTab(next.getAttribute("data-tool-tab"));
-          next.focus();
-        }
+    document.querySelectorAll("[data-tool-tab]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        activateButton(button.getAttribute("data-tool-tab"));
       });
     });
 
-    activateTab("popular");
+    activateButton("all");
   }
 
   if (document.readyState === "loading") {
