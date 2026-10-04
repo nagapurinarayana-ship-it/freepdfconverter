@@ -95,7 +95,9 @@ for (const relative of htmlFiles) {
   const head = relative === "404.html" ? "" : appHead + "\n";
   if (relative === "404.html" || relative === "offline.html") {
     const noindex = '<meta name="robots" content="noindex,nofollow,noarchive">';
-    if (!/<meta\s+name=["']robots["']/i.test(html)) {
+    if (/<meta\s+name=["']robots["'][^>]*>/i.test(html)) {
+      html = html.replace(/<meta\s+name=["']robots["'][^>]*>/i, noindex);
+    } else {
       html = html.replace("</head>", noindex + "\n</head>");
     }
   }
