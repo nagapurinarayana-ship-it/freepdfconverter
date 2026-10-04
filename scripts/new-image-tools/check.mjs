@@ -3,10 +3,14 @@ import path from "node:path";
 
 const dist = path.join(process.cwd(), "dist");
 
+// Five new image tools use the isolated bootstrap strategy. Sign PDF is new too,
+// but its normal fingerprinted application script does not need an image bootstrap.
 const NEW_IMAGE_TOOLS = [
-  { name: "photo-compressor", page: "tools/photo-compressor.html", stableEntry: false },
-  { name: "signature-resizer", page: "tools/signature-resizer.html", stableEntry: false },
-  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html", stableEntry: true }
+  "photo-compressor",
+  "signature-resizer",
+  "passport-id-photo-maker",
+  "thumb-impression-resizer",
+  "handwritten-declaration-resizer"
 ];
 
 async function walk(directory) {
@@ -24,63 +28,57 @@ const relativeFiles = files.map((file) => path.relative(dist, file).split(path.s
 const failures = [];
 
 for (const tool of NEW_IMAGE_TOOLS) {
-  const pageFile = path.join(dist, tool.page);
+  const pageFile = path.join(dist, `tools/${tool}.html`);
   let html;
   try {
     html = await readFile(pageFile, "utf8");
   } catch {
-    failures.push(`${tool.name}: page missing: ${tool.page}`);
+    failures.push(`${tool}: page missing`);
     continue;
   }
 
-  const stableEntry = `assets/js/tools/${tool.name}.entry.js`;
-  const stableModule = `assets/js/tools/${tool.name}.tool.js`;
-  const entryPattern = new RegExp(`^assets/js/tools/${tool.name}\\.entry\\.[a-f0-9]{10}\\.js$`);
-  const modulePattern = new RegExp(`^assets/js/tools/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`);
+  const stableEntry = `assets/js/tools/${tool}.entry.js`;
+  const stableModule = `assets/js/tools/${tool}.tool.js`;
+  const entryPattern = new RegExp(`^assets/js/tools/${tool}\\.entry\\.[a-f0-9]{10}\\.js$`);
+  const modulePattern = new RegExp(`^assets/js/tools/${tool}\\.tool\\.[a-f0-9]{10}\\.js$`);
   const entries = relativeFiles.filter((file) => entryPattern.test(file));
   const modules = relativeFiles.filter((file) => modulePattern.test(file));
 
-  if (modules.length !== 1) failures.push(`${tool.name}: expected exactly one fingerprinted tool module, found ${modules.length}`);
-  if (relativeFiles.includes(stableModule)) failures.push(`${tool.name}: stable tool module exists`);
+  if (entries.length !== 1) failures.push(`${tool}: expected exactly one fingerprinted entry module, found ${entries.length}`);
+  if (modules.length !== 1) failures.push(`${tool}: expected exactly one fingerprinted tool module, found ${modules.length}`);
+  if (relativeFiles.includes(stableEntry)) failures.push(`${tool}: stable entry asset exists`);
+  if (relativeFiles.includes(stableModule)) failures.push(`${tool}: stable tool module exists`);
 
-  const directToolScripts = html.match(new RegExp(`<script[^>]*${tool.name}\\.tool\\.[a-f0-9]{10}\\.js[^>]*></script>`, "gi")) || [];
-  if (directToolScripts.length) failures.push(`${tool.name}: page directly loads the tool module`);
+  const entryScripts = html.match(new RegExp(`<script[^>]*${tool}\\.entry\\.[a-f0-9]{10}\\.js[^>]*></script>`, "gi")) || [];
+  if (entryScripts.length !== 1) failures.push(`${tool}: expected exactly one fingerprinted entry script in HTML, found ${entryScripts.length}`);
+  else if (!/type=["']module["']/i.test(entryScripts[0])) failures.push(`${tool}: fingerprinted entry must be a module script`);
 
-  if (tool.stableEntry) {
-    if (!relativeFiles.includes(stableEntry)) failures.push(`${tool.name}: stable entry bootstrap is missing`);
-    if (entries.length) failures.push(`${tool.name}: fingerprinted entry asset leaked alongside stable bootstrap`);
+  const stableEntryScripts = html.match(new RegExp(`<script[^>]*${tool}\\.entry\\.js[^>]*></script>`, "gi")) || [];
+  if (stableEntryScripts.length) failures.push(`${tool}: stable entry URL leaked into HTML`);
 
-    const stableScripts = html.match(new RegExp(`<script[^>]*${tool.name}\\.entry\\.js[^>]*></script>`, "gi")) || [];
-    if (stableScripts.length !== 1) failures.push(`${tool.name}: expected exactly one stable entry script, found ${stableScripts.length}`);
-    else if (!/type=["']module["']/i.test(stableScripts[0])) failures.push(`${tool.name}: stable entry must be a module script`);
+  const directToolScripts = html.match(new RegExp(`<script[^>]*${tool}\\.tool\\.[a-f0-9]{10}\\.js[^>]*></script>`, "gi")) || [];
+  if (directToolScripts.length) failures.push(`${tool}: page directly loads the tool module instead of the entry bootstrap`);
 
-    try {
-      const source = await readFile(path.join(dist, stableEntry), "utf8");
-      const imported = source.match(/import\(["']([^"']+)["']\)/)?.[1] || "";
-      if (!new RegExp(`/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`).test(imported)) failures.push(`${tool.name}: stable entry does not import its fingerprinted tool module`);
-      else if (!relativeFiles.includes(imported.replace(/^\//, ""))) failures.push(`${tool.name}: stable entry imports missing module: ${imported}`);
-    } catch {
-      failures.push(`${tool.name}: stable entry cannot be read`);
-    }
-  } else {
-    if (entries.length !== 1) failures.push(`${tool.name}: expected exactly one fingerprinted entry asset, found ${entries.length}`);
-    if (relativeFiles.includes(stableEntry)) failures.push(`${tool.name}: stable entry asset exists`);
-
-    const entryScripts = html.match(new RegExp(`<script[^>]*${tool.name}\\.entry\\.[a-f0-9]{10}\\.js[^>]*></script>`, "gi")) || [];
-    if (entryScripts.length !== 1) failures.push(`${tool.name}: expected exactly one fingerprinted entry script, found ${entryScripts.length}`);
-    else if (!/type=["']module["']/i.test(entryScripts[0])) failures.push(`${tool.name}: fingerprinted entry must be a module script`);
-
-    if (entries.length === 1) {
-      const source = await readFile(path.join(dist, entries[0]), "utf8");
-      const imported = source.match(/import\(["']([^"']+)["']\)/)?.[1] || "";
-      if (!new RegExp(`/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`).test(imported)) failures.push(`${tool.name}: entry does not import its fingerprinted tool module`);
-      else if (!relativeFiles.includes(imported.replace(/^\//, ""))) failures.push(`${tool.name}: entry imports missing module: ${imported}`);
-    }
+  if (entries.length === 1) {
+    const source = await readFile(path.join(dist, entries[0]), "utf8");
+    const imported = source.match(/import\(["']([^"']+)["']\)/)?.[1] || "";
+    const expected = new RegExp(`/${tool}\\.tool\\.[a-f0-9]{10}\\.js$`);
+    if (!expected.test(imported)) failures.push(`${tool}: fingerprinted entry does not import its fingerprinted tool module`);
+    else if (!relativeFiles.includes(imported.replace(/^\//, ""))) failures.push(`${tool}: fingerprinted entry imports missing module: ${imported}`);
   }
 }
 
-if (failures.length) {
-  throw new Error("New image-tools isolated verification failed:\n- " + failures.join("\n- "));
+const signPage = path.join(dist, "tools/sign-pdf.html");
+try {
+  const html = await readFile(signPage, "utf8");
+  const scripts = relativeFiles.filter((file) => /^assets\/js\/sign-pdf\.[a-f0-9]{10}\.js$/.test(file));
+  if (scripts.length !== 1) failures.push(`sign-pdf: expected exactly one fingerprinted implementation script, found ${scripts.length}`);
+  else if (!html.includes(`../${scripts[0]}`)) failures.push(`sign-pdf: page does not load ${scripts[0]}`);
+  if (relativeFiles.includes("assets/js/sign-pdf.js")) failures.push("sign-pdf: stable implementation asset exists");
+} catch {
+  failures.push("sign-pdf: page missing");
 }
 
-console.log("New image-tools isolated verification passed for exactly three tools: Photo Compressor, Signature Resizer and Thumb Impression Resizer.");
+if (failures.length) throw new Error("New-tools isolated verification failed:\n- " + failures.join("\n- "));
+
+console.log("New-tools isolated verification passed: 5 new image tools use isolated fingerprinted entry -> fingerprinted module bootstraps, and Sign PDF uses its normal fingerprinted application script. Existing working tools are outside this strategy and check.");
