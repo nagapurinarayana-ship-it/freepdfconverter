@@ -113,21 +113,27 @@
       return Array.from(input.files || []);
     }
 
+    function resetInput() {
+      try { input.value = ""; } catch (_) { /* Some browsers make file inputs immutable. */ }
+    }
+
     function consume(files) {
       if (handled || !files.length) return false;
       handled = true;
 
       // Pass a stable snapshot of File objects to the tool. Never make a tool
       // read input.files later: mobile browser FileLists can be transient.
-      onFiles(files);
-
-      // Reset only after delivery so selecting the same file again still emits
-      // a change event. Do not replace the input element; labels, focus and
-      // mobile picker state depend on that DOM node remaining stable.
-      window.setTimeout(function () {
-        try { input.value = ""; } catch (_) { /* Some browsers make file inputs immutable. */ }
-      }, 0);
-      return true;
+      // Keep the native input intact until the async selection handler has
+      // finished. Some Android/WebView providers invalidate the FileList too
+      // aggressively when the input is cleared immediately after change.
+      try {
+        return Promise.resolve(onFiles(files)).finally(function () {
+          window.setTimeout(resetInput, 0);
+        });
+      } catch (error) {
+        resetInput();
+        throw error;
+      }
     }
 
     input.addEventListener("change", function () {
