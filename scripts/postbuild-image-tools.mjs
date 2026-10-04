@@ -46,4 +46,35 @@ if (entryMappings.length) {
   }
 }
 
-console.log(`Added application-upload workflow cross-links and normalized ${entryMappings.length} image-tool entry scripts`);
+// Load image-tool bootstraps exactly like the proven classic-defer JPG→PDF path:
+// common.js runs first, then the stable entry script dynamically imports the
+// fingerprinted tool module. Do not let the .tool.js module execute directly
+// from HTML, because it reads window.FreePDF during module evaluation.
+const eagerToolModule = /\s*<script\s+type=["']module["']\s+src=["'][^"']*assets\/js\/tools\/(?:photo-compressor|signature-resizer|passport-id-photo-maker|thumb-impression-resizer|handwritten-declaration-resizer)\.tool\.js["']><\/script>/gi;
+const entryModuleTag = /<script\s+type=["']module["']\s+src=["']([^"']*assets\/js\/tools\/(?:photo-compressor|signature-resizer|passport-id-photo-maker|thumb-impression-resizer|handwritten-declaration-resizer)\.entry\.js)["']><\/script>/gi;
+let removedToolModules = 0;
+let normalizedEntryTags = 0;
+
+const htmlFiles = [];
+const walkHtml = async (directory) => {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const full = path.join(directory, entry.name);
+    if (entry.isDirectory()) await walkHtml(full);
+    else if (entry.name.endsWith(".html")) htmlFiles.push(full);
+  }
+};
+await walkHtml(dist);
+
+for (const file of htmlFiles) {
+  const html = await readFile(file, "utf8");
+  const removed = html.match(eagerToolModule);
+  if (removed?.length) removedToolModules += removed.length;
+  const withoutEagerModules = html.replace(eagerToolModule, "");
+  const normalized = withoutEagerModules.replace(entryModuleTag, function (_full, src) {
+    normalizedEntryTags += 1;
+    return '<script src="' + src + '" defer></script>';
+  });
+  if (normalized !== html) await writeFile(file, normalized, "utf8");
+}
+
+console.log("Added application-upload workflow cross-links and normalized " + entryMappings.length + " image-tool entry scripts; removed " + removedToolModules + " direct tool modules; normalized " + normalizedEntryTags + " entry tags to classic defer");
