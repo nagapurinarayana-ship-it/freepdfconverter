@@ -14,11 +14,6 @@ const NEW_IMAGE_TOOLS = [
   { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
 ];
 
-const NATIVE_PICKER_RECOVERY = new Map([
-  ["photo-compressor", { inputId: "imageFile" }],
-  ["signature-resizer", { inputId: "signatureFile" }]
-]);
-
 for (const tool of NEW_IMAGE_TOOLS) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
@@ -43,10 +38,12 @@ for (const tool of NEW_IMAGE_TOOLS) {
     await rm(path.join(toolsDir, oldModule), { force: true });
   }
 
-  const affectedTool = NATIVE_PICKER_RECOVERY.has(tool.name);
-  const entrySource = affectedTool
-    ? `function start() {\n  if (!window.FreePDF) {\n    window.setTimeout(start, 0);\n    return;\n  }\n  import("/assets/js/tools/${fingerprintedModuleName}").then(function (module) {\n    module.mount();\n  }).catch(function (error) {\n    console.error("FreePDF tool bootstrap failed:", error);\n  });\n}\n\nif (document.readyState === "loading") {\n  document.addEventListener("DOMContentLoaded", start, { once: true });\n} else {\n  start();\n}\n`
-    : `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
+  // All five new image tools use exactly the same entry contract as the
+  // already-working image tools: a static module import followed by mount().
+  // Photo Compressor and Signature Resizer previously had a separate dynamic
+  // bootstrap/native-picker path; that path is intentionally removed so these
+  // two tools cannot diverge from the proven picker lifecycle.
+  const entrySource = `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
 
   const entryHash = createHash("sha256").update(entrySource).digest("hex").slice(0, 10);
   const entryName = `${tool.name}.entry.${entryHash}.js`;
@@ -68,27 +65,15 @@ for (const tool of NEW_IMAGE_TOOLS) {
     `<script type="module" src="/assets/js/tools/${entryName}"></script>`
   );
 
+  // Remove all temporary picker-recovery hooks. The shared common.js
+  // bindFileInput/bindDropZone lifecycle is the single picker implementation
+  // used by the working image tools.
   html = html.replace(/\sdata-targeted-android-picker(?:=["'][^"']*["'])?/gi, "");
   html = html.replace(/\sdata-targeted-android-accept=["'][^"']*["']/gi, "");
   html = html.replace(/\sdata-new-tool-picker(?:=["'][^"']*["'])?/gi, "");
   html = html.replace(/\sdata-new-tool-accept=["'][^"']*["']/gi, "");
   html = html.replace(/<script id="new-tool-android-picker">[\s\S]*?<\/script>/gi, "");
   html = html.replace(/<script id="targeted-android-file-picker">[\s\S]*?<\/script>/gi, "");
-
-  const recovery = NATIVE_PICKER_RECOVERY.get(tool.name);
-  if (recovery) {
-    const inputPattern = new RegExp(
-      `<input\\b([^>]*\\bid=["']${recovery.inputId}["'][^>]*)>`,
-      "i"
-    );
-    html = html.replace(inputPattern, (match, attrs) => {
-      // Android Chrome has been unreliable when these two new tools combine
-      // the native image accept filter with the picker. Keep the native input
-      // unrestricted and let ToolController perform the real file validation.
-      const nextAttrs = attrs.replace(/\saccept=["'][^"']*["']/i, "") + " data-new-tool-picker=\"1\"";
-      return `<input${nextAttrs}>`;
-    });
-  }
 
   if (!html.includes(`/assets/js/tools/${entryName}`)) {
     throw new Error(`${tool.name}: entry was not installed into the page`);
@@ -103,4 +88,4 @@ for (const tool of NEW_IMAGE_TOOLS) {
   await writeFile(pagePath, html, "utf8");
 }
 
-console.log("Final new-tool strategy applied; Photo Compressor and Signature Resizer use dynamic bootstrap plus native picker recovery with fingerprinted cache-busting entries, while the other three image tools retain the existing entry contract. Existing working tools remain unchanged.");
+console.log("Final new-tool strategy applied uniformly to all five image tools: static fingerprinted entry imports with the shared native file-picker lifecycle. Existing working tools remain unchanged.");
