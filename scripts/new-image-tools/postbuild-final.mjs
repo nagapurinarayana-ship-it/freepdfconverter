@@ -15,10 +15,10 @@ const NEW_IMAGE_TOOLS = [
 ];
 
 // Keep the new tools isolated from the existing loader, but use the same
-// proven native <input type=file> flow as the four working new tools.
-// Do not replace the browser's native Android file picker with a custom
-// showOpenFilePicker handoff: that was the failure mode affecting Photo
-// Compressor and Signature Resizer on Android.
+// proven native <input type=file> flow as the working new tools.
+// Photo Compressor and Signature Resizer additionally use a stable bootstrap
+// URL because their bootstrap must never be served from an older service-worker
+// cache after deployment. Their actual tool modules remain fingerprinted.
 for (const tool of NEW_IMAGE_TOOLS) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
@@ -49,7 +49,10 @@ for (const tool of NEW_IMAGE_TOOLS) {
 
   const entrySource = `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
   const entryHash = createHash("sha256").update(entrySource).digest("hex").slice(0, 10);
-  const stableEntryName = `${tool.name}.entry.${entryHash}.js`;
+  const useStableEntry = tool.name === "photo-compressor" || tool.name === "signature-resizer";
+  const stableEntryName = useStableEntry
+    ? `${tool.name}.entry.js`
+    : `${tool.name}.entry.${entryHash}.js`;
   await writeFile(path.join(toolsDir, stableEntryName), entrySource, "utf8");
 
   const entryFiles = (await readdir(toolsDir)).filter((file) =>
@@ -59,8 +62,8 @@ for (const tool of NEW_IMAGE_TOOLS) {
     await rm(path.join(toolsDir, entryFile), { force: true });
   }
 
-  // Remove old direct module tags and install exactly one fingerprinted
-  // static module entry. Existing tools are never touched here.
+  // Remove old direct module tags and install exactly one entry.
+  // Existing working tools keep their current fingerprinted entry strategy.
   html = html.replace(
     new RegExp(`<script[^>]*src=["'][^"']*/${tool.name}\\.tool(?:\\.[a-f0-9]+)?\\.js["'][^>]*></script>`, "gi"),
     ""
@@ -70,8 +73,8 @@ for (const tool of NEW_IMAGE_TOOLS) {
     `<script type="module" src="/assets/js/tools/${stableEntryName}"></script>`
   );
 
-  // Remove any legacy custom-picker markers/scripts. The native file input
-  // remains untouched so Android Chrome handles file selection normally.
+  // Remove legacy custom-picker markers/scripts. The native file input remains
+  // the source of truth for all five new image tools.
   html = html.replace(/\sdata-targeted-android-picker(?:=["'][^"']*["'])?/gi, "");
   html = html.replace(/\sdata-targeted-android-accept=["'][^"']*["']/gi, "");
   html = html.replace(/\sdata-new-tool-picker(?:=["'][^"']*["'])?/gi, "");
@@ -80,7 +83,7 @@ for (const tool of NEW_IMAGE_TOOLS) {
   html = html.replace(/<script id="targeted-android-file-picker">[\s\S]*?<\/script>/gi, "");
 
   if (!html.includes(stableEntryName)) {
-    throw new Error(`${tool.name}: fingerprinted static entry was not installed into the page`);
+    throw new Error(`${tool.name}: entry was not installed into the page`);
   }
 
   let serviceWorker = await readFile(serviceWorkerPath, "utf8");
@@ -93,5 +96,5 @@ for (const tool of NEW_IMAGE_TOOLS) {
 }
 
 console.log(
-  "Final isolated new-tool strategy applied to the five new image tools; all use fingerprinted static entries and the native browser file input. Existing working tools remain unchanged."
+  "Final isolated new-tool strategy applied to the five new image tools; Photo Compressor and Signature Resizer use stable network-first bootstraps, while the other new tools retain their existing fingerprinted entries. Existing working tools remain unchanged."
 );
