@@ -21,6 +21,10 @@
 /assets/js/core/*
   Cache-Control: public, max-age=0, must-revalidate
 
+/assets/js/tools/*.entry.js
+  ! Cache-Control
+  Cache-Control: public, max-age=0, must-revalidate
+
 /assets/vendor/*
   Cache-Control: public, max-age=31536000, immutable
 
