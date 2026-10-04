@@ -164,6 +164,22 @@ if (signatureToolAsset) {
 if (!photoToolAsset) failures.push("Photo Compressor -> fingerprinted photo tool module is missing");
 if (!toolJsAssets.some((file) => /photo-compressor\.tool\.[a-f0-9]{10}\.js$/.test(file))) failures.push("Image tools -> fingerprinted photo tool module is missing");
 
+const imageEntryChecks = [
+  ["photo-compressor", "Photo Compressor"],
+  ["signature-resizer", "Signature Resizer"],
+  ["passport-id-photo-maker", "Passport & ID Photo Maker"],
+  ["thumb-impression-resizer", "Thumb Impression Resizer"],
+  ["handwritten-declaration-resizer", "Handwritten Declaration Resizer"]
+];
+for (const [toolId, label] of imageEntryChecks) {
+  const imageToolPage = await readFile(path.join(dist, "tools", toolId + ".html"), "utf8");
+  const entryMarker = "assets/js/tools/" + toolId + ".entry.js";
+  const directToolMarker = "assets/js/tools/" + toolId + ".tool.js";
+  const entryCount = imageToolPage.split(entryMarker).length - 1;
+  if (entryCount !== 1) failures.push(label + " -> expected exactly one stable entry script, found " + entryCount);
+  if (imageToolPage.includes(directToolMarker)) failures.push(label + " -> direct tool module must not be loaded by the HTML page");
+}
+
 const handwrittenPage = await readFile(path.join(dist, "tools/handwritten-declaration-resizer.html"), "utf8");
 if (!handwrittenPage.includes('10 KB') || !handwrittenPage.includes('50 KB') || !handwrittenPage.includes('100 KB') || !handwrittenPage.includes('customTarget') || !handwrittenPage.includes('Auto-crop extra whitespace') || !handwrittenPage.includes('Millimetres')) {
   failures.push("Handwritten Declaration Resizer -> target sizes, cleanup or dimension workflow is incomplete");
