@@ -28,16 +28,25 @@ for (const file of htmlFiles) {
     if (!/\btype=["'](?:button|submit|reset)["']/i.test(match[1])) failures.push(relative + " -> button is missing an explicit type");
   }
 
-  for (const match of html.matchAll(/<(input|select|textarea)\b([^>]*)>/gi)) {
+  const labelRanges = [];
+  const labelStack = [];
+  for (const labelMatch of html.matchAll(/<\\/?label\\b[^>]*>/gi)) {
+    if (/^<label\\b/i.test(labelMatch[0])) labelStack.push(labelMatch.index);
+    else if (labelStack.length) {
+      const labelStart = labelStack.pop();
+      labelRanges.push([labelStart, labelMatch.index + labelMatch[0].length]);
+    }
+  }
+
+  for (const match of html.matchAll(/<(input|select|textarea)\\b([^>]*)>/gi)) {
     const name = match[1].toLowerCase();
     const tag = match[2];
-    const type = tag.match(/\btype=["']([^"']+)["']/i)?.[1]?.toLowerCase() || "";
+    const type = tag.match(/\\btype=["\']([^"\']+)["\']/i)?.[1]?.toLowerCase() || "";
     if (name === "input" && /^(hidden|button|submit|reset|image)$/.test(type)) continue;
-    if (/\baria-label=["'][^"']+["']/i.test(tag) || /\baria-labelledby=["'][^"']+["']/i.test(tag)) continue;
-    const id = tag.match(/\bid=["']([^"']+)["']/i)?.[1];
+    if (/\\baria-label=["\'][^"\']+["\']/i.test(tag) || /\\baria-labelledby=["\'][^"\']+["\']/i.test(tag)) continue;
+    const id = tag.match(/\\bid=["\']([^"\']+)["\']/i)?.[1];
     const explicitLabel = id && new RegExp("<label\\\\b[^>]*\\\\bfor=[\\\"\']" + escapeRegex(id) + "[\\\"\']", "i").test(html);
-    const before = html.slice(0, match.index);
-    const wrappedLabel = id && before.lastIndexOf("<label") > before.lastIndexOf("</label>");
+    const wrappedLabel = labelRanges.some(([labelStart, labelEnd]) => match.index >= labelStart && match.index < labelEnd);
     const labelled = Boolean(explicitLabel || wrappedLabel);
     if (!labelled) failures.push(relative + " -> " + name + " control lacks an associated label or ARIA accessible name");
   }
