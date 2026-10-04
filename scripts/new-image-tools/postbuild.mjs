@@ -7,7 +7,9 @@ const dist = path.join(process.cwd(), "dist");
 const NEW_IMAGE_TOOLS = [
   { name: "photo-compressor", page: "tools/photo-compressor.html" },
   { name: "signature-resizer", page: "tools/signature-resizer.html" },
-  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" }
+  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" },
+  { name: "passport-id-photo-maker", page: "tools/passport-id-photo-maker.html" },
+  { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
 ];
 
 let verifiedEntryScripts = 0;
@@ -47,9 +49,7 @@ for (const tool of NEW_IMAGE_TOOLS) {
   const entrySource = await readFile(entryFile, "utf8");
 
   const moduleImport = entrySource.match(/import\(["']([^"']+)["']\)/)?.[1] || "";
-  const modulePattern = new RegExp(
-    `/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`
-  );
+  const modulePattern = new RegExp(`/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`);
   if (!modulePattern.test(moduleImport)) {
     throw new Error(
       `${tool.name}: fingerprinted entry does not import its fingerprinted tool module (got ${moduleImport || "none"})`
