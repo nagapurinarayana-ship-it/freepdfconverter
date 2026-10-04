@@ -50,7 +50,7 @@ if (entryMappings.length) {
 // common.js runs first, then the stable entry script dynamically imports the
 // fingerprinted tool module. Do not let the .tool.js module execute directly
 // from HTML, because it reads window.FreePDF during module evaluation.
-const eagerToolModule = /\s*<script\s+type=["']module["']\s+src=["'][^"']*assets\/js\/tools\/(?:photo-compressor|signature-resizer|passport-id-photo-maker|thumb-impression-resizer|handwritten-declaration-resizer)\.tool\.js["']><\/script>/gi;
+const eagerToolModule = /\s*<script\s+type=["']module["']\s+src=["'][^"']*assets\/js\/tools\/(?:photo-compressor|signature-resizer|passport-id-photo-maker|thumb-impression-resizer|handwritten-declaration-resizer)\.tool(?:\.[a-f0-9]{10})?\.js["']><\/script>/gi;
 const entryModuleTag = /<script\s+type=["']module["']\s+src=["']([^"']*assets\/js\/tools\/(?:photo-compressor|signature-resizer|passport-id-photo-maker|thumb-impression-resizer|handwritten-declaration-resizer)\.entry\.js)["']><\/script>/gi;
 let removedToolModules = 0;
 let normalizedEntryTags = 0;
