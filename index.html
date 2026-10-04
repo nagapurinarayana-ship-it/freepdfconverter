@@ -41,33 +41,91 @@
 <script>
 (function () {
   "use strict";
-  function activateFilter(name) {
-    var buttons = document.querySelectorAll("[data-tool-filter]");
-    var panes = document.querySelectorAll("[data-tool-pane]");
-    var found = false;
+
+  function countCards(pane) {
+    return pane ? pane.querySelectorAll(".tool-card").length : 0;
+  }
+
+  function syncFilterCounts(directory) {
+    var buttons = directory.querySelectorAll("[data-tool-filter]");
+    var panes = directory.querySelectorAll("[data-tool-pane]");
+
+    buttons.forEach(function (button) {
+      var paneId = button.getAttribute("aria-controls");
+      var pane = paneId ? document.getElementById(paneId) : null;
+      var count = countCards(pane);
+      var countNode = button.querySelector("[data-tool-count]");
+      if (countNode && count) countNode.textContent = String(count);
+    });
+
+    panes.forEach(function (pane) {
+      var count = countCards(pane);
+      var label = pane.querySelector(".tool-pane-heading > span");
+      if (label && count) label.textContent = count + (count === 1 ? " tool" : " tools");
+    });
+
+    var allPane = document.getElementById("pane-all");
+    var total = countCards(allPane);
+    document.querySelectorAll("[data-tool-count]").forEach(function (node) {
+      if (node.closest(".tool-filter-button")) return;
+      if (node.matches(".badge[data-tool-count]") && total) {
+        node.textContent = total + " free tools";
+      }
+    });
+  }
+
+  function activateFilter(directory, name) {
+    var buttons = directory.querySelectorAll("[data-tool-filter]");
+    var panes = directory.querySelectorAll("[data-tool-pane]");
+    var target = document.getElementById("pane-" + name);
+
+    if (!target) {
+      name = "all";
+      target = document.getElementById("pane-all");
+    }
+
     buttons.forEach(function (button) {
       var active = button.getAttribute("data-tool-filter") === name;
       button.setAttribute("aria-pressed", active ? "true" : "false");
       button.classList.toggle("is-active", active);
-      if (active) found = true;
     });
+
     panes.forEach(function (pane) {
-      var active = pane.getAttribute("data-tool-pane") === name;
+      var active = pane === target;
       pane.hidden = !active;
       pane.classList.toggle("is-active", active);
+      pane.setAttribute("aria-hidden", active ? "false" : "true");
     });
-    if (!found) activateFilter("all");
   }
+
   function init() {
-    document.querySelectorAll("[data-tool-filter]").forEach(function (button) {
-      button.addEventListener("click", function () {
-        activateFilter(button.getAttribute("data-tool-filter"));
-      });
+    var directory = document.getElementById("tool-directory");
+    if (!directory || directory.dataset.filterReady === "1") return;
+    directory.dataset.filterReady = "1";
+
+    syncFilterCounts(directory);
+
+    directory.addEventListener("click", function (event) {
+      var button = event.target.closest("[data-tool-filter]");
+      if (!button || !directory.contains(button)) return;
+      event.preventDefault();
+      activateFilter(directory, button.getAttribute("data-tool-filter"));
     });
-    activateFilter("all");
+
+    window.addEventListener("pageshow", function () {
+      var activeButton = directory.querySelector("[data-tool-filter][aria-pressed='true']");
+      activateFilter(directory, activeButton ? activeButton.getAttribute("data-tool-filter") : "all");
+    }, { passive: true });
+
+    var initialButton = directory.querySelector("[data-tool-filter][aria-pressed='true']");
+    activateFilter(directory, initialButton ? initialButton.getAttribute("data-tool-filter") : "all");
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
-  else init();
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
 }());
 </script>
 </body></html>
