@@ -1,4 +1,4 @@
-import { mount } from "./photo-compressor.tool.js";
+import { mount } from "/assets/js/tools/photo-compressor.tool.js";
 
 function start() {
   if (!window.FreePDF || typeof window.FreePDF.bindDropZone !== "function") {
