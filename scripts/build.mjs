@@ -89,10 +89,17 @@ await injectToolRegistry(path.join(dist, "index.html"));
 
 for (const relative of htmlFiles) {
   const file = path.join(dist, relative);
-  const html = await readFile(file, "utf8");
-  const withCleanLinks = rewriteInternalLinks(html);
+  let html = await readFile(file, "utf8");
+  html = rewriteInternalLinks(html);
+
   const head = relative === "404.html" ? "" : appHead + "\n";
-  await writeFile(file, withCleanLinks.replace("</head>", head + "</head>"), "utf8");
+  if (relative === "404.html" || relative === "offline.html") {
+    const noindex = '<meta name="robots" content="noindex,nofollow,noarchive">';
+    if (!/<meta\s+name=["']robots["']/i.test(html)) {
+      html = html.replace("</head>", noindex + "\n</head>");
+    }
+  }
+  await writeFile(file, html.replace("</head>", head + "</head>"), "utf8");
 }
 
 if (origin) {
