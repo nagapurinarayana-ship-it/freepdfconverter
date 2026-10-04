@@ -33,10 +33,10 @@ function schemaTypes(html, file) {
   return types;
 }
 
-function checkPage(relative, expectedUrl, localized = false) {
+async function checkPage(relative, expectedUrl, localized = false) {
   const file = localPath(relative);
-  if (!requireFile(file)) return;
-  const html = readFileSync(file);
+  if (!await requireFile(file)) return;
+  const html = await readFileSync(file);
   const title = html.match(/<title>([\s\S]*?)<\/title>/i)?.[1]?.trim() || "";
   const description = html.match(/<meta\s+[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i)?.[1]?.trim() || "";
   const canonical = html.match(/<link\s+[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["'][^>]*>/i)?.[1] || "";
@@ -92,9 +92,9 @@ function checkPage(relative, expectedUrl, localized = false) {
   console.log("PASS " + relative);
 }
 
-function requireFile(file) {
+async function requireFile(file) {
   try {
-    require("node:fs").accessSync(file);
+    await access(file);
     return true;
   } catch {
     fail("missing file " + path.relative(dist, file));
@@ -102,22 +102,22 @@ function requireFile(file) {
   }
 }
 
-function readFileSync(file) {
-  return require("node:fs").readFileSync(file, "utf8");
+async function readFileSync(file) {
+  return readFile(file, "utf8");
 }
 
 for (const relative of [...indexablePages, ...supplementalPages]) {
-  checkPage(relative, SITE + pagePathname(relative));
+  await checkPage(relative, SITE + pagePathname(relative));
 }
 
 for (const item of allLocalizedPaths()) {
   const relative = item.path.replace(/^\//, "") + (item.path.endsWith("/") ? "index.html" : ".html");
-  checkPage(relative, SITE + item.path, true);
+  await checkPage(relative, SITE + item.path, true);
 }
 
 const sitemapPath = path.join(dist, "sitemap.xml");
 const robotsPath = path.join(dist, "robots.txt");
-const sitemap = readFileSync(sitemapPath);
+const sitemap = await readFileSync(sitemapPath);
 const sitemapUrls = new Set([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]));
 
 if (!sitemapUrls.size) fail("dist/sitemap.xml has no URLs");
@@ -135,7 +135,7 @@ for (const url of sitemapUrls) {
   if (/\.html(?:$|[?#])/.test(url)) fail("sitemap contains legacy .html URL " + url);
 }
 
-const robots = readFileSync(robotsPath);
+const robots = await readFileSync(robotsPath);
 if (!/User-agent:\s*\*/i.test(robots)) fail("robots.txt missing User-agent *");
 if (!/Allow:\s*\//i.test(robots)) fail("robots.txt missing Allow: /");
 if (!robots.includes("Sitemap: " + SITE + "/sitemap.xml")) fail("robots.txt does not point to production sitemap");
@@ -143,7 +143,7 @@ if (!robots.includes("Sitemap: " + SITE + "/sitemap.xml")) fail("robots.txt does
 for (const relative of ["404.html", "offline.html"]) {
   const file = localPath(relative);
   try {
-    const html = readFileSync(file);
+    const html = await readFileSync(file);
     if (!/name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(html)) fail(relative + " must be noindex");
   } catch {}
 }
