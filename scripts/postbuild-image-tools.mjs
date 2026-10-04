@@ -46,4 +46,21 @@ if (entryMappings.length) {
   }
 }
 
+// The entry bootstrap is the only module that should initialize the new image
+// tools. Loading the tool module directly as a second module is unsafe because
+// the tool modules read shared window.FreePDF state during module evaluation,
+// while common.js is a deferred classic script. On some browsers this ordering
+// race leaves the module evaluated before window.FreePDF exists and the entry
+// import then reuses the failed module evaluation. Remove any eager tool-module
+// tags from the generated HTML; the stable entry loads the tool after
+// DOMContentLoaded, when the shared runtime is guaranteed to be initialized.
+const eagerToolModule = /\s*<script\s+type=["']module["']\s+src=["'][^"']*\/assets\/js\/tools\/[^"']+\.tool\.js["']><\/script>/gi;
+for (const file of await readdir(dist, { withFileTypes: true })) {
+  if (!file.isFile() || !file.name.endsWith(".html")) continue;
+  const full = path.join(dist, file.name);
+  const content = await readFile(full, "utf8");
+  const cleaned = content.replace(eagerToolModule, "");
+  if (cleaned !== content) await writeFile(full, cleaned, "utf8");
+}
+
 console.log(`Added application-upload workflow cross-links and normalized ${entryMappings.length} image-tool entry scripts`);
