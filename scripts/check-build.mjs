@@ -128,7 +128,7 @@ const thumbPage = await readFile(path.join(dist, "tools/thumb-impression-resizer
 if (!thumbPage.includes('300 × 300 px') || !thumbPage.includes('600 × 600 px') || !thumbPage.includes('Auto-crop extra whitespace') || !thumbPage.includes('custom')) {
   failures.push("Thumb Impression Resizer -> presets, cleanup or custom-size workflow is incomplete");
 }
-if (!thumbPage.includes("assets/js/tools/thumb-impression-resizer.entry.js")) failures.push("Thumb Impression Resizer -> direct entry script is missing");
+if (!/assets\\/js\\/tools\\/thumb-impression-resizer\\.entry\\.[a-f0-9]{10}\\.js/.test(thumbPage) || /assets\\/js\\/tools\\/thumb-impression-resizer\\.entry\\.js/.test(thumbPage)) failures.push("Thumb Impression Resizer -> fingerprinted entry script contract is missing");
 if (/\bZIP\b/i.test(thumbPage) || /\.zip\b/i.test(thumbPage)) failures.push("Thumb Impression Resizer -> ZIP output reference remains");
 const thumbToolAsset = toolJsAssets.find((file) => /^thumb-impression-resizer\.tool\.[a-f0-9]{10}\.js$/.test(file));
 if (!thumbToolAsset) failures.push("Thumb Impression Resizer -> fingerprinted tool module is missing");
@@ -141,7 +141,7 @@ const passportPage = await readFile(path.join(dist, "tools/passport-id-photo-mak
 if (!passportPage.includes('35 × 45 mm') || !passportPage.includes('2 × 2 in') || !passportPage.includes('focusY') || !passportPage.includes('custom')) {
   failures.push("Passport & ID Photo Maker -> preset, custom-size or framing workflow is incomplete");
 }
-if (!passportPage.includes("assets/js/tools/passport-id-photo-maker.entry.js")) failures.push("Passport & ID Photo Maker -> direct entry script is missing");
+if (!/assets\\/js\\/tools\\/passport-id-photo-maker\\.entry\\.[a-f0-9]{10}\\.js/.test(passportPage) || /assets\\/js\\/tools\\/passport-id-photo-maker\\.entry\\.js/.test(passportPage)) failures.push("Passport & ID Photo Maker -> fingerprinted entry script contract is missing");
 if (/\bZIP\b/i.test(passportPage) || /\.zip\b/i.test(passportPage)) failures.push("Passport & ID Photo Maker -> ZIP output reference remains");
 const passportToolAsset = toolJsAssets.find((file) => /^passport-id-photo-maker\.tool\.[a-f0-9]{10}\.js$/.test(file));
 if (!passportToolAsset) failures.push("Passport & ID Photo Maker -> fingerprinted tool module is missing");
@@ -168,7 +168,7 @@ const handwrittenPage = await readFile(path.join(dist, "tools/handwritten-declar
 if (!handwrittenPage.includes('10 KB') || !handwrittenPage.includes('50 KB') || !handwrittenPage.includes('100 KB') || !handwrittenPage.includes('customTarget') || !handwrittenPage.includes('Auto-crop extra whitespace') || !handwrittenPage.includes('Millimetres')) {
   failures.push("Handwritten Declaration Resizer -> target sizes, cleanup or dimension workflow is incomplete");
 }
-if (!handwrittenPage.includes("assets/js/tools/handwritten-declaration-resizer.entry.js")) failures.push("Handwritten Declaration Resizer -> direct entry script is missing");
+if (!/assets\\/js\\/tools\\/handwritten-declaration-resizer\\.entry\\.[a-f0-9]{10}\\.js/.test(handwrittenPage) || /assets\\/js\\/tools\\/handwritten-declaration-resizer\\.entry\\.js/.test(handwrittenPage)) failures.push("Handwritten Declaration Resizer -> fingerprinted entry script contract is missing");
 if (/\bZIP\b/i.test(handwrittenPage) || /\.zip\b/i.test(handwrittenPage)) failures.push("Handwritten Declaration Resizer -> ZIP output reference remains");
 const handwrittenToolAsset = toolJsAssets.find((file) => /^handwritten-declaration-resizer\.tool\.[a-f0-9]{10}\.js$/.test(file));
 if (!handwrittenToolAsset) failures.push("Handwritten Declaration Resizer -> fingerprinted tool module is missing");
