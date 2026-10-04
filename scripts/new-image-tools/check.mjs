@@ -67,7 +67,7 @@ for (const tool of NEW_IMAGE_TOOLS) {
   ) || [];
 
   if (entryHtmlMatches.length !== 1) {
-    failures.push(`${tool.name}: page must contain exactly one deferred fingerprinted entry script, found ${entryHtmlMatches.length}`);
+    failures.push(`${tool.name}: page must contain exactly one fingerprinted entry module script, found ${entryHtmlMatches.length}`);
   }
 
   const directHtmlMatches = html.match(
@@ -119,5 +119,5 @@ if (failures.length) {
 }
 
 console.log(
-  `New image-tools isolated verification passed: ${NEW_IMAGE_TOOLS.length} tools, fingerprinted entry -> fingerprinted module, no stable URLs, no direct module script tags.`
+  `New image-tools isolated verification passed: ${NEW_IMAGE_TOOLS.length} tools, fingerprinted module entry -> fingerprinted tool module, no stable URLs, no direct module script tags.`
 );
