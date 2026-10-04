@@ -35,7 +35,10 @@ for (const file of htmlFiles) {
     if (name === "input" && /^(hidden|button|submit|reset|image)$/.test(type)) continue;
     if (/\baria-label=["'][^"']+["']/i.test(tag) || /\baria-labelledby=["'][^"']+["']/i.test(tag)) continue;
     const id = tag.match(/\bid=["']([^"']+)["']/i)?.[1];
-    const labelled = id && new RegExp("<label\\b[^>]*\\bfor=[\\\"\']" + escapeRegex(id) + "[\\\"\']", "i").test(html);
+    const explicitLabel = id && new RegExp("<label\\\\b[^>]*\\\\bfor=[\\\"\']" + escapeRegex(id) + "[\\\"\']", "i").test(html);
+    const before = html.slice(0, match.index);
+    const wrappedLabel = id && before.lastIndexOf("<label") > before.lastIndexOf("</label>");
+    const labelled = Boolean(explicitLabel || wrappedLabel);
     if (!labelled) failures.push(relative + " -> " + name + " control lacks an associated label or ARIA accessible name");
   }
 
