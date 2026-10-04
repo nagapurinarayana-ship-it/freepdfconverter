@@ -154,9 +154,13 @@ async function ensureGlobalUiAssets(rootDirectory) {
     let html = await readFile(file, "utf8");
     const hasStyles = /<link[^>]+href=["'][^"']*assets\/css\/styles\.css/i.test(html);
     const hasCommon = /<script[^>]+src=["'][^"']*assets\/js\/common\.js/i.test(html);
+    const hasMonetization = /<script[^>]+src=["'][^"']*assets\/js\/monetization-config\.js/i.test(html);
+    const hasAds = /<script[^>]+src=["'][^"']*assets\/js\/ads\.js/i.test(html);
     const additions = [];
     if (!hasStyles) additions.push('<link rel="stylesheet" href="/assets/css/styles.css">');
     if (!hasCommon) additions.push('<script src="/assets/js/common.js" defer></script>');
+    if (!hasMonetization) additions.push('<script src="/assets/js/monetization-config.js" defer></script>');
+    if (!hasAds) additions.push('<script src="/assets/js/ads.js" defer></script>');
     if (!additions.length) continue;
     if (!/<head[\s\S]*<\/head>/i.test(html)) continue;
     html = html.replace("</head>", additions.join("\n") + "\n</head>");
