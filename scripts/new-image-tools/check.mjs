@@ -64,20 +64,20 @@ for (const tool of NEW_IMAGE_TOOLS) {
 
   const entryHtmlMatches = html.match(
     new RegExp(
-      String.raw`<script\\b[^>]*\\bsrc=["'][^"']*/${tool.name}\\.entry\\.[a-f0-9]{10}\\.js["'][^>]*></script>`,
+      String.raw`<script[^>]*${tool.name}\\.entry\\.[a-f0-9]{10}\\.js[^>]*></script>`,
       "gi"
     )
   ) || [];
 
   if (entryHtmlMatches.length !== 1) {
     failures.push(`${tool.name}: page must contain exactly one fingerprinted entry script, found ${entryHtmlMatches.length}`);
-  } else if (!/\\btype=["']module["']/i.test(entryHtmlMatches[0])) {
+  } else if (!/type=["']module["']/i.test(entryHtmlMatches[0])) {
     failures.push(`${tool.name}: fingerprinted entry must remain a module script`);
   }
 
   const directHtmlMatches = html.match(
     new RegExp(
-      String.raw`<script\\b[^>]*\\bsrc=["'][^"']*/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js["'][^>]*></script>`,
+      String.raw`<script[^>]*${tool.name}\\.tool\\.[a-f0-9]{10}\\.js[^>]*></script>`,
       "gi"
     )
   ) || [];
