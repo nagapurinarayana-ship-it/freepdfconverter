@@ -1,6 +1,7 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pagePathname } from "./site-config.mjs";
+import { toolRegistry } from "./tool-registry.mjs";
 
 const dist = path.join(process.cwd(), "dist");
 const origin = (process.env.SITE_ORIGIN || "https://freepdfconverter-all-in-one.pages.dev").replace(/\/$/, "");
@@ -72,7 +73,8 @@ await collectHtml(dist);
 
 for (const file of htmlFiles) {
   const relative = path.relative(dist, file).replaceAll(path.sep, "/");
-  const values = seo[relative];
+  const tool = toolRegistry.find((item) => item.path === relative);
+  const values = seo[relative] || (tool ? generatedToolSeo(tool) : undefined);
 
   let html = await readFile(file, "utf8");
   const canonicalUrl = origin + pagePathname(relative);
@@ -101,6 +103,20 @@ async function collectHtml(directory) {
     if (entry.isDirectory()) await collectHtml(full);
     else if (entry.isFile() && entry.name.toLowerCase().endsWith(".html")) htmlFiles.push(full);
   }
+}
+
+
+function generatedToolSeo(tool) {
+  const titles = {
+    "photo-compressor": "Compress Images Online Free — Photo Compressor | FreePDF Tools",
+    "signature-resizer": "Resize Signature Online — Free Signature Tool | FreePDF Tools",
+    "passport-id-photo-maker": "Passport & ID Photo Maker — Resize Online | FreePDF Tools",
+    "thumb-impression-resizer": "Thumb Impression Resizer — Free Online Tool | FreePDF Tools",
+    "handwritten-declaration-resizer": "Handwritten Declaration Resizer — Free Tool | FreePDF Tools"
+  };
+  const title = titles[tool.id] || (tool.label + " Online Free — Browser Tool | FreePDF Tools");
+  const description = String(tool.description).replace(/\.$/, "") + ". Process supported files locally in your browser without uploading the source file.";
+  return [title, description];
 }
 
 function escapeAttribute(value) {
