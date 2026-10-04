@@ -16,7 +16,31 @@ export async function injectToolRegistry(targetFile = path.join(root, "index.htm
     throw new Error("index.html is missing TOOL-REGISTRY markers");
   }
 
-  const cards = toolRegistry
+  const categoryGroups = [
+    {
+      id: "pdf-tools",
+      kicker: "PDF essentials",
+      title: "Work with PDFs",
+      description: "Merge, split, edit, secure, clean and organize PDF files.",
+      ids: ["merge-pdf","split-pdf","unlock-pdf","protect-pdf","rotate-pdf","organize-pdf","add-page-numbers","remove-pdf-metadata","crop-pdf","extract-pdf-text","compress-pdf","ocr-pdf","sign-pdf","watermark-pdf"]
+    },
+    {
+      id: "converter-tools",
+      kicker: "Conversions",
+      title: "Convert between formats",
+      description: "Move between PDF, Word and image formats in a few clicks.",
+      ids: ["jpg-to-pdf","pdf-to-image","pdf-to-word","word-to-pdf"]
+    },
+    {
+      id: "image-tools",
+      kicker: "Images & forms",
+      title: "Prepare photos and form images",
+      description: "Compress, resize and prepare the image files common forms ask for.",
+      ids: ["photo-compressor","signature-resizer","passport-id-photo-maker","thumb-impression-resizer","handwritten-declaration-resizer"]
+    }
+  ];
+
+  const cardsFor = (tools) => tools
     .filter((tool) => tool.home !== false)
     .map((tool) => {
       const href = tool.path.replace(/\.html$/i, "");
@@ -25,11 +49,25 @@ export async function injectToolRegistry(targetFile = path.join(root, "index.htm
         '<span class="tool-icon">' + escapeHtml(tool.icon) + "</span>",
         "<h3>" + escapeHtml(tool.label) + "</h3>",
         "<p>" + escapeHtml(tool.description) + "</p>",
-        '<span class="go">Open tool →</span>',
+        '<span class="go" aria-hidden="true">→</span>',
         "</a>"
       ].join("");
     })
     .join("\n");
+
+  const cards = categoryGroups.map((group) => {
+    const tools = group.ids.map((id) => toolRegistry.find((tool) => tool.id === id)).filter(Boolean);
+    return [
+      '<section class="tool-category" id="' + group.id + '">',
+      '<div class="tool-category-head"><div><div class="tool-category-kicker">' + group.kicker + '</div><h3>' + group.title + '</h3></div><p>' + tools.length + ' tools</p></div>',
+      '<div class="tool-card-grid">',
+      cardsFor(tools),
+      '</div>',
+      '</section>'
+    ].join("\n");
+  }).join("\n");
+
+
 
   html = html.slice(0, startIndex + start.length) + "\n" + cards + "\n" + html.slice(endIndex);
 
