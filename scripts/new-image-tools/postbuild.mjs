@@ -1,13 +1,16 @@
-import { readFile, writeFile, rm } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const dist = path.join(process.cwd(), "dist");
 
-// New tools only. Existing working tools are intentionally excluded.
+// ONLY these five image tools use the new isolated loader strategy.
+// Existing working tools are intentionally excluded.
 const NEW_IMAGE_TOOLS = [
   { name: "photo-compressor", page: "tools/photo-compressor.html" },
   { name: "signature-resizer", page: "tools/signature-resizer.html" },
-  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" }
+  { name: "passport-id-photo-maker", page: "tools/passport-id-photo-maker.html" },
+  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" },
+  { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
 ];
 
 let verifiedEntryScripts = 0;
@@ -17,22 +20,24 @@ for (const tool of NEW_IMAGE_TOOLS) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
 
+  // Never allow the fingerprinted implementation module to be executed directly
+  // by HTML. The entry module owns the dynamic import of the fingerprinted tool.
   const directModule = new RegExp(
     `<script\\s+type=["']module["']\\s+src=["'][^"']*/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js["']\\s*></script>`,
     "gi"
   );
-
   const directMatches = html.match(directModule);
   if (directMatches?.length) {
     removedDirectModules += directMatches.length;
     html = html.replace(directModule, "");
   }
 
+  // New strategy: keep the fingerprinted entry bootstrap as a module so the
+  // browser receives a fresh URL whenever the build changes.
   const entryPattern = new RegExp(
-    `<script\\s+(?:type=["']module["']\\s+)?src=["']([^"']*/${tool.name}\\.entry\\.[a-f0-9]{10}\\.js)["'](?:\\s+defer)?\\s*></script>`,
+    `<script\\b(?=[^>]*\\btype=["']module["'])(?=[^>]*\\bsrc=["'][^"']*/${tool.name}\\.entry\\.[a-f0-9]{10}\\.js["'])[^>]*></script>`,
     "gi"
   );
-
   const entryMatches = [...html.matchAll(entryPattern)];
 
   if (entryMatches.length !== 1) {
@@ -41,48 +46,20 @@ for (const tool of NEW_IMAGE_TOOLS) {
     );
   }
 
-  const entrySrc = entryMatches[0][1];
-  const entryFile = path.resolve(path.dirname(pagePath), entrySrc);
-  const entryRelative = path.relative(dist, entryFile).split(path.sep).join("/");
+  const entrySrc = entryMatches[0][0].match(/src=["']([^"']+)["']/i)?.[1] || "";
+  const normalizedSrc = entrySrc.startsWith("/") ? entrySrc.slice(1) : entrySrc.replace(/^\.\//, "");
+  const entryFile = path.join(dist, normalizedSrc);
   const entrySource = await readFile(entryFile, "utf8");
 
   const moduleImport = entrySource.match(/import\(["']([^"']+)["']\)/)?.[1] || "";
-  const modulePattern = new RegExp(`/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`);
-  if (!modulePattern.test(moduleImport)) {
+  if (!new RegExp(`/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`).test(moduleImport)) {
     throw new Error(
       `${tool.name}: fingerprinted entry does not import its fingerprinted tool module (got ${moduleImport || "none"})`
     );
   }
 
-  if (tool.name === "thumb-impression-resizer") {
-    const stableEntryRelative = "assets/js/tools/thumb-impression-resizer.entry.js";
-    const stableEntryFile = path.join(dist, stableEntryRelative);
-
-    await writeFile(stableEntryFile, entrySource, "utf8");
-    await rm(entryFile, { force: true });
-
-    const oldPublicPath = "/" + entryRelative;
-    html = html.replace(
-      entryPattern,
-      '<script type="module" src="../assets/js/tools/thumb-impression-resizer.entry.js"></script>'
-    );
-
-    const serviceWorkerPath = path.join(dist, "service-worker.js");
-    let serviceWorker = await readFile(serviceWorkerPath, "utf8");
-    serviceWorker = serviceWorker.split(oldPublicPath).join("/" + stableEntryRelative);
-    await writeFile(serviceWorkerPath, serviceWorker, "utf8");
-  }
-
   if (html.includes(`/assets/js/tools/${tool.name}.tool.js`)) {
     throw new Error(`${tool.name}: stable tool-module URL leaked into generated HTML`);
-  }
-
-  if (tool.name === "thumb-impression-resizer") {
-    if (!html.includes("assets/js/tools/thumb-impression-resizer.entry.js")) {
-      throw new Error("thumb-impression-resizer: stable entry bootstrap is missing");
-    }
-  } else if (html.includes(`/assets/js/tools/${tool.name}.entry.js`)) {
-    throw new Error(`${tool.name}: stable entry URL leaked into generated HTML`);
   }
 
   verifiedEntryScripts += 1;
