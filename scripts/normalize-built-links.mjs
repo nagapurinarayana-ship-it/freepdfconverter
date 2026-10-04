@@ -7,7 +7,17 @@ await collectHtml(dist);
 
 for (const file of htmlFiles) {
   const html = await readFile(file, "utf8");
-  const normalized = html.replace(/(href=["'])([^"']+)(["'])/gi, function (full, prefix, href, suffix) {
+  const relative = path.relative(dist, file).replaceAll(path.sep, "/");
+  let normalized = normalizeInternalLinks(html);
+  normalized = normalizeGlobalHeader(normalized, relative);
+
+  if (normalized !== html) await writeFile(file, normalized, "utf8");
+}
+
+console.log("Normalized internal HTML links and the shared production header.");
+
+function normalizeInternalLinks(html) {
+  return html.replace(/(href=["'])([^"']+)(["'])/gi, function (full, prefix, href, suffix) {
     if (/^(?:https?:|mailto:|tel:|data:|#|javascript:)/i.test(href)) return full;
 
     const suffixIndex = href.search(/[?#]/);
@@ -22,11 +32,41 @@ for (const file of htmlFiles) {
 
     return prefix + clean + trailing + suffix;
   });
-
-  if (normalized !== html) await writeFile(file, normalized, "utf8");
 }
 
-console.log("Normalized internal HTML links in the production build.");
+function normalizeGlobalHeader(html, relative) {
+  const current = relative === "index.html" || relative.startsWith("tools/")
+    ? "all"
+    : relative.startsWith("guides/")
+      ? "guides"
+      : relative.startsWith("topics/")
+        ? "topics"
+        : relative === "privacy.html"
+          ? "privacy"
+          : relative === "about.html"
+            ? "about"
+            : "";
+
+  const links = [
+    ["all", "/#tools", "All tools"],
+    ["guides", "/guides/", "Guides"],
+    ["topics", "/topics/", "Topics"],
+    ["privacy", "/privacy", "Privacy"],
+    ["about", "/about", "About"]
+  ];
+
+  const nav = links.map(function (item) {
+    const aria = current === item[0] ? ' aria-current="page"' : "";
+    return '<a href="' + item[1] + '"' + aria + '>' + item[2] + '</a>';
+  }).join("");
+
+  const header = '<header class="site-header"><div class="container header-inner">' +
+    '<a class="logo" href="/" aria-label="FreePDF Tools home"><span class="logo-mark" aria-hidden="true">PDF</span><span>FreePDF Tools</span></a>' +
+    '<nav class="main-nav" aria-label="Main navigation">' + nav + '</nav>' +
+    '</div></header>';
+
+  return html.replace(/<header\s+class=["']site-header["'][\s\S]*?<\/header>/i, header);
+}
 
 async function collectHtml(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
