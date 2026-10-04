@@ -65,3 +65,5 @@ self.addEventListener("fetch", function (event) {
     }));
   }
 });
+
+// Deploy the exact known-good d9 baseline to production.
