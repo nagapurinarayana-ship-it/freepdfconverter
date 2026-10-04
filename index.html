@@ -9,28 +9,20 @@
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <meta property="og:type" content="website"><meta property="og:site_name" content="FreePDF Tools"><meta property="og:title" content="Free PDF Converter & Online Tools — Fast, Private & Free | FreePDF Tools"><meta property="og:description" content="Merge, split, compress, convert, sign and optimize PDFs and images instantly. No account required."><meta property="og:url" content="https://freepdfconverter-all-in-one.pages.dev/"><meta property="og:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg"><meta property="og:image:alt" content="FreePDF Tools — free private browser-based PDF and image utilities"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Free PDF Converter & Online Tools — Fast, Private & Free"><meta name="twitter:description" content="Merge, split, compress, convert, sign and optimize PDFs and images instantly. No account required."><meta name="twitter:image" content="https://freepdfconverter-all-in-one.pages.dev/assets/images/freepdf-tools-social.jpg">
-</head><body class="home-page"><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="container header-inner"><a class="logo" href="./" aria-label="FreePDF Tools home"><span class="logo-mark" aria-hidden="true">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav" aria-label="Main navigation"><a href="#tools">All tools</a><a href="#tools">Popular</a><a href="guides/">Guides</a><a href="topics/">Topics</a><a href="#privacy">Privacy</a><a href="about">About</a></nav></div></header>
+</head><body class="home-page"><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="container header-inner"><a class="logo" href="./" aria-label="FreePDF Tools home"><span class="logo-mark" aria-hidden="true">PDF</span><span>FreePDF Tools</span></a><nav class="main-nav" aria-label="Main navigation"><a href="#tools">All tools</a><a href="guides/">Guides</a><a href="topics/">Topics</a><a href="#privacy">Privacy</a><a href="about">About</a></nav></div></header>
 <main id="main">
 <section class="hero hero-final"><div class="container"><div class="hero-final-inner">
 <span class="eyebrow">Free forever · No account · Private in your browser</span>
 <h1>Everything you need to work with PDFs, images &amp; documents.</h1>
 <p class="lead">Pick the job. Choose your file. Get the result. FreePDF Tools keeps the experience simple while your supported files stay on your device.</p>
-<div class="hero-actions hero-actions-center"><a class="button button-large" href="#tools">All tools</a><a class="button secondary button-large" href="tools/compress-pdf">Compress a PDF</a></div>
+<div class="hero-actions hero-actions-center"><a class="button button-large" href="#tools">All tools</a><a class="button secondary button-large" href="tools/compress-pdf">Compress a PDF</a></div><div class="hero-quick-start" aria-label="Quick start"><span class="hero-quick-label">Quick start</span><a href="tools/pdf-to-word">PDF → Word</a><a href="tools/jpg-to-pdf">JPG / PNG → PDF</a><a href="tools/photo-compressor">Compress Photo</a></div>
 <div class="hero-proof"><span>⚡ Instant start</span><span>🔒 Supported files stay local</span><span>📱 Mobile friendly</span><span>💯 No sign-up</span></div>
 </div></section>
 <div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>
 <section class="section home-tools-section" id="tools"><div class="container">
 <div class="section-heading section-heading-wide"><span class="badge" data-tool-count>23 free tools</span><h2>All the tools. Nothing important hidden.</h2><p>Everything is grouped by the job you are trying to finish, so you can scan the library quickly and jump straight in.</p></div>
 <div class="tool-directory" id="tool-directory" aria-live="polite">
-<div class="tool-tabs-wrap">
-<div class="tool-tabs" aria-label="Tool categories">
-<button class="tool-tab is-active" id="button-all" type="button" aria-pressed="true" data-tool-tab="all">All tools</button>
-<button class="tool-tab" id="button-popular" type="button" aria-pressed="false" data-tool-tab="popular">Popular</button>
-<button class="tool-tab" id="button-pdf" type="button" aria-pressed="false" data-tool-tab="pdf">PDF <span data-tool-count="pdf">14</span></button>
-<button class="tool-tab" id="button-converters" type="button" aria-pressed="false" data-tool-tab="converters">Converters <span data-tool-count="converters">4</span></button>
-<button class="tool-tab" id="button-images" type="button" aria-pressed="false" data-tool-tab="images">Images &amp; Forms <span data-tool-count="images">5</span></button>
-</div>
-</div>
+<div class="tool-filter-wrap"><div class="tool-filter" aria-label="Filter tools"><button class="tool-filter-button is-active" id="button-all" type="button" aria-pressed="true" data-tool-filter="all">All tools <span data-tool-count="all">23</span></button><button class="tool-filter-button" id="button-pdf" type="button" aria-pressed="false" data-tool-filter="pdf">PDF <span data-tool-count="pdf">14</span></button><button class="tool-filter-button" id="button-convert" type="button" aria-pressed="false" data-tool-filter="convert">Convert <span data-tool-count="convert">4</span></button><button class="tool-filter-button" id="button-images" type="button" aria-pressed="false" data-tool-filter="images">Images &amp; Forms <span data-tool-count="images">5</span></button></div></div>
 <!-- TOOL-REGISTRY:START -->
 <!-- TOOL-REGISTRY:END -->
 </div></section>
@@ -48,43 +40,33 @@
 <script>
 (function () {
   "use strict";
-
-  function activateButton(name) {
-    var buttons = document.querySelectorAll("[data-tool-tab]");
+  function activateFilter(name) {
+    var buttons = document.querySelectorAll("[data-tool-filter]");
     var panes = document.querySelectorAll("[data-tool-pane]");
     var found = false;
-
     buttons.forEach(function (button) {
-      var active = button.getAttribute("data-tool-tab") === name;
+      var active = button.getAttribute("data-tool-filter") === name;
       button.setAttribute("aria-pressed", active ? "true" : "false");
       button.classList.toggle("is-active", active);
       if (active) found = true;
     });
-
     panes.forEach(function (pane) {
       var active = pane.getAttribute("data-tool-pane") === name;
       pane.hidden = !active;
       pane.classList.toggle("is-active", active);
     });
-
-    if (!found) activateButton("all");
+    if (!found) activateFilter("all");
   }
-
   function init() {
-    document.querySelectorAll("[data-tool-tab]").forEach(function (button) {
+    document.querySelectorAll("[data-tool-filter]").forEach(function (button) {
       button.addEventListener("click", function () {
-        activateButton(button.getAttribute("data-tool-tab"));
+        activateFilter(button.getAttribute("data-tool-filter"));
       });
     });
-
-    activateButton("all");
+    activateFilter("all");
   }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init, { once: true });
-  } else {
-    init();
-  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
+  else init();
 }());
 </script>
 </body></html>
