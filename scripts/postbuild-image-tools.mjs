@@ -13,9 +13,9 @@ if (!index.includes('id="application-upload-workflows"') && index.includes(marke
   await writeFile(indexPath, index, "utf8");
 }
 
-// Entry scripts are tiny stable bootstrap files. Keep their public URLs stable;
-// they dynamically import the fingerprinted tool module produced by the build.
-// This also keeps the generated HTML contract deterministic for the image tools.
+// Keep one stable bootstrap per new image tool. The bootstrap is a module because
+// it uses a static import of the fingerprinted tool module. Only the imported
+// module filename changes when the tool implementation changes.
 const toolsDir = path.join(dist, "assets/js/tools");
 const files = await readdir(toolsDir);
 const entryMappings = [];
@@ -46,10 +46,8 @@ if (entryMappings.length) {
   }
 }
 
-// Load image-tool bootstraps exactly like the proven classic-defer JPG→PDF path:
-// common.js runs first, then the stable entry script dynamically imports the
-// fingerprinted tool module. Do not let the .tool.js module execute directly
-// from HTML, because it reads window.FreePDF during module evaluation.
+// Load image-tool bootstraps through native module execution. Do not convert
+// these tags to classic scripts: their entry files contain static ES imports.
 const eagerToolModule = /\s*<script\s+type=["']module["']\s+src=["'][^"']*assets\/js\/tools\/(?:photo-compressor|signature-resizer|passport-id-photo-maker|thumb-impression-resizer|handwritten-declaration-resizer)\.tool(?:\.[a-f0-9]{10})?\.js["']><\/script>/gi;
 const entryModuleTag = /<script\s+type=["']module["']\s+src=["']([^"']*assets\/js\/tools\/(?:photo-compressor|signature-resizer|passport-id-photo-maker|thumb-impression-resizer|handwritten-declaration-resizer)\.entry\.js)["']><\/script>/gi;
 let removedToolModules = 0;
@@ -72,9 +70,9 @@ for (const file of htmlFiles) {
   const withoutEagerModules = html.replace(eagerToolModule, "");
   const normalized = withoutEagerModules.replace(entryModuleTag, function (_full, src) {
     normalizedEntryTags += 1;
-    return '<script src="' + src + '" defer></script>';
+    return '<script type="module" src="' + src + '"></script>';
   });
   if (normalized !== html) await writeFile(file, normalized, "utf8");
 }
 
-console.log("Added application-upload workflow cross-links and normalized " + entryMappings.length + " image-tool entry scripts; removed " + removedToolModules + " direct tool modules; normalized " + normalizedEntryTags + " entry tags to classic defer");
+console.log("Added application-upload workflow cross-links and normalized " + entryMappings.length + " image-tool entry scripts; removed " + removedToolModules + " direct tool modules; preserved " + normalizedEntryTags + " entry tags as ES modules");
