@@ -187,7 +187,7 @@ export function mount() {
           dimensions,
           mime,
           targetBytes,
-          cropMode: "contain",
+          cropMode: el.dimensionMode.value === "exact" && !el.keepAspect.checked ? "fill" : "contain",
           background,
           setProgress,
           progressStart: (index / files.length) * 75,
