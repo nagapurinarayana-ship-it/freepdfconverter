@@ -108,6 +108,8 @@
   function bindFileInput(input, onFiles) {
     var handled = false;
     var retryDelays = [0, 40, 120, 300, 600];
+    var pickerRecoveryEnabled = input.hasAttribute("data-new-tool-picker");
+    var recoveryTimer = null;
 
     function readSelection() {
       return Array.from(input.files || []);
@@ -121,11 +123,6 @@
       if (handled || !files.length) return false;
       handled = true;
 
-      // Pass a stable snapshot of File objects to the tool. Never make a tool
-      // read input.files later: mobile browser FileLists can be transient.
-      // Keep the native input intact until the async selection handler has
-      // finished. Some Android/WebView providers invalidate the FileList too
-      // aggressively when the input is cleared immediately after change.
       try {
         return Promise.resolve(onFiles(files)).finally(function () {
           window.setTimeout(resetInput, 0);
@@ -136,14 +133,43 @@
       }
     }
 
+    function recoverNativePickerSelection() {
+      if (!pickerRecoveryEnabled || recoveryTimer || handled) return;
+
+      var startedAt = Date.now();
+      function probe() {
+        recoveryTimer = null;
+        if (handled) return;
+
+        var files = readSelection();
+        if (files.length) {
+          consume(files);
+          return;
+        }
+
+        if (Date.now() - startedAt < 5000) {
+          recoveryTimer = window.setTimeout(probe, 100);
+        }
+      }
+
+      probe();
+    }
+
+    input.addEventListener("click", function () {
+      handled = false;
+      recoverNativePickerSelection();
+    });
+
+    if (pickerRecoveryEnabled) {
+      window.addEventListener("focus", recoverNativePickerSelection);
+      window.addEventListener("pageshow", recoverNativePickerSelection);
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") recoverNativePickerSelection();
+      });
+    }
+
     input.addEventListener("change", function () {
       handled = false;
-
-      // Some Android/WebView file providers briefly expose an empty FileList
-      // while returning from the native picker. Read the native input again on
-      // a short bounded schedule instead of assuming the first change snapshot
-      // is complete. This preserves desktop behavior while fixing the mobile
-      // picker -> tool hand-off.
       retryDelays.forEach(function (delay) {
         window.setTimeout(function () {
           consume(readSelection());
