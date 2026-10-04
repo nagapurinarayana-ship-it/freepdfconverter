@@ -4,8 +4,8 @@ import { join } from 'node:path'
 const dist = 'dist'
 const overrides = {
   'index.html': [
-    'Free PDF Converter Online — Merge, Split, Unlock & Convert PDF',
-    'Free PDF converter and private browser PDF tools to merge, split, unlock, organize, crop and convert files. No account and supported operations do not upload documents.'
+    'Free PDF Tools Online — Merge, Split, Compress & Convert | FreePDF Tools',
+    'Free online PDF tools to merge, split, compress, convert, sign, OCR and manage documents and images. Supported browser processing keeps source files on your device.'
   ],
   'pdf-converter-online.html': [
     'Free PDF Converter Online — Private, No Uploads | FreePDF Tools',
@@ -22,6 +22,26 @@ const overrides = {
   'guides/pdf-converter-without-upload.html': [
     'PDF Converter Without Upload — How Private Browser Processing Works',
     'Learn how to convert and manage PDF files without uploading them to an application server, when local browser processing helps and what its limitations are.'
+  ],
+  'tools/photo-compressor.html': [
+    'Compress Images Online Free — Photo Compressor | FreePDF Tools',
+    'Compress JPG, PNG and WebP images to practical target sizes such as 20KB, 50KB and 100KB directly in your browser.'
+  ],
+  'tools/signature-resizer.html': [
+    'Resize Signature Online — Free Signature Tool | FreePDF Tools',
+    'Resize, clean and compress a signature image for online forms while keeping supported processing in your browser.'
+  ],
+  'tools/passport-id-photo-maker.html': [
+    'Passport & ID Photo Maker — Resize Online | FreePDF Tools',
+    'Create passport and ID photos with common dimensions, framing options and file-size limits directly in your browser.'
+  ],
+  'tools/thumb-impression-resizer.html': [
+    'Thumb Impression Resizer — Free Online Tool | FreePDF Tools',
+    'Resize and compress thumb-impression images for online forms with custom dimensions, cleanup and file-size limits.'
+  ],
+  'tools/handwritten-declaration-resizer.html': [
+    'Handwritten Declaration Resizer — Free Tool | FreePDF Tools',
+    'Resize, trim and compress handwritten declaration images for online forms with custom dimensions and target file sizes.'
   ],
   'tools/ocr-pdf.html': [
     'OCR PDF Online Free — Scanned PDF to Word | FreePDF Tools',
