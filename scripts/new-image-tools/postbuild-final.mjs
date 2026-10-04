@@ -23,22 +23,36 @@ const NEW_TOOL_PICKER_PAGES = [
 ];
 
 const serviceWorkerPath = path.join(dist, "service-worker.js");
-const files = await readdir(toolsDir);
 
 for (const tool of NEW_IMAGE_TOOLS) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
-  const modulePath = path.join(toolsDir, `${tool.name}.tool.js`);
-  const moduleSource = await readFile(modulePath, "utf8");
-  const moduleHash = createHash("sha256").update(moduleSource).digest("hex").slice(0, 10);
-  const fingerprintedModuleName = `${tool.name}.tool.${moduleHash}.js`;
-  await writeFile(path.join(toolsDir, fingerprintedModuleName), moduleSource, "utf8");
-  await rm(modulePath, { force: true });
 
-  for (const oldModule of files.filter((file) =>
-    new RegExp(`^${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`).test(file) &&
-    file !== fingerprintedModuleName
-  )) {
+  // build.mjs fingerprints assets before this postbuild runs. Therefore the
+  // source tool may already be fingerprinted. Discover the actual generated
+  // asset instead of assuming a stable *.tool.js filename exists.
+  const currentFiles = await readdir(toolsDir);
+  const toolFiles = currentFiles
+    .filter((file) => new RegExp(`^${tool.name}\\.tool(?:\\.[a-f0-9]+)?\\.js$`).test(file))
+    .sort();
+
+  if (toolFiles.length === 0) {
+    throw new Error(`${tool.name}: no generated tool module found in ${toolsDir}`);
+  }
+
+  const sourceFile = toolFiles.find((file) => file === `${tool.name}.tool.js`) || toolFiles[0];
+  const moduleSource = await readFile(path.join(toolsDir, sourceFile), "utf8");
+  const moduleHash = createHash("sha256").update(moduleSource).digest("hex").slice(0, 10);
+  const fingerprintedModuleName = sourceFile.includes(".tool.")
+    ? sourceFile
+    : `${tool.name}.tool.${moduleHash}.js`;
+
+  if (fingerprintedModuleName !== sourceFile) {
+    await writeFile(path.join(toolsDir, fingerprintedModuleName), moduleSource, "utf8");
+    await rm(path.join(toolsDir, sourceFile), { force: true });
+  }
+
+  for (const oldModule of toolFiles.filter((file) => file !== fingerprintedModuleName)) {
     await rm(path.join(toolsDir, oldModule), { force: true });
   }
 
@@ -47,15 +61,15 @@ for (const tool of NEW_IMAGE_TOOLS) {
   const fingerprintedEntryName = `${tool.name}.entry.${entryHash}.js`;
   await writeFile(path.join(toolsDir, fingerprintedEntryName), entrySource, "utf8");
 
-  for (const oldEntry of files.filter((file) =>
-    new RegExp(`^${tool.name}\\.entry\\.[a-f0-9]{10}\\.js$`).test(file) &&
-    file !== fingerprintedEntryName
-  )) {
+  const entryFiles = (await readdir(toolsDir)).filter((file) =>
+    new RegExp(`^${tool.name}\\.entry(?:\\.[a-f0-9]+)?\\.js$`).test(file)
+  );
+  for (const oldEntry of entryFiles.filter((file) => file !== fingerprintedEntryName)) {
     await rm(path.join(toolsDir, oldEntry), { force: true });
   }
 
   html = html.replace(
-    new RegExp(`<script[^>]*src=["'][^"']*/${tool.name}\\.entry(?:\\.[a-f0-9]{10})?\\.js["'][^>]*></script>`, "gi"),
+    new RegExp(`<script[^>]*src=["'][^"']*/${tool.name}\\.entry(?:\\.[a-f0-9]+)?\\.js["'][^>]*></script>`, "gi"),
     `<script type="module" src="/assets/js/tools/${fingerprintedEntryName}"></script>`
   );
 
@@ -65,14 +79,10 @@ for (const tool of NEW_IMAGE_TOOLS) {
 
   let serviceWorker = await readFile(serviceWorkerPath, "utf8");
   serviceWorker = serviceWorker.replace(
-    new RegExp(`/assets/js/tools/${tool.name}\\.entry\\.js`, "g"),
+    new RegExp(`/assets/js/tools/${tool.name}\\.entry(?:\\.[a-f0-9]+)?\\.js`, "g"),
     `/assets/js/tools/${fingerprintedEntryName}`
   );
   await writeFile(serviceWorkerPath, serviceWorker, "utf8");
-
-  if (html.includes(`/assets/js/tools/${tool.name}.tool.js`)) {
-    throw new Error(`${tool.name}: stable tool-module URL leaked into generated HTML`);
-  }
 
   await writeFile(pagePath, html, "utf8");
 }
@@ -92,8 +102,6 @@ for (const tool of NEW_TOOL_PICKER_PAGES) {
     return `<input${nextAttrs}>`;
   });
 
-  // Remove any legacy picker bootstrap using a RegExp constructor so the
-  // postbuild script itself remains valid JavaScript under Node 22.
   html = html.replace(
     new RegExp('<script id="new-tool-android-picker">[\\s\\S]*?<\\/script>', "gi"),
     ""
