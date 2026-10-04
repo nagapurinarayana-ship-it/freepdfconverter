@@ -59,7 +59,7 @@ export function clampPixels(value, fallback) {
   return Math.max(DIMENSION_LIMITS.minPx, Math.min(DIMENSION_LIMITS.maxPx, Math.round(numeric)));
 }
 
-export function resolveDimensions({ mode, width, height, unit, dpi, sourceWidth, sourceHeight, keepAspect }) {
+export function resolveDimensions({ mode, width, height, unit, dpi, sourceWidth, sourceHeight }) {
   const sourceRatio = sourceWidth / Math.max(1, sourceHeight);
   if (mode === "original") {
     return { width: sourceWidth, height: sourceHeight };
@@ -74,10 +74,10 @@ export function resolveDimensions({ mode, width, height, unit, dpi, sourceWidth,
     };
   }
 
-  // Exact and physical modes define the output canvas. Aspect preservation belongs
-  // to the drawing mode (contain/fill), not to the canvas dimensions themselves.
-  // This keeps requested pixel/physical dimensions exact while still allowing
-  // the caller to preserve the source aspect ratio without distortion.
+  // Exact and physical modes define the requested output canvas. They may upscale
+  // a smaller source because a form's required pixel/physical dimensions are a
+  // hard output requirement. Aspect preservation is handled by contain/fill when
+  // the image is drawn into that canvas.
   const resolvedWidth = clampPixels(pixelsFromPhysical(width, unit, dpi), sourceWidth);
   const resolvedHeight = clampPixels(pixelsFromPhysical(height, unit, dpi), sourceHeight);
 
