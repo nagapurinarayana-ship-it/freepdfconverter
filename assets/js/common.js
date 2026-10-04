@@ -1,6 +1,51 @@
 (function () {
   "use strict";
 
+  function normalizeGlobalHeader() {
+    var header = document.querySelector(".site-header");
+    if (!header) return;
+    var nav = header.querySelector(".main-nav");
+    var logo = header.querySelector(".logo");
+    if (!nav || !logo) return;
+
+    var path = window.location.pathname.replace(/\\/+$/, "") || "/";
+    var section = path === "/" || /^\\/(([^/]+)\\.html)?$/.test(path) ? "all" :
+      path.indexOf("/guides/") === 0 ? "guides" :
+      path.indexOf("/topics/") === 0 ? "topics" :
+      path === "/privacy" || path === "/privacy.html" ? "privacy" :
+      path === "/about" || path === "/about.html" ? "about" :
+      path.indexOf("/tools/") === 0 ? "all" : "";
+
+    logo.setAttribute("href", "/");
+    logo.setAttribute("aria-label", "FreePDF Tools home");
+    var mark = logo.querySelector(".logo-mark");
+    if (mark) mark.setAttribute("aria-hidden", "true");
+    var label = logo.querySelector(".logo > span:last-child");
+    if (label) label.textContent = "FreePDF Tools";
+
+    var links = [
+      ["all", "/#tools", "All tools"],
+      ["guides", "/guides/", "Guides"],
+      ["topics", "/topics/", "Topics"],
+      ["privacy", "/privacy", "Privacy"],
+      ["about", "/about", "About"]
+    ];
+    nav.setAttribute("aria-label", "Main navigation");
+    nav.replaceChildren();
+    links.forEach(function (item) {
+      var link = document.createElement("a");
+      link.href = item[1];
+      link.textContent = item[2];
+      if (section === item[0]) link.setAttribute("aria-current", "page");
+      nav.appendChild(link);
+    });
+    document.body.classList.add("nav-ready");
+  }
+
+  // Normalize the shared shell before tool-specific page logic runs. Keeping
+  // one header structure prevents navigation jumps and inconsistent mobile UI.
+  normalizeGlobalHeader();
+
   if (typeof Uint8Array.prototype.toHex !== "function") {
     Object.defineProperty(Uint8Array.prototype, "toHex", {
       configurable: true,
