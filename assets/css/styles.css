@@ -570,3 +570,40 @@ h3 { font-size: 1.16rem; margin: 0 0 8px; }
   .home-page .tool-pane-heading h3 { font-size: 1.35rem; }
   .home-page .tool-pane-heading > span { font-size: .75rem; }
 }
+
+
+/* Shared navigation stability — applies to every page. */
+@view-transition { navigation: auto; }
+body .site-header { min-height: 64px; view-transition-name: site-header; }
+body:not(.nav-ready) .site-header { visibility: hidden; }
+body.nav-ready .site-header { visibility: visible; }
+.site-header .header-inner { min-height: 64px; overflow: hidden; }
+.site-header .logo { flex: 0 0 auto; white-space: nowrap; min-width: 0; }
+.site-header .logo > span:last-child { white-space: nowrap; }
+.site-header .main-nav { flex: 1 1 auto; min-width: 0; overflow-x: auto; justify-content: flex-end; scrollbar-width: none; }
+.site-header .main-nav::-webkit-scrollbar { display: none; }
+.site-header .main-nav a { flex: 0 0 auto; white-space: nowrap; }
+.site-header .main-nav a[aria-current="page"] { color: var(--brand-dark); background: #edf3ff; }
+@media (max-width: 760px) {
+  .site-header .header-inner { min-height: 58px; gap: 8px; }
+  .site-header .main-nav { justify-content: flex-start; gap: 0; }
+  .site-header .main-nav a { padding: 6px 6px; font-size: .78rem; }
+}
+@media (max-width: 520px) {
+  .site-header .logo { gap: 7px; font-size: .9rem; }
+  .site-header .logo-mark { width: 32px; height: 36px; font-size: 12px; }
+  .site-header .main-nav a { padding-inline: 5px; font-size: .72rem; }
+}
+
+/* Homepage: keep the ranked popular grid compact and prevent empty ad space from dominating the first screen. */
+@media (max-width: 760px) {
+  .home-page .hero-final { padding: 36px 0 20px; }
+  .home-page .hero-final-inner h1 { margin-bottom: 11px; }
+  .home-page .hero-final-inner .lead { line-height: 1.5; }
+  .home-page .hero-actions-center { margin-top: 18px; }
+  .home-page .hero-actions-center .button { min-height: 48px; }
+  .home-page .hero-popular { margin-top: 13px; gap: 7px; }
+  .home-page .hero-popular a { min-height: 42px; padding: 7px 6px; }
+  .home-page .ad-container[data-ad-zone="top"] { min-height: 90px; max-height: 90px; margin: 8px auto; overflow: hidden; }
+  .home-page .ad-container[data-ad-zone="top"] iframe { height: 90px !important; max-height: 90px; }
+}
