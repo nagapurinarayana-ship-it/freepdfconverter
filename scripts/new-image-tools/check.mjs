@@ -38,55 +38,102 @@ const relativeFiles = files.map((file) => path.relative(dist, file).split(path.s
 for (const tool of NEW_IMAGE_TOOLS) {
   const entryPattern = new RegExp(String.raw`^assets/js/tools/${tool.name}\.entry\.[a-f0-9]{10}\.js$`);
   const modulePattern = new RegExp(String.raw`^assets/js/tools/${tool.name}\.tool\.[a-f0-9]{10}\.js$`);
-  const entries = relativeFiles.filter((file) => entryPattern.test(file));
-  const modules = relativeFiles.filter((file) => modulePattern.test(file));
+  const stableEntry = `assets/js/tools/${tool.name}.entry.js`;
+  const stableModule = `assets/js/tools/${tool.name}.tool.js`;
 
-  if (entries.length !== 1) failures.push(`${tool.name}: expected one fingerprinted entry asset, found ${entries.length}`);
-  if (modules.length !== 1) failures.push(`${tool.name}: expected one fingerprinted tool asset, found ${modules.length}`);
-  if (relativeFiles.includes(`assets/js/tools/${tool.name}.entry.js`)) failures.push(`${tool.name}: stable entry asset exists`);
-  if (relativeFiles.includes(`assets/js/tools/${tool.name}.tool.js`)) failures.push(`${tool.name}: stable tool asset exists`);
+  if (relativeFiles.includes(stableModule)) {
+    failures.push(`${tool.name}: stable tool asset exists`);
+  }
 
-  const html = allText.get(path.join(dist, tool.page));
+  const pageFile = path.join(dist, tool.page);
+  const html = allText.get(pageFile);
   if (!html) {
     failures.push(`${tool.name}: page missing: ${tool.page}`);
     continue;
   }
 
-  const entryHtmlMatches = html.match(new RegExp(
-    `<script[^>]*${tool.name}\\.entry\\.[a-f0-9]{10}\\.js[^>]*></script>`, "gi"
-  )) || [];
-  if (entryHtmlMatches.length !== 1) failures.push(`${tool.name}: expected exactly one fingerprinted entry script, found ${entryHtmlMatches.length}`);
-  else if (!/type=["']module["']/i.test(entryHtmlMatches[0])) failures.push(`${tool.name}: fingerprinted entry must remain a module script`);
+  if (tool.name === "thumb-impression-resizer") {
+    if (!relativeFiles.includes(stableEntry)) {
+      failures.push(`${tool.name}: stable entry bootstrap asset is missing`);
+    }
 
-  const directHtmlMatches = html.match(new RegExp(
-    `<script[^>]*${tool.name}\\.tool\\.[a-f0-9]{10}\\.js[^>]*></script>`, "gi"
-  )) || [];
-  if (directHtmlMatches.length) failures.push(`${tool.name}: page directly loads the tool module`);
+    const stableEntryFile = path.join(dist, stableEntry);
+    try {
+      const entrySource = await readFile(stableEntryFile, "utf8");
+      const importMatch = entrySource.match(/import\(["']([^"']+)["']\)/);
+      const imported = importMatch?.[1] || "";
+      const expectedModulePattern = /\/thumb-impression-resizer\.tool\.[a-f0-9]{10}\.js$/;
+      if (!expectedModulePattern.test(imported)) {
+        failures.push(`${tool.name}: stable entry does not dynamically import a fingerprinted tool module (got "${imported || "none"}")`);
+      } else if (!relativeFiles.includes(imported.replace(/^\//, ""))) {
+        failures.push(`${tool.name}: stable entry imports missing module: ${imported}`);
+      }
+    } catch {
+      failures.push(`${tool.name}: stable entry bootstrap could not be read`);
+    }
 
-  if (html.includes(`/assets/js/tools/${tool.name}.entry.js`) || html.includes(`/assets/js/tools/${tool.name}.tool.js`)) {
-    failures.push(`${tool.name}: page contains a stable image-tool URL`);
-  }
+    const stableEntryMatches = html.match(
+      new RegExp(`<script[^>]*${tool.name}\\.entry\\.js[^>]*></script>`, "gi")
+    ) || [];
+    if (stableEntryMatches.length !== 1) {
+      failures.push(`${tool.name}: page must contain exactly one stable entry script, found ${stableEntryMatches.length}`);
+    } else if (!/type=["']module["']/i.test(stableEntryMatches[0])) {
+      failures.push(`${tool.name}: stable entry must remain a module script`);
+    }
 
-  if (entries.length === 1 && modules.length === 1) {
-    const entrySource = await readFile(path.join(dist, entries[0]), "utf8");
-    const imported = entrySource.match(/import\(["']([^"']+)["']\)/)?.[1] || "";
-    if (!new RegExp(String.raw`/${tool.name}\.tool\.[a-f0-9]{10}\.js$`).test(imported)) {
-      failures.push(`${tool.name}: entry does not dynamically import its fingerprinted tool module`);
-    } else if (!relativeFiles.includes(imported.replace(/^\//, ""))) {
-      failures.push(`${tool.name}: dynamically imported module is missing: ${imported}`);
+    const fingerprintedEntryMatches = html.match(
+      new RegExp(`<script[^>]*${tool.name}\\.entry\\.[a-f0-9]{10}\\.js[^>]*></script>`, "gi")
+    ) || [];
+    if (fingerprintedEntryMatches.length) {
+      failures.push(`${tool.name}: fingerprinted entry leaked into HTML after stable bootstrap conversion`);
+    }
+  } else {
+    const entryPattern = new RegExp(
+      `^assets/js/tools/${tool.name}\\.entry\\.[a-f0-9]{10}\\.js$`
+    );
+    const modulePattern = new RegExp(
+      `^assets/js/tools/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`
+    );
+    const entries = relativeFiles.filter((file) => entryPattern.test(file));
+    const modules = relativeFiles.filter((file) => modulePattern.test(file));
+
+    if (entries.length !== 1) failures.push(`${tool.name}: expected one fingerprinted entry asset, found ${entries.length}`);
+    if (modules.length !== 1) failures.push(`${tool.name}: expected one fingerprinted tool asset, found ${modules.length}`);
+    if (relativeFiles.includes(stableEntry)) failures.push(`${tool.name}: stable entry asset exists`);
+
+    const entryHtmlMatches = html.match(
+      new RegExp(`<script[^>]*${tool.name}\\.entry\\.[a-f0-9]{10}\\.js[^>]*></script>`, "gi")
+    ) || [];
+    if (entryHtmlMatches.length !== 1) {
+      failures.push(`${tool.name}: page must contain exactly one fingerprinted entry script, found ${entryHtmlMatches.length}`);
+    } else if (!/type=["']module["']/i.test(entryHtmlMatches[0])) {
+      failures.push(`${tool.name}: fingerprinted entry must remain a module script`);
+    }
+
+    if (entries.length === 1 && modules.length === 1) {
+      const entryFile = path.join(dist, entries[0]);
+      const entrySource = await readFile(entryFile, "utf8");
+      const importMatch = entrySource.match(/import\(["']([^"']+)["']\)/);
+      const imported = importMatch?.[1] || "";
+      const expectedModulePattern = new RegExp(`/${tool.name}\\.tool\\.[a-f0-9]{10}\\.js$`);
+      if (!expectedModulePattern.test(imported)) {
+        failures.push(`${tool.name}: entry does not dynamically import a fingerprinted tool module (got "${imported || "none"}")`);
+      } else if (!relativeFiles.includes(imported.replace(/^\//, ""))) {
+        failures.push(`${tool.name}: dynamically imported module is missing: ${imported}`);
+      }
     }
   }
-}
 
-for (const tool of NEW_PDF_TOOLS) {
-  const html = allText.get(path.join(dist, tool.page));
-  if (!html) {
-    failures.push(`${tool.name}: page missing: ${tool.page}`);
-    continue;
+  const directHtmlMatches = html.match(
+    new RegExp(`<script[^>]*${tool.name}\\.tool\\.[a-f0-9]{10}\\.js[^>]*></script>`, "gi")
+  ) || [];
+  if (directHtmlMatches.length) {
+    failures.push(`${tool.name}: page directly loads the tool module`);
   }
-  if (!relativeFiles.includes(tool.script)) failures.push(`${tool.name}: implementation script missing: ${tool.script}`);
-  if (!html.includes(tool.script)) failures.push(`${tool.name}: page does not load its implementation script`);
-}
 
-if (failures.length) throw new Error("New-tools isolated verification failed:\n- " + failures.join("\n- "));
-console.log(`New-tools isolated verification passed: ${NEW_IMAGE_TOOLS.length} new image tools + ${NEW_PDF_TOOLS.length} new PDF tool.`);
+  if (html.includes(`/assets/js/tools/${tool.name}.tool.js`) ||
+      (tool.name !== "thumb-impression-resizer" && html.includes(`/assets/js/tools/${tool.name}.entry.js`))) {
+    failures.push(`${tool.name}: page contains an unexpected stable image-tool URL`);
+  }
+
+
