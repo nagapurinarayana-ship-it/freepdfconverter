@@ -51,17 +51,21 @@ self.addEventListener("fetch", function (event) {
   }
 
   if (url.pathname.startsWith("/assets/")) {
-    event.respondWith(caches.match(request).then(function (cached) {
-      if (cached) return cached;
-      return fetch(request).then(function (response) {
-        if (response.ok) {
-          const copy = response.clone();
-          event.waitUntil(caches.open(RUNTIME_CACHE).then(function (cache) {
-            return cache.put(request, copy);
-          }));
-        }
-        return response;
-      });
+    // Assets contain the application JavaScript and CSS. They must not be
+    // served cache-first: stable image-tool entry URLs can otherwise keep an
+    // older picker/runtime forever on a device even after a new deployment.
+    // Prefer the live deployment and retain the previous response only as an
+    // offline fallback.
+    event.respondWith(fetch(request).then(function (response) {
+      if (response.ok) {
+        const copy = response.clone();
+        event.waitUntil(caches.open(RUNTIME_CACHE).then(function (cache) {
+          return cache.put(request, copy);
+        }));
+      }
+      return response;
+    }).catch(function () {
+      return caches.match(request);
     }));
   }
 });
