@@ -5,6 +5,7 @@ import { chooseExtension, reductionPercent, resolveDimensions, targetBytesFromSe
 
 const MB = window.FreePDF.MB; const MAX_FILE = 15 * MB; const MAX_FILES = 20; const MAX_TOTAL_BYTES = 100 * MB;
 const PRESETS = Object.freeze({
+  "240": { width: 240, height: 240, unit: "px", dpi: 200, label: "240 × 240 px · 200 DPI" },
   "3.5x1.5cm": { width: 3.5, height: 1.5, unit: "cm", dpi: 200, label: "3.5 × 1.5 cm" },
   "600x200": { width: 600, height: 200, unit: "px", dpi: 96, label: "600 × 200 px" },
   "300": { width: 300, height: 300, unit: "px", dpi: 96, label: "300 × 300 px" },
@@ -25,7 +26,7 @@ export function mount() {
     onFilesSelected: ({ files, state, el }) => { revokeUrls(state.previewUrls || []); revokeUrls(state.outputUrls || []); state.previewUrls = files.map((file) => URL.createObjectURL(file)); state.outputUrls = []; state.images = []; if (state.previewUrls[0]) renderPreview(state.previewUrls[0], el.inputPreview, files[0].name); el.batchCount.textContent = files.length + " selected"; el.batchSize.textContent = window.FreePDF.formatBytes(files.reduce((sum, file) => sum + file.size, 0)); el.outputSummary.textContent = "Not processed yet"; el.resultList.textContent = ""; },
     onReset: ({ state, el }) => { revokeUrls(state.previewUrls || []); revokeUrls(state.outputUrls || []); state.previewUrls = []; state.outputUrls = []; state.images = []; el.batchCount.textContent = "0 selected"; el.batchSize.textContent = "0 B"; el.outputSummary.textContent = "Not processed yet"; el.resultList.textContent = ""; el.inputPreview.textContent = ""; el.outputPreview.textContent = ""; updateCustomFields(el); },
     onProcess: async ({ files, state, el, setProgress, setStatus, formatBytes, safeBaseName, downloadBlob }) => {
-      const preset = el.preset.value === "custom" ? { width: Number(el.width.value || 600), height: Number(el.height.value || 200), unit: el.unit.value, dpi: Number(el.dpi.value || 96), label: "Custom size" } : PRESETS[el.preset.value];
+      const preset = el.preset.value === "custom" ? { width: Number(el.width.value || 240), height: Number(el.height.value || 240), unit: el.unit.value, dpi: Number(el.dpi.value || 200), label: "Custom size" } : PRESETS[el.preset.value];
       const targetBytes = targetBytesFromSelection(el.targetSize.value, el.customTarget.value); const removeBackground = el.background.value === "transparent"; const background = removeBackground ? "keep" : "white"; const mime = el.format.value; const results = [];
       revokeUrls(state.outputUrls || []); state.outputUrls = [];
       for (let index = 0; index < files.length; index += 1) {
