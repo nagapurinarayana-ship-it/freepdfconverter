@@ -35,6 +35,33 @@ assert.equal(pixelsFromPhysical(3.5, "cm", 300), 413);
 assert.equal(clampPixels(9000, 1600), 6000);
 assert.deepEqual(
   resolveDimensions({
+    mode: "exact",
+    width: 35,
+    height: 45,
+    unit: "mm",
+    dpi: 300,
+    sourceWidth: 1200,
+    sourceHeight: 800,
+    keepAspect: true
+  }),
+  { width: 413, height: 531 }
+);
+assert.deepEqual(
+  resolveDimensions({
+    mode: "physical",
+    width: 2,
+    height: 2,
+    unit: "cm",
+    dpi: 300,
+    sourceWidth: 1200,
+    sourceHeight: 800,
+    keepAspect: true
+  }),
+  { width: 236, height: 236 }
+);
+
+assert.deepEqual(
+  resolveDimensions({
     mode: "max-width",
     width: 800,
     height: 1200,
