@@ -242,7 +242,13 @@ export function mount() {
   });
 
   controller.mount();
-  controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
+  updateDpiState();
+
+  const updateDpiState = () => {
+    const usesPhysicalUnits = controller.el.dimensionUnit.value === "mm" || controller.el.dimensionUnit.value === "cm";
+    controller.el.dpi.hidden = !usesPhysicalUnits;
+    controller.el.dpi.disabled = controller.el.dimensionMode.value === "original" || !usesPhysicalUnits;
+  };
 
   controller.el.targetSize.addEventListener("change", function () {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
@@ -252,12 +258,12 @@ export function mount() {
     const mode = controller.el.dimensionMode.value;
     controller.el.dimensionFields.hidden = mode === "original";
     controller.el.dimensionUnit.disabled = mode === "original";
-    controller.el.dpi.disabled = mode !== "exact" && mode !== "physical";
+    updateDpiState();
     controller.el.cropMode.disabled = mode !== "exact";
     if (mode !== "exact") controller.el.keepAspect.checked = true;
   });
 
   controller.el.dimensionUnit.addEventListener("change", function () {
-    controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
+    updateDpiState();
   });
 }
