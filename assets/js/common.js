@@ -172,6 +172,10 @@
     input.addEventListener("click", function () {
       handled = false;
       stopRecovery();
+      // Start recovery before the native picker opens. Android Chrome can
+      // return from the picker without emitting change/focus/visibility events.
+      // The timer resumes with the page and reads input.files directly.
+      if (pickerRecoveryEnabled) startRecovery();
     });
 
     if (pickerRecoveryEnabled) {
