@@ -211,3 +211,34 @@ h3 { font-size: 1.16rem; margin: 0 0 8px; }
   .home-page .tool-card-grid { grid-template-columns: 1fr; }
   .home-page .tool-pane-heading { align-items: center; }
 }
+
+/* Final homepage UX: quick actions + persistent normal filter buttons. */
+.home-page .hero-quick-start { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; margin-top:20px; }
+.home-page .hero-quick-label { color:#728197; font-size:.76rem; font-weight:850; text-transform:uppercase; letter-spacing:.08em; }
+.home-page .hero-quick-start a { display:inline-flex; align-items:center; min-height:38px; padding:8px 13px; border:1px solid #dfe6ef; border-radius:999px; color:#31445d; background:rgba(255,255,255,.82); text-decoration:none; font-weight:780; font-size:.82rem; box-shadow:0 5px 14px rgba(24,55,100,.04); }
+.home-page .hero-quick-start a:hover { color:var(--brand-dark); border-color:#b8cbeb; background:#fff; transform:translateY(-1px); }
+.home-page .tool-filter-wrap { position:sticky; top:68px; z-index:24; margin:0 -8px 18px; padding:8px; background:rgba(246,248,252,.94); backdrop-filter:blur(14px); }
+.home-page .tool-filter { display:flex; gap:7px; max-width:900px; margin:0 auto; padding:5px; overflow-x:auto; border:1px solid #dfe6ef; border-radius:16px; background:rgba(255,255,255,.97); box-shadow:0 10px 26px rgba(24,55,100,.07); scrollbar-width:none; }
+.home-page .tool-filter::-webkit-scrollbar { display:none; }
+.home-page .tool-filter-button { flex:0 0 auto; min-height:42px; padding:9px 15px; border:0; border-radius:11px; background:transparent; color:#516176; font-weight:820; white-space:nowrap; cursor:pointer; }
+.home-page .tool-filter-button span { display:inline-block; margin-left:5px; color:#8291a5; font-size:.73rem; font-weight:800; }
+.home-page .tool-filter-button:hover { background:#f2f6fc; color:var(--brand-dark); }
+.home-page .tool-filter-button.is-active { color:#fff; background:var(--brand); box-shadow:0 6px 16px rgba(31,103,255,.22); }
+.home-page .tool-filter-button.is-active span { color:rgba(255,255,255,.88); }
+.home-page .tool-pane[hidden] { display:none; }
+.home-page .tool-pane.is-active { animation:toolPaneIn .16s ease-out; }
+.home-page .tool-pane-heading { display:flex; align-items:end; justify-content:space-between; gap:16px; margin-bottom:14px; padding:0 2px 10px; border-bottom:1px solid #e4eaf2; }
+.home-page .tool-pane-heading h3 { margin:0; font-size:1.42rem; }
+.home-page .tool-pane-heading > span { color:var(--muted); font-size:.8rem; font-weight:750; }
+.home-page .tool-card-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+@keyframes toolPaneIn { from { opacity:.35; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+@media (max-width:1000px) { .home-page .tool-card-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:760px) {
+  .home-page .tool-filter-wrap { top:60px; margin-inline:-2px; }
+  .home-page .tool-filter { border-radius:14px; }
+  .home-page .tool-filter-button { min-height:40px; padding:8px 13px; font-size:.9rem; }
+  .home-page .tool-card-grid { grid-template-columns:1fr; }
+  .home-page .tool-pane-heading { align-items:center; }
+  .home-page .hero-quick-start { justify-content:flex-start; overflow-x:auto; flex-wrap:nowrap; padding-bottom:2px; }
+  .home-page .hero-quick-start a { flex:0 0 auto; }
+}
