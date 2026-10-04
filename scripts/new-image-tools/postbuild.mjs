@@ -3,14 +3,17 @@ import path from "node:path";
 
 const dist = path.join(process.cwd(), "dist");
 
+// ONLY new image tools. Existing working tools are intentionally excluded.
 const NEW_IMAGE_TOOLS = [
   { name: "photo-compressor", page: "tools/photo-compressor.html" },
   { name: "signature-resizer", page: "tools/signature-resizer.html" },
-  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" }
+  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" },
+  { name: "passport-id-photo-maker", page: "tools/passport-id-photo-maker.html" },
+  { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
 ];
 
 const fingerprint = "[a-f0-9]{10}";
-let normalizedEntryScripts = 0;
+let verifiedEntryScripts = 0;
 let removedDirectModules = 0;
 
 for (const tool of NEW_IMAGE_TOOLS) {
@@ -41,7 +44,12 @@ for (const tool of NEW_IMAGE_TOOLS) {
     );
   }
 
-  normalizedEntryScripts += 1;
+  const entryTag = entryMatches[0][0];
+  if (!/type=["']module["']/i.test(entryTag)) {
+    throw new Error(`${tool.name}: fingerprinted entry must remain a module script`);
+  }
+
+  verifiedEntryScripts += 1;
 
   if (html.includes(`/assets/js/tools/${tool.name}.entry.js`) ||
       html.includes(`/assets/js/tools/${tool.name}.tool.js`)) {
@@ -52,5 +60,5 @@ for (const tool of NEW_IMAGE_TOOLS) {
 }
 
 console.log(
-  `New image-tools isolated loader: normalized ${normalizedEntryScripts} fingerprinted entry scripts; removed ${removedDirectModules} direct tool-module scripts. Existing tool loaders were not modified.`
+  `New image-tools isolated loader: verified ${verifiedEntryScripts} fingerprinted entry modules; removed ${removedDirectModules} direct tool-module scripts. Existing working tools were not modified.`
 );
