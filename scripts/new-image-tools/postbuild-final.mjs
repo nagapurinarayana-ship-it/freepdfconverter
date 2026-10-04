@@ -27,10 +27,6 @@ const serviceWorkerPath = path.join(dist, "service-worker.js");
 for (const tool of NEW_IMAGE_TOOLS) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
-
-  // build.mjs fingerprints assets before this postbuild runs. Therefore the
-  // source tool may already be fingerprinted. Discover the actual generated
-  // asset instead of assuming a stable *.tool.js filename exists.
   const currentFiles = await readdir(toolsDir);
   const toolFiles = currentFiles
     .filter((file) => new RegExp(`^${tool.name}\\.tool(?:\\.[a-f0-9]+)?\\.js$`).test(file))
@@ -43,52 +39,56 @@ for (const tool of NEW_IMAGE_TOOLS) {
   const sourceFile = toolFiles.find((file) => file === `${tool.name}.tool.js`) || toolFiles[0];
   const moduleSource = await readFile(path.join(toolsDir, sourceFile), "utf8");
   const moduleHash = createHash("sha256").update(moduleSource).digest("hex").slice(0, 10);
-  const fingerprintedModuleName = sourceFile.includes(".tool.")
-    ? sourceFile
-    : `${tool.name}.tool.${moduleHash}.js`;
+  const fingerprintedModuleName = `${tool.name}.tool.${moduleHash}.js`;
 
-  if (fingerprintedModuleName !== sourceFile) {
+  if (sourceFile !== fingerprintedModuleName) {
     await writeFile(path.join(toolsDir, fingerprintedModuleName), moduleSource, "utf8");
     await rm(path.join(toolsDir, sourceFile), { force: true });
   }
 
-  for (const oldModule of toolFiles.filter((file) => file !== fingerprintedModuleName)) {
+  for (const oldModule of toolFiles.filter((file) => file !== sourceFile && file !== fingerprintedModuleName)) {
     await rm(path.join(toolsDir, oldModule), { force: true });
   }
 
+  // Keep the bootstrap URL stable, but make its static import point directly
+  // at the fingerprinted implementation. This avoids dynamic imports and
+  // avoids executing the tool module directly from the HTML page.
+  const stableEntryName = `${tool.name}.entry.js`;
+  const stableEntryPath = path.join(toolsDir, stableEntryName);
   const entrySource = `import { mount } from "/assets/js/tools/${fingerprintedModuleName}";\nmount();\n`;
-  const entryHash = createHash("sha256").update(entrySource).digest("hex").slice(0, 10);
-  const fingerprintedEntryName = `${tool.name}.entry.${entryHash}.js`;
-  await writeFile(path.join(toolsDir, fingerprintedEntryName), entrySource, "utf8");
+  await writeFile(stableEntryPath, entrySource, "utf8");
 
   const entryFiles = (await readdir(toolsDir)).filter((file) =>
     new RegExp(`^${tool.name}\\.entry(?:\\.[a-f0-9]+)?\\.js$`).test(file)
   );
-  for (const oldEntry of entryFiles.filter((file) => file !== fingerprintedEntryName)) {
+  for (const oldEntry of entryFiles.filter((file) => oldEntryName(oldEntry) !== stableEntryName)) {
     await rm(path.join(toolsDir, oldEntry), { force: true });
   }
 
+  // Ensure the page contains exactly one module bootstrap and never the
+  // implementation module itself.
+  html = html.replace(
+    new RegExp(`<script[^>]*src=["'][^"']*/${tool.name}\\.tool(?:\\.[a-f0-9]+)?\\.js["'][^>]*></script>`, "gi"),
+    ""
+  );
   html = html.replace(
     new RegExp(`<script[^>]*src=["'][^"']*/${tool.name}\\.entry(?:\\.[a-f0-9]+)?\\.js["'][^>]*></script>`, "gi"),
-    `<script type="module" src="/assets/js/tools/${fingerprintedEntryName}"></script>`
+    `<script type="module" src="/assets/js/tools/${stableEntryName}"></script>`
   );
 
-  if (!html.includes(fingerprintedEntryName)) {
-    throw new Error(`${tool.name}: fingerprinted static entry was not installed into the page`);
+  if (!html.includes(`/assets/js/tools/${stableEntryName}`)) {
+    throw new Error(`${tool.name}: stable ES-module bootstrap was not installed into the page`);
   }
 
   let serviceWorker = await readFile(serviceWorkerPath, "utf8");
   serviceWorker = serviceWorker.replace(
     new RegExp(`/assets/js/tools/${tool.name}\\.entry(?:\\.[a-f0-9]+)?\\.js`, "g"),
-    `/assets/js/tools/${fingerprintedEntryName}`
+    `/assets/js/tools/${stableEntryName}`
   );
   await writeFile(serviceWorkerPath, serviceWorker, "utf8");
-
   await writeFile(pagePath, html, "utf8");
 }
 
-// Preserve the native file-input contract for the six new tools. Do not install
-// Android-specific picker overrides or File System Access API bridges here.
 for (const tool of NEW_TOOL_PICKER_PAGES) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
@@ -101,15 +101,17 @@ for (const tool of NEW_TOOL_PICKER_PAGES) {
     nextAttrs = nextAttrs.replace(/\sdata-new-tool-accept=["'][^"']*["']/i, "");
     return `<input${nextAttrs}>`;
   });
-
   html = html.replace(
     new RegExp('<script id="new-tool-android-picker">[\\s\\S]*?<\\/script>', "gi"),
     ""
   );
-
   await writeFile(pagePath, html, "utf8");
 }
 
+function oldEntryName(file) {
+  return file.replace(/\.[a-f0-9]{10}(?=\.js$)/, "");
+}
+
 console.log(
-  "Final isolated strategy applied only to the five new image tools; native file-input handling preserved for the six new tools. Existing working tools remain unchanged."
+  "Final isolated strategy applied only to the five new image tools; stable ES-module bootstraps now import fingerprinted implementations; native file-input handling preserved for the six new tools. Existing working tools remain unchanged."
 );
