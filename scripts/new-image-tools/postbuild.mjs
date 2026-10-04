@@ -7,9 +7,7 @@ const dist = path.join(process.cwd(), "dist");
 const NEW_IMAGE_TOOLS = [
   { name: "photo-compressor", page: "tools/photo-compressor.html" },
   { name: "signature-resizer", page: "tools/signature-resizer.html" },
-  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" },
-  { name: "passport-id-photo-maker", page: "tools/passport-id-photo-maker.html" },
-  { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
+  { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" }
 ];
 
 let verifiedEntryScripts = 0;
