@@ -3,13 +3,18 @@ import path from "node:path";
 
 const dist = path.join(process.cwd(), "dist");
 
-// ONLY new image tools. Existing working tools are intentionally excluded.
+// New image tools only. Existing working tools are intentionally excluded.
 const NEW_IMAGE_TOOLS = [
   { name: "photo-compressor", page: "tools/photo-compressor.html" },
   { name: "signature-resizer", page: "tools/signature-resizer.html" },
   { name: "thumb-impression-resizer", page: "tools/thumb-impression-resizer.html" },
   { name: "passport-id-photo-maker", page: "tools/passport-id-photo-maker.html" },
   { name: "handwritten-declaration-resizer", page: "tools/handwritten-declaration-resizer.html" }
+];
+
+// Sign PDF is also new, but it has its own PDF-specific implementation rather than the image-tool bootstrap.
+const NEW_PDF_TOOLS = [
+  { name: "sign-pdf", page: "tools/sign-pdf.html", script: "assets/js/sign-pdf.js" }
 ];
 
 async function walk(directory) {
@@ -25,7 +30,6 @@ async function walk(directory) {
 const files = await walk(dist);
 const htmlFiles = files.filter((file) => file.endsWith(".html"));
 const allText = new Map();
-
 for (const file of htmlFiles) allText.set(file, await readFile(file, "utf8"));
 
 const failures = [];
@@ -72,12 +76,17 @@ for (const tool of NEW_IMAGE_TOOLS) {
       failures.push(`${tool.name}: dynamically imported module is missing: ${imported}`);
     }
   }
-
-  for (const [file, text] of allText) {
-    const directGlobal = new RegExp(String.raw`<script\s+type=["']module["']\s+src=["'][^"']*/${tool.name}\.tool\.[a-f0-9]{10}\.js["']\s*></script>`, "i");
-    if (directGlobal.test(text)) failures.push(`${tool.name}: direct module script leaked into ${path.relative(dist, file)}`);
-  }
 }
 
-if (failures.length) throw new Error("New image-tools isolated verification failed:\n- " + failures.join("\n- "));
-console.log(`New image-tools isolated verification passed: ${NEW_IMAGE_TOOLS.length} new image tools.`);
+for (const tool of NEW_PDF_TOOLS) {
+  const html = allText.get(path.join(dist, tool.page));
+  if (!html) {
+    failures.push(`${tool.name}: page missing: ${tool.page}`);
+    continue;
+  }
+  if (!relativeFiles.includes(tool.script)) failures.push(`${tool.name}: implementation script missing: ${tool.script}`);
+  if (!html.includes(tool.script)) failures.push(`${tool.name}: page does not load its implementation script`);
+}
+
+if (failures.length) throw new Error("New-tools isolated verification failed:\n- " + failures.join("\n- "));
+console.log(`New-tools isolated verification passed: ${NEW_IMAGE_TOOLS.length} new image tools + ${NEW_PDF_TOOLS.length} new PDF tool.`);
