@@ -50,15 +50,6 @@ self.addEventListener("fetch", function (event) {
     return;
   }
 
-  // Image-tool entry bootstraps intentionally keep stable public URLs. They
-  // are changed during deployments, so never satisfy them from the browser
-  // HTTP cache or the service-worker runtime cache. The actual tool modules
-  // remain fingerprinted and can stay aggressively cached.
-  if (url.pathname.startsWith("/assets/js/tools/") && url.pathname.endsWith(".entry.js")) {
-    event.respondWith(fetch(request, { cache: "no-store" }));
-    return;
-  }
-
   if (url.pathname.startsWith("/assets/")) {
     event.respondWith(caches.match(request).then(function (cached) {
       if (cached) return cached;
