@@ -32,7 +32,7 @@ export function clampTargetKb(value) {
 export function targetBytesFromSelection(value, customKb) {
   if (value === "custom") return clampTargetKb(customKb) * KB;
   const numeric = Number(value);
-  return Number.isFinite(numeric) && numeric > 0 ? Math.round(numeric) : 100 * KB;
+  return Number.isFinite(numeric) && numeric > 0 ? Math.round(numeric * KB) : 100 * KB;
 }
 
 export function reductionPercent(inputBytes, outputBytes) {
