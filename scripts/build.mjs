@@ -84,6 +84,7 @@ for (const relative of copyCandidates) {
 }
 for (const directory of directories) await cp(path.join(root, directory), path.join(dist, directory), { recursive: true });
 await generateSearchIntentPages(dist, origin);
+await ensureGlobalUiAssets(dist);
 await injectToolRegistry(path.join(dist, "index.html"));
 
 for (const relative of htmlFiles) {
@@ -146,6 +147,22 @@ const fingerprintedAssets = await fingerprintAssets();
 await buildServiceWorker(fingerprintedAssets);
 
 console.log("Built FreePDF Tools" + (origin ? " for " + origin : " without production canonical URLs"));
+
+async function ensureGlobalUiAssets(rootDirectory) {
+  const htmlFiles = (await walk(rootDirectory)).filter((file) => file.endsWith(".html"));
+  for (const file of htmlFiles) {
+    let html = await readFile(file, "utf8");
+    const hasStyles = /<link[^>]+href=["'][^"']*assets\/css\/styles\.css/i.test(html);
+    const hasCommon = /<script[^>]+src=["'][^"']*assets\/js\/common\.js/i.test(html);
+    const additions = [];
+    if (!hasStyles) additions.push('<link rel="stylesheet" href="/assets/css/styles.css">');
+    if (!hasCommon) additions.push('<script src="/assets/js/common.js" defer></script>');
+    if (!additions.length) continue;
+    if (!/<head[\\s\\S]*<\\/head>/i.test(html)) continue;
+    html = html.replace("</head>", additions.join("\n") + "\n</head>");
+    await writeFile(file, html, "utf8");
+  }
+}
 
 function extract(html, pattern) {
   return html.match(pattern)?.[1]?.trim() || "";
