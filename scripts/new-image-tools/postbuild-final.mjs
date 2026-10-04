@@ -81,8 +81,8 @@ for (const tool of NEW_IMAGE_TOOLS) {
 }
 
 // Only the six new tools receive this mobile picker behavior. Existing tools
-// do not load the script and therefore keep their proven picker unchanged.
-const pickerScript = '<script src="/assets/js/new-tool-mobile-picker.js" defer></script>';
+// do not receive this marker or script and keep their proven picker unchanged.
+const pickerScript = `<script>(function(){"use strict";var a=/Android/i.test(navigator.userAgent)&&/Chrome|Chromium|CriOS|EdgA|OPR/i.test(navigator.userAgent)&&!/Firefox|FxiOS/i.test(navigator.userAgent);if(!a)return;document.querySelectorAll('input[type="file"][data-new-tool-picker]').forEach(function(i){i.removeAttribute("accept");});}());</script>`;
 for (const tool of NEW_TOOL_PICKER_PAGES) {
   const pagePath = path.join(dist, tool.page);
   let html = await readFile(pagePath, "utf8");
@@ -100,12 +100,16 @@ for (const tool of NEW_TOOL_PICKER_PAGES) {
     throw new Error(`${tool.page}: new-tool picker marker could not be installed`);
   }
 
-  if (!html.includes("/assets/js/new-tool-mobile-picker.js")) {
-    html = html.replace(/<script[^>]+src=["'][^"']*common\.js[^"']*["'][^>]*><\/script>/i, (match) => `${match}${pickerScript}`);
+  if (!html.includes("data-new-tool-picker")) {
+    throw new Error(`${tool.page}: picker marker missing`);
   }
 
-  if (!html.includes("/assets/js/new-tool-mobile-picker.js")) {
-    throw new Error(`${tool.page}: mobile picker script could not be installed`);
+  if (!html.includes("Android|Chromium") && !html.includes("navigator.userAgent")) {
+    html = html.replace("</head>", pickerScript + "</head>");
+  }
+
+  if (!html.includes("navigator.userAgent")) {
+    throw new Error(`${tool.page}: Android picker script could not be installed`);
   }
 
   await writeFile(pagePath, html, "utf8");
