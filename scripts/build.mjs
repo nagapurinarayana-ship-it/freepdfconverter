@@ -74,7 +74,7 @@ const directories = ["assets", "tools", "guides"];
 await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
 
-const htmlFiles = [...new Set([...indexablePages, ...supplementalPages, "404.html"])];
+const htmlFiles = [...new Set([...indexablePages, ...supplementalPages, "404.html", "offline.html"])];
 const generatedSearchPages = new Set(SEARCH_INTENT_PATHS);
 const copyCandidates = [...files, ...htmlFiles.filter((relative) => !files.includes(relative) && !generatedSearchPages.has(relative))];
 for (const relative of copyCandidates) {
@@ -260,6 +260,18 @@ function structuredData(relative, canonical, title, description) {
     "@type": "BreadcrumbList",
     itemListElement: breadcrumbItems
   }];
+
+  if (articlePages.has(relative)) {
+    graph.push({
+      "@type": "WebPage",
+      "@id": canonical,
+      "url": canonical,
+      "name": title,
+      "description": description,
+      "inLanguage": "en",
+      "isPartOf": { "@type": "WebSite", name: "FreePDF Tools", url: origin + "/" }
+    });
+  }
 
   if (relative === "guides/index.html") {
     graph.push({
