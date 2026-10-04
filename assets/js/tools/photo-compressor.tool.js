@@ -238,7 +238,7 @@ export function mount() {
           ? "The browser could not encode one of the selected images. Try a smaller image or a different output format."
           : "The selected images could not be optimized in your browser.";
       setStatus(message, "error");
-    }}
+    }
   });
 
   controller.mount();
