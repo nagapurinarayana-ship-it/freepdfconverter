@@ -1,7 +1,7 @@
 import { ToolController } from "../core/tool-controller.js";
 import { createImageAdjuster } from "../core/image-adjuster.js";
 import { loadImage } from "../core/image-tool-kit.js";
-import { encodeBestUnderTarget } from "../core/image-form-engine.js";
+import { encodeImageAtQuality } from "../core/image-form-engine.js";
 import {
   chooseExtension,
   reductionPercent,
@@ -116,6 +116,51 @@ function buildSmartPassportCrop(image, aspectRatio, focusY = 0.40) {
   };
 }
 
+async function encodePassportAtTarget({
+  image,
+  dimensions,
+  targetBytes,
+  cropRect,
+  setProgress,
+  progressStart = 0,
+  progressEnd = 100
+}) {
+  const qualities = [0.95, 0.90, 0.85, 0.80, 0.75, 0.70, 0.65, 0.60, 0.55, 0.50, 0.45, 0.40, 0.35];
+  let bestUnder = null;
+  let bestAny = null;
+
+  for (let index = 0; index < qualities.length; index += 1) {
+    const quality = qualities[index];
+    const blob = await encodeImageAtQuality({
+      image,
+      width: dimensions.width,
+      height: dimensions.height,
+      mime: "image/jpeg",
+      quality,
+      cropMode: "fill",
+      background: "white",
+      cropRect
+    });
+
+    if (!blob) throw new Error("encode-failed");
+
+    if (!bestAny || quality > bestAny.quality) {
+      bestAny = { blob, width: dimensions.width, height: dimensions.height, quality };
+    }
+
+    if (blob.size <= targetBytes && (!bestUnder || quality > bestUnder.quality)) {
+      bestUnder = { blob, width: dimensions.width, height: dimensions.height, quality };
+    }
+
+    setProgress(
+      progressStart + ((index + 1) / qualities.length) * (progressEnd - progressStart)
+    );
+  }
+
+  if (bestUnder) return { ...bestUnder, reached: true };
+  return { ...bestAny, reached: false };
+}
+
 function sourceForFile(file, image, url, preset, focusY = 0.40) {
   const dimensions = resolveDimensions(preset);
   const aspectRatio = dimensions.width / dimensions.height;
@@ -221,7 +266,7 @@ export function mount() {
     maxFileMessage: "Each source image must be 20 MB or smaller.",
     emptySummary: "No photos selected",
     initialMessage: "Choose a photo. Processing stays on your device.",
-    readyMessage: "Ready. Choose the required photo size and framing, then create the image file(s).",
+    readyMessage: "Ready. Choose the required photo size and framing, then create the image file(s). The export preserves the required pixel dimensions; if the size target is too small, the safest higher-quality result is used instead of making the photo blurry.",
     readErrorMessage: "One or more selected images could not be read by your browser.",
     onFilesSelected: async ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
@@ -292,19 +337,15 @@ export function mount() {
 
         const dimensions = resolveDimensions(preset);
 
-        const result = await encodeBestUnderTarget({
+        const result = await encodePassportAtTarget({
           image,
           dimensions,
-          mime,
           targetBytes,
-          cropMode: "fill",
-          background: "white",
           cropRect: state.cropSelections[index] || buildSmartPassportCrop(
             image,
             dimensions.width / dimensions.height,
             Number(el.focusY.value || 40) / 100
           ),
-          cropFocusY: Number(el.focusY.value || 40) / 100,
           setProgress,
           progressStart: (index / files.length) * 80,
           progressEnd: ((index + 1) / files.length) * 80
