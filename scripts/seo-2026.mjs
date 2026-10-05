@@ -32,16 +32,16 @@ const overrides = {
     'Crop, resize, clean and compress a signature image for online forms with practical file-size targets while keeping supported processing in your browser.'
   ],
   'tools/passport-id-photo-maker.html': [
-    'Passport & ID Photo Maker — 35×45, 2×2 & Custom Sizes | FreePDF Tools',
-    'Create passport and ID photos with common 35×45 mm, 2×2 inch and custom sizes, manual framing and file-size limits in your browser.'
+    'Passport & ID Photo Maker — 35×45 & 2×2 | FreePDF Tools',
+    'Create passport and ID photos with 35×45 mm, 2×2 inch and custom sizes, manual framing and file-size limits in your browser.'
   ],
   'tools/thumb-impression-resizer.html': [
-    'Thumb Impression Resize & Compress for Online Forms | FreePDF Tools',
-    'Crop, resize and compress thumb-impression images for online forms with square or custom dimensions, background cleanup and file-size limits.'
+    'Thumb Impression Resizer for Online Forms | FreePDF Tools',
+    'Crop, resize and compress thumb-impression images for online forms with custom dimensions, background cleanup and file-size limits.'
   ],
   'tools/handwritten-declaration-resizer.html': [
-    'Resize & Compress Handwritten Declaration for Forms | FreePDF Tools',
-    'Crop, resize and compress handwritten declaration images for online forms with custom dimensions, background options and maximum file-size targets.'
+    'Handwritten Declaration Resizer | FreePDF Tools',
+    'Crop, resize and compress handwritten declaration images for online forms with custom dimensions and maximum file-size targets.'
   ],
   'tools/ocr-pdf.html': [
     'OCR PDF Online Free — Scanned PDF to Word | FreePDF Tools',
