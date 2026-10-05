@@ -55,7 +55,7 @@ for (const [label, needle] of [
   ["Social Bar", "a8897ecee48386eabd13ef3cbb2661c5"],
   ["Popunder", "64d880a1349413fe7dcb55cf8a8b6379"],
   ["Smartlink", "c1kt57md?key=16cfe2b361699a8b0b12a8dc0c8c79b7"],
-  ["728x90 Banner", "7b9ff27e517a15cbdb8b889b758ec1b"],
+  ["728x90 Banner", "7b9ff27e517a15dcbdb8b889b758ec1b"],
   ["Banner source", "highrevenueformat.com"]
 ]) {
   if (!monetizationSource.includes(needle)) failures.push("monetization -> supplied Adsterra " + label + " configuration is missing");
