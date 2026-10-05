@@ -95,7 +95,7 @@ function renderPreview(url, container, label, options = {}) {
       "linear-gradient(45deg, #e7e9ee 25%, transparent 25%)," +
       "linear-gradient(-45deg, #e7e9ee 25%, transparent 25%)," +
       "linear-gradient(45deg, transparent 75%, #e7e9ee 75%)," +
-      "linear-gradient(-45deg, transparent 75%, #e7e9ee 75%),";
+      "linear-gradient(-45deg, transparent 75%, #e7e9ee 75%)";
     figure.style.backgroundSize = "16px 16px";
     figure.style.backgroundPosition = "0 0, 0 8px, 8px -8px, -8px 0";
     figure.style.backgroundColor = "#ffffff";
