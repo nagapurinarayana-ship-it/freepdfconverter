@@ -10,11 +10,12 @@ for (const file of htmlFiles) {
   const relative = path.relative(dist, file).replaceAll(path.sep, "/");
   let normalized = normalizeInternalLinks(html);
   normalized = normalizeGlobalHeader(normalized, relative);
+  normalized = ensureHeaderVisibilityStyles(normalized);
 
   if (normalized !== html) await writeFile(file, normalized, "utf8");
 }
 
-console.log("Normalized internal HTML links and the shared production header.");
+console.log("Normalized internal HTML links, the shared production header, and header visibility.");
 
 function normalizeInternalLinks(html) {
   return html.replace(/(href=["'])([^"']+)(["'])/gi, function (full, prefix, href, suffix) {
@@ -66,6 +67,20 @@ function normalizeGlobalHeader(html, relative) {
     '</div></header>';
 
   return html.replace(/<header\s+class=["']site-header["'][\s\S]*?<\/header>/i, header);
+}
+
+function ensureHeaderVisibilityStyles(html) {
+  const href = "/assets/css/header-stability.css";
+  if (new RegExp("<link[^>]+href=[\\\"']" + escapeRegExp(href) + "[\\\"']", "i").test(html)) return html;
+
+  const link = '<link rel="stylesheet" href="' + href + '">';
+  const stylesHref = /<link[^>]+href=["'][^"']*assets\/css\/styles(?:\.[a-f0-9]{10})?\.css["'][^>]*>/i;
+  if (stylesHref.test(html)) return html.replace(stylesHref, function (match) { return match + link; });
+  return html.replace("</head>", link + "\n</head>");
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 async function collectHtml(directory) {
