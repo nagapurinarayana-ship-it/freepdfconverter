@@ -7,28 +7,33 @@ const MARKER_END = "<!-- freepdf-effectivecpm:end -->";
 const htmlFiles = [];
 await collectHtml(dist);
 
-// Adsterra is mounted by assets/js/ads.js at runtime. This build step deliberately
-// creates only stable, empty placement hooks so third-party scripts never become
-// part of the build HTML and never block/replace page content.
+// Runtime monetization lives in assets/js/ads.js. This build step owns only the
+// stable placement contract required by the quality checks and page layout.
 for (const file of htmlFiles) {
   let html = await readFile(file, "utf8");
   html = stripLegacyAdMarkup(html);
 
-  const hasManagedZone = /data-ad-zone=["'](?:content|mid)["']/i.test(html);
-  if (!hasManagedZone && html.includes("</main>")) {
-    const pageAds = `\n${MARKER_START}\n<div class="container"><div class="ad-container ad-container-managed" data-ad-zone="content" aria-label="Advertisement"></div></div>\n${MARKER_END}`;
-    const toolHero = html.match(/<section[^>]*class=["'][^"']*tool-hero[^"']*["'][^>]*>[\s\S]*?<\/section>/i);
-    if (toolHero && toolHero.index !== undefined) {
-      const insertAt = toolHero.index + toolHero[0].length;
-      html = html.slice(0, insertAt) + pageAds + html.slice(insertAt);
+  if (!html.includes(MARKER_START) && html.includes("</main>")) {
+    const existingZone = html.match(/<div class="container">\s*<div class="ad-container[^>]*data-ad-zone=["'][^"']+["'][^>]*><\/div>\s*<\/div>/i);
+    if (existingZone && existingZone.index !== undefined) {
+      const before = html.slice(0, existingZone.index);
+      const after = html.slice(existingZone.index + existingZone[0].length);
+      html = before + MARKER_START + "\n" + existingZone[0] + "\n" + MARKER_END + after;
     } else {
-      const article = html.match(/<article\b[\s\S]*?<\/article>/i);
-      if (article && article.index !== undefined) {
-        const insertAt = article.index + article[0].length;
+      const pageAds = `\n${MARKER_START}\n<div class="container"><div class="ad-container ad-container-managed" data-ad-zone="content" aria-label="Advertisement"></div></div>\n${MARKER_END}`;
+      const toolHero = html.match(/<section[^>]*class=["'][^"']*tool-hero[^"']*["'][^>]*>[\s\S]*?<\/section>/i);
+      if (toolHero && toolHero.index !== undefined) {
+        const insertAt = toolHero.index + toolHero[0].length;
         html = html.slice(0, insertAt) + pageAds + html.slice(insertAt);
       } else {
-        const mainEnd = html.lastIndexOf("</main>");
-        html = html.slice(0, mainEnd) + pageAds + html.slice(mainEnd);
+        const article = html.match(/<article\b[\s\S]*?<\/article>/i);
+        if (article && article.index !== undefined) {
+          const insertAt = article.index + article[0].length;
+          html = html.slice(0, insertAt) + pageAds + html.slice(insertAt);
+        } else {
+          const mainEnd = html.lastIndexOf("</main>");
+          html = html.slice(0, mainEnd) + pageAds + html.slice(mainEnd);
+        }
       }
     }
   }
