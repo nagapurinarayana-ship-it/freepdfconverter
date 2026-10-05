@@ -53,14 +53,22 @@
 <label class="field"><span>Width</span><input id="width" type="number" min="32" max="6000" value="1600" inputmode="decimal"></label>
 <label class="field"><span>Height</span><input id="height" type="number" min="32" max="6000" value="1200" inputmode="decimal"></label>
 <label class="field"><span>DPI for mm/cm</span><select id="dpi"><option value="72">72 DPI</option><option value="96" selected>96 DPI</option><option value="150">150 DPI</option><option value="300">300 DPI</option></select></label>
-<label class="check-row"><input id="keepAspect" type="checkbox" checked><span><strong>Keep aspect ratio</strong><small>Prevents unexpected stretching when resizing.</small></span></label>
+<label class="check-row"><input id="keepAspect" type="checkbox" checked><span><strong>Keep aspect ratio</strong><small>Prevents stretching. Uncheck for manual framing in the exact output box.</small></span></label>
 </div>
 
 <div id="dimensionFields">
 <div class="form-grid">
 <label class="field"><span>Crop behavior</span><select id="cropMode"><option value="contain" selected>Fit inside — keep the whole image</option><option value="fill">Fill box — crop overflow</option></select></label>
-<label class="field"><span>Background</span><select id="background"><option value="white" selected>White</option><option value="keep">Keep transparency</option></select></label>
+<label class="field"><span>Background</span><select id="background"><option value="white" selected>White</option><option value="keep">Keep transparency when supported</option></select></label>
 </div>
+</div>
+
+<div id="photoAdjuster" class="image-adjuster-host" hidden>
+  <div class="section-heading compact">
+    <span class="eyebrow">Framing</span>
+    <h2>Position the photo inside the output box</h2>
+    <p class="helper-text">Drag to reposition and pinch or zoom to control the crop. In batch mode, each selected image keeps its own framing.</p>
+  </div>
 </div>
 
 <div class="preview-grid">
@@ -82,7 +90,7 @@
 
 <aside class="tool-side">
 <div class="side-card"><h3>What makes this useful</h3><ul><li>10KB to 2MB presets plus custom targets</li><li>Pixels or mm/cm with DPI conversion</li><li>Fit or crop-to-box behavior</li><li>Batch processing with individual downloads</li><li>Original files remain unchanged</li></ul></div>
-<div class="side-card"><h3>Important</h3><p>A target is a maximum goal. Some images cannot reach very small limits without becoming visibly poor, so the optimizer stops at its closest safe tested result instead of destroying detail just to hit a number.</p></div>
+<div class="side-card"><h3>Important</h3><p>A target is a maximum goal. Some images cannot reach very small limits without becoming visibly poor, so the optimizer stops at its closest safe tested result instead of destroying detail just to hit a number.</p><p>For exact output boxes, uncheck “Keep aspect ratio” to reveal manual framing before compression.</p></div>
 <div class="side-card"><h3>Best format</h3><p>JPG is usually the most practical choice for photographs. PNG is better when transparency or sharp flat graphics matter. WebP can be smaller when the receiving form accepts it.</p></div>
 <div class="side-card"><h3>Need a signature?</h3><p><a href="signature-resizer">Resize and clean a signature →</a></p></div>
 </aside>
