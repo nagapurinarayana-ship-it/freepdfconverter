@@ -123,6 +123,29 @@ jobs:
           robots="$(curl -L -sS --max-time 20 "${SITE_ORIGIN}/robots.txt")"
           grep -q "Sitemap: https://freepdfconverter-all-in-one.pages.dev/sitemap.xml" <<<"$robots"
 
+      - name: Measure live response times
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "## Live response timing"
+            echo
+            echo "| Page | HTTP | TTFB (s) | Total (s) |"
+            echo "|---|---:|---:|---:|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for path in "/" "/tools/merge-pdf" "/tools/compress-pdf" "/tools/pdf-to-word" "/tools/word-to-pdf" "/tools/pdf-to-image" "/tools/jpg-to-pdf" "/tools/ocr-pdf" "/tools/photo-compressor"; do
+            metrics="$(curl -L -sS -o /dev/null -w '%{http_code} %{time_starttransfer} %{time_total}' --max-time 20 "${SITE_ORIGIN}${path}")"
+            status="$(printf '%s' "$metrics" | awk '{print $1}')"
+            ttfb="$(printf '%s' "$metrics" | awk '{print $2}')"
+            total="$(printf '%s' "$metrics" | awk '{print $3}')"
+            printf '| %s | %s | %s | %s |\n' "$path" "$status" "$ttfb" "$total" >> "$GITHUB_STEP_SUMMARY"
+
+            awk -v value="$ttfb" 'BEGIN { if (value > 5) exit 1 }' || {
+              echo "::warning title=Slow live TTFB::slow first byte for $path: $ttfb seconds"
+            }
+          done
+
       - name: Verify live service-worker safety
         shell: bash
         run: |
