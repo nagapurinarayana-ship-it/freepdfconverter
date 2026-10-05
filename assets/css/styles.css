@@ -663,3 +663,17 @@ body{min-height:100vh}
   .image-adjuster-controls { gap:8px; }
   .image-adjuster-controls .button { flex:1 1 auto; }
 }
+
+
+/* Passport framing guide — visual positioning aid, not face detection. */
+.image-adjuster[data-guide-type="passport"] .image-adjuster-guide::before {
+  left: 29%; right: 29%; top: 10%; bottom: auto; height: 48%;
+  border: 2px dashed rgba(255,255,255,.78);
+  border-radius: 48% 48% 44% 44%;
+}
+.image-adjuster[data-guide-type="passport"] .image-adjuster-guide::after {
+  left: 8%; right: 8%; top: auto; bottom: 0; height: 40%;
+  border: 2px dashed rgba(255,255,255,.72);
+  border-bottom: 0;
+  border-radius: 52% 52% 0 0;
+}

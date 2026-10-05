@@ -28,7 +28,7 @@
 <main id="main">
 <section class="tool-hero"><div class="container"><div class="breadcrumbs"><a href="../">Home</a> / Passport &amp; ID Photo Maker</div><span class="eyebrow">Free · local processing · direct downloads</span>
 <h1>Passport &amp; ID Photo Maker</h1>
-<p class="lead">Create a clean JPG at a required photo ratio and pixel size. Choose a common preset, set a maximum file size, adjust vertical framing, and keep your source photo on your device.</p></div></section>
+<p class="lead">Create a clean JPG at a required photo ratio and pixel size. Choose a common preset, set a maximum file size, and adjust the final framing yourself before export. Your source photo stays on your device.</p></div></section>
 <div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>
 <div class="container tool-shell">
 <section class="tool-panel" aria-labelledby="photo-title">
@@ -59,9 +59,8 @@
 </div>
 <p id="dpiNote" class="muted">Preset uses 300 DPI to create a print-friendly pixel size. Always check the destination's current requirements.</p>
 
-<div class="section-heading compact"><span class="eyebrow">3. Framing</span><h2>Position the subject inside the crop</h2></div>
-<label class="field"><span>Vertical framing <output id="focusValue">50%</output></span><input id="focusY" type="range" min="0" max="100" value="50"></label>
-<p class="muted">Move the slider if the centered crop would cut off hair or leave too much space above the head. This tool does not automatically detect faces.</p>
+<div class="section-heading compact"><span class="eyebrow">3. Adjust framing</span><h2>Position the full head and shoulders inside the guide</h2><p>Drag the photo, pinch or zoom, and check the final crop before creating the JPG. The guide is a visual aid; it does not detect faces.</p></div>
+<div id="passportAdjuster" class="image-adjuster-host"></div>
 
 <div class="preview-grid">
 <div class="side-card"><h3>Source preview</h3><div id="inputPreview" class="preview-host"></div></div>
@@ -90,8 +89,8 @@
 <section class="content-section"><div class="container content-narrow">
 <h2>Passport and ID photo sizing without uploading your photo</h2>
 <p>This tool converts a normal photo into a fixed JPG canvas using the dimensions you choose. For physical dimensions such as millimetres, the tool calculates the corresponding pixel canvas from the selected DPI. The receiving application is still the authority on what it accepts.</p>
-<h2>Why vertical framing matters</h2>
-<p>A standard center crop is not always the right crop for a portrait. Use the vertical framing slider to move the source image inside the fixed photo box before exporting.</p>
+<h2>Why manual framing matters</h2>
+<p>A standard center crop is not always the right crop for a portrait. The editor starts with a sensible portrait position, then lets you drag and zoom until the head and shoulders are framed the way you need.</p>
 <h2>Batch processing</h2>
 <p>When several photos need the same requirements, select them together. Each result is prepared independently and downloaded as its own JPG file.</p>
 <h2>Privacy</h2>

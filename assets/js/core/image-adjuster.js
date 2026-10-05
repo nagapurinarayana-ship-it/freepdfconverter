@@ -1,11 +1,12 @@
-export function createImageAdjuster({ container, aspectRatio = 1, label = "Image framing", onChange: initialOnChange = () => {} }) {
+export function createImageAdjuster({ container, aspectRatio = 1, label = "Image framing", instructions = "Drag to move · pinch or wheel to zoom", guideType = "generic", onChange: initialOnChange = () => {} }) {
   if (!container) throw new Error("Missing image-adjuster container.");
   const root = document.createElement("div");
   root.className = "image-adjuster";
+  root.dataset.guideType = guideType;
   root.innerHTML = `
     <div class="image-adjuster-toolbar">
       <strong class="image-adjuster-title"></strong>
-      <span class="image-adjuster-help">Drag to move · pinch or wheel to zoom</span>
+      <span class="image-adjuster-help"></span>
       <div class="image-adjuster-nav" data-image-adjuster-nav></div>
     </div>
     <div class="image-adjuster-viewport" role="img" aria-label="Adjust the selected image framing">
@@ -36,6 +37,7 @@ export function createImageAdjuster({ container, aspectRatio = 1, label = "Image
   const status = root.querySelector("[data-adjuster-status]");
 
   title.textContent = label;
+  help.textContent = instructions;
   let onChange = initialOnChange;
   let source = null;
   let suggested = null;
@@ -88,7 +90,7 @@ export function createImageAdjuster({ container, aspectRatio = 1, label = "Image
     image.style.height = imageHeight + "px";
     image.style.transform = "translate3d(" + tx + "px," + ty + "px,0) scale(" + scale + ")";
     zoomValue.textContent = Math.round((scale / minScale) * 100) + "%";
-    status.textContent = "Drag or zoom until the complete signature is inside the frame.";
+    status.textContent = "Adjust the framing until all important content is inside the frame.";
     notify();
   }
 

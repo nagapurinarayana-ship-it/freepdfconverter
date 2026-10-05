@@ -1,4 +1,5 @@
 import { ToolController } from "../core/tool-controller.js";
+import { createImageAdjuster } from "../core/image-adjuster.js";
 import { loadImage } from "../core/image-tool-kit.js";
 import { encodeBestUnderTarget } from "../core/image-form-engine.js";
 import {
@@ -66,7 +67,119 @@ function updatePresetControls(el) {
     : "Preset uses 300 DPI to create a print-friendly pixel size. Always check the destination's current requirements.";
 }
 
+function resolveDimensions(preset) {
+  return {
+    width: Math.max(32, Math.round(
+      preset.unit === "mm"
+        ? (preset.width / 25.4) * preset.dpi
+        : preset.unit === "cm"
+          ? (preset.width / 2.54) * preset.dpi
+          : preset.width
+    )),
+    height: Math.max(32, Math.round(
+      preset.unit === "mm"
+        ? (preset.height / 25.4) * preset.dpi
+        : preset.unit === "cm"
+          ? (preset.height / 2.54) * preset.dpi
+          : preset.height
+    ))
+  };
+}
+
+function buildSmartPassportCrop(image, aspectRatio, focusY = 0.40) {
+  const sourceWidth = image.naturalWidth;
+  const sourceHeight = image.naturalHeight;
+  const sourceRatio = sourceWidth / Math.max(1, sourceHeight);
+
+  let width = sourceWidth;
+  let height = sourceHeight;
+
+  if (sourceRatio > aspectRatio) {
+    height = sourceHeight;
+    width = sourceHeight * aspectRatio;
+  } else {
+    width = sourceWidth;
+    height = sourceWidth / aspectRatio;
+  }
+
+  const centerX = sourceWidth / 2;
+  const desiredCenterY = sourceHeight * focusY;
+  const minCenterY = height / 2;
+  const maxCenterY = sourceHeight - height / 2;
+  const centerY = Math.min(maxCenterY, Math.max(minCenterY, desiredCenterY));
+
+  return {
+    x: Math.max(0, centerX - width / 2),
+    y: Math.max(0, centerY - height / 2),
+    width,
+    height
+  };
+}
+
+function sourceForFile(file, image, url, preset) {
+  const dimensions = resolveDimensions(preset);
+  const aspectRatio = dimensions.width / dimensions.height;
+  return {
+    file,
+    image,
+    url,
+    width: image.naturalWidth,
+    height: image.naturalHeight,
+    suggestedCrop: buildSmartPassportCrop(image, aspectRatio)
+  };
+}
+
 export function mount() {
+  async function showActiveEditor(files, state, el, index, resetCrop = false) {
+    state.activeIndex = Math.max(0, Math.min(index, files.length - 1));
+    const file = files[state.activeIndex];
+
+    if (!state.images) state.images = [];
+    let cached = state.images.find((entry) => entry.file === file);
+    if (!cached) {
+      cached = { file, image: await loadImage(file) };
+      state.images.push(cached);
+    }
+
+    const preset = resolvePreset(el);
+    const source = sourceForFile(
+      file,
+      cached.image,
+      state.previewUrls[state.activeIndex],
+      preset
+    );
+    state.editorSources[state.activeIndex] = source;
+
+    if (resetCrop) {
+      state.cropSelections[state.activeIndex] = null;
+    }
+
+    const savedCrop = state.cropSelections[state.activeIndex] || source.suggestedCrop;
+    el.passportAdjuster.hidden = false;
+
+    if (!state.editor) {
+      state.editor = createImageAdjuster({
+        container: el.passportAdjuster,
+        aspectRatio: source.width / source.height,
+        label: "Passport photo framing",
+        instructions: "Drag to move · pinch or wheel to zoom. Keep the full head, chin and shoulders inside the guide.",
+        guideType: "passport"
+      });
+      state.editor.setOnChange((crop) => {
+        state.cropSelections[state.activeIndex] = crop;
+      });
+    }
+
+    state.editor.setAspectRatio(source.suggestedCrop.width / source.suggestedCrop.height);
+    state.editor.setSource(source, source.suggestedCrop, savedCrop);
+    state.editor.getNavigationApi().setNavigation({
+      index: state.activeIndex,
+      count: files.length,
+      onPrevious: () => showActiveEditor(files, state, el, state.activeIndex - 1),
+      onNext: () => showActiveEditor(files, state, el, state.activeIndex + 1)
+    });
+  }
+
   const controller = new ToolController({
     multiple: true,
     maxFiles: MAX_FILES,
@@ -91,8 +204,6 @@ export function mount() {
       targetSize: "#targetSize",
       customTargetWrap: "#customTargetWrap",
       customTarget: "#customTarget",
-      focusY: "#focusY",
-      focusValue: "#focusValue",
       inputPreview: "#inputPreview",
       outputPreview: "#outputPreview",
       outputSummary: "#outputSummary",
@@ -108,15 +219,15 @@ export function mount() {
     initialMessage: "Choose a photo. Processing stays on your device.",
     readyMessage: "Ready. Choose the required photo size and framing, then create the image file(s).",
     readErrorMessage: "One or more selected images could not be read by your browser.",
-    onFilesSelected: ({ files, state, el }) => {
+    onFilesSelected: async ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
-      state.previewUrls = [];
+      state.previewUrls = files.map((file) => URL.createObjectURL(file));
       state.outputUrls = [];
       state.images = [];
-
-      state.images = [];
-      state.previewUrls = files.map((file) => URL.createObjectURL(file));
+      state.editorSources = [];
+      state.cropSelections = [];
+      state.activeIndex = 0;
 
       if (state.previewUrls[0]) {
         renderPreview(state.previewUrls[0], el.inputPreview, files[0].name);
@@ -128,6 +239,8 @@ export function mount() {
       );
       el.outputSummary.textContent = "Not processed yet";
       el.resultList.textContent = "";
+
+      await showActiveEditor(files, state, el, 0);
     },
     onReset: ({ state, el }) => {
       revokeUrls(state.previewUrls || []);
@@ -135,7 +248,13 @@ export function mount() {
       state.previewUrls = [];
       state.outputUrls = [];
       state.images = [];
+      state.editorSources = [];
+      state.cropSelections = [];
+      state.editor?.destroy?.();
+      state.editor = null;
+      state.activeIndex = 0;
 
+      el.passportAdjuster.textContent = "";
       el.batchCount.textContent = "0 selected";
       el.batchSize.textContent = "0 B";
       el.outputSummary.textContent = "Not processed yet";
@@ -149,7 +268,6 @@ export function mount() {
     }) => {
       const preset = resolvePreset(el);
       const targetBytes = targetBytesFromSelection(el.targetSize.value, el.customTarget.value);
-      const focusY = Number(el.focusY.value) / 100;
       const mime = "image/jpeg";
       const outputExtension = chooseExtension(mime);
 
@@ -168,22 +286,7 @@ export function mount() {
         const cached = state.images.find((entry) => entry.file === file);
         const image = cached?.image || await loadImage(file);
 
-        const dimensions = {
-          width: Math.max(32, Math.round(
-            preset.unit === "mm"
-              ? (preset.width / 25.4) * preset.dpi
-              : preset.unit === "cm"
-                ? (preset.width / 2.54) * preset.dpi
-                : preset.width
-          )),
-          height: Math.max(32, Math.round(
-            preset.unit === "mm"
-              ? (preset.height / 25.4) * preset.dpi
-              : preset.unit === "cm"
-                ? (preset.height / 2.54) * preset.dpi
-                : preset.height
-          ))
-        };
+        const dimensions = resolveDimensions(preset);
 
         const result = await encodeBestUnderTarget({
           image,
@@ -192,8 +295,10 @@ export function mount() {
           targetBytes,
           cropMode: "fill",
           background: "white",
-          cropFocusX: 0.5,
-          cropFocusY: focusY,
+          cropRect: state.cropSelections[index] || buildSmartPassportCrop(
+            image,
+            dimensions.width / dimensions.height
+          ),
           setProgress,
           progressStart: (index / files.length) * 80,
           progressEnd: ((index + 1) / files.length) * 80
@@ -269,12 +374,37 @@ export function mount() {
 
   controller.mount();
 
-  controller.el.preset.addEventListener("change", () => updatePresetControls(controller.el));
-  controller.el.focusY.addEventListener("input", () => {
-    controller.el.focusValue.textContent = controller.el.focusY.value + "%";
+  controller.el.preset.addEventListener("change", async () => {
+    updatePresetControls(controller.el);
+    if (controller.ready && controller.files.length) {
+      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+    }
   });
+
   controller.el.targetSize.addEventListener("change", () => {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
   });
+
+  controller.el.width.addEventListener("input", async () => {
+    if (controller.ready && controller.files.length && controller.el.preset.value === "custom") {
+      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+    }
+  });
+  controller.el.height.addEventListener("input", async () => {
+    if (controller.ready && controller.files.length && controller.el.preset.value === "custom") {
+      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+    }
+  });
+  controller.el.unit.addEventListener("change", async () => {
+    if (controller.ready && controller.files.length && controller.el.preset.value === "custom") {
+      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+    }
+  });
+  controller.el.dpi.addEventListener("change", async () => {
+    if (controller.ready && controller.files.length && controller.el.preset.value === "custom") {
+      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+    }
+  });
+
   updatePresetControls(controller.el);
 }
