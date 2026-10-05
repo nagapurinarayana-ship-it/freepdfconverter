@@ -102,6 +102,60 @@ function canvasToSource(canvas) {
   });
 }
 
+async function validatePreparedSignature(blob, transparent) {
+  const url = URL.createObjectURL(blob);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("output-validation-failed"));
+      element.src = url;
+    });
+
+    const maxDimension = 256;
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(1, image.naturalWidth),
+      maxDimension / Math.max(1, image.naturalHeight)
+    );
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+    if (!transparent) {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+    }
+    ctx.drawImage(image, 0, 0, width, height);
+
+    const pixels = ctx.getImageData(0, 0, width, height).data;
+    let meaningfulPixels = 0;
+
+    for (let index = 0; index < pixels.length; index += 4) {
+      const alpha = pixels[index + 3];
+      if (transparent) {
+        if (alpha > 8) meaningfulPixels += 1;
+      } else if (
+        alpha > 8 &&
+        (pixels[index] < 245 || pixels[index + 1] < 245 || pixels[index + 2] < 245)
+      ) {
+        meaningfulPixels += 1;
+      }
+    }
+
+    if (meaningfulPixels === 0) {
+      throw new Error(
+        transparent ? "blank-transparent-output" : "blank-signature-output"
+      );
+    }
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 function dimensionsForEditor(el) {
   const mode = el.dimensionMode.value;
   return (mode === "exact" || mode === "physical") && !el.keepAspect.checked;
@@ -349,6 +403,13 @@ export function mount() {
 
         if (!result) throw new Error("encode-failed");
 
+        try {
+          await validatePreparedSignature(result.blob, transparent);
+        } catch (error) {
+          error.message = error.message + ":" + file.name;
+          throw error;
+        }
+
         const outputUrl = URL.createObjectURL(result.blob);
         state.outputUrls.push(outputUrl);
 
@@ -424,7 +485,13 @@ export function mount() {
       const message =
         error?.message === "encode-failed"
           ? "The browser could not encode the signature. Try a larger target or a different output format."
-          : "The selected signature images could not be prepared in your browser.";
+          : /^blank-transparent-output:/.test(error?.message || "")
+            ? "The transparent result appears empty. Keep the signature visible in the framing box and try again."
+            : /^blank-signature-output:/.test(error?.message || "")
+              ? "The prepared signature appears empty. Adjust the framing so the signature is inside the output box and try again."
+              : /^output-validation-failed:/.test(error?.message || "")
+                ? "The prepared file could not be verified. Try preparing the signature again."
+                : "The selected signature images could not be prepared in your browser.";
       setStatus(message, "error");
     }
   });
