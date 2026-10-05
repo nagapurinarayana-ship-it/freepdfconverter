@@ -116,7 +116,7 @@ function buildSmartPassportCrop(image, aspectRatio, focusY = 0.40) {
   };
 }
 
-function sourceForFile(file, image, url, preset) {
+function sourceForFile(file, image, url, preset, focusY = 0.40) {
   const dimensions = resolveDimensions(preset);
   const aspectRatio = dimensions.width / dimensions.height;
   return {
@@ -125,7 +125,7 @@ function sourceForFile(file, image, url, preset) {
     url,
     width: image.naturalWidth,
     height: image.naturalHeight,
-    suggestedCrop: buildSmartPassportCrop(image, aspectRatio)
+    suggestedCrop: buildSmartPassportCrop(image, aspectRatio, focusY)
   };
 }
 
@@ -146,7 +146,8 @@ export function mount() {
       file,
       cached.image,
       state.previewUrls[state.activeIndex],
-      preset
+      preset,
+      Number(el.focusY.value || 40) / 100
     );
     state.editorSources[state.activeIndex] = source;
 
@@ -209,7 +210,10 @@ export function mount() {
       outputSummary: "#outputSummary",
       resultList: "#resultList",
       batchCount: "#batchCount",
-      batchSize: "#batchSize"
+      batchSize: "#batchSize",
+      focusY: "#focusY",
+      focusValue: "#focusValue",
+      passportAdjuster: "#passportAdjuster"
     },
     maxFileBytes: MAX_FILE,
     accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name),
@@ -297,8 +301,10 @@ export function mount() {
           background: "white",
           cropRect: state.cropSelections[index] || buildSmartPassportCrop(
             image,
-            dimensions.width / dimensions.height
+            dimensions.width / dimensions.height,
+            Number(el.focusY.value || 40) / 100
           ),
+          cropFocusY: Number(el.focusY.value || 40) / 100,
           setProgress,
           progressStart: (index / files.length) * 80,
           progressEnd: ((index + 1) / files.length) * 80
@@ -373,6 +379,13 @@ export function mount() {
   });
 
   controller.mount();
+
+  controller.el.focusY.addEventListener("input", async () => {
+    controller.el.focusValue.textContent = controller.el.focusY.value + "%";
+    if (controller.ready && controller.files.length) {
+      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+    }
+  });
 
   controller.el.preset.addEventListener("change", async () => {
     updatePresetControls(controller.el);
