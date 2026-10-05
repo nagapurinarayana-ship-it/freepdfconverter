@@ -1,7 +1,7 @@
 import { clampPixels, isTargetReached, QUALITY_LADDER, WIDTH_LADDER } from "./image-form-policy.js";
-import { createCanvas, drawContain, drawCover, makeBlob } from "./image-tool-kit.js";
+import { createCanvas, drawContain, drawCover, drawSourceCrop, makeBlob } from "./image-tool-kit.js";
 
-export async function encodeImageAtQuality({ image, width, height, mime, quality, cropMode, background, cropFocusX = 0.5, cropFocusY = 0.5 }) {
+export async function encodeImageAtQuality({ image, width, height, mime, quality, cropMode, background, cropFocusX = 0.5, cropFocusY = 0.5, cropRect = null }) {
   const alpha = mime !== "image/jpeg" && background !== "white";
   const result = createCanvas(image, { width, height, alpha });
   const ctx = result.ctx;
@@ -11,7 +11,8 @@ export async function encodeImageAtQuality({ image, width, height, mime, quality
     ctx.fillRect(0, 0, width, height);
   }
 
-  if (cropMode === "fill") drawCover(image, ctx, width, height, cropFocusX, cropFocusY);
+  if (cropRect) drawSourceCrop(image, ctx, width, height, cropRect);
+  else if (cropMode === "fill") drawCover(image, ctx, width, height, cropFocusX, cropFocusY);
   else drawContain(image, ctx, width, height);
 
   return makeBlob(result.canvas, mime, mime === "image/png" ? undefined : quality);
@@ -28,7 +29,8 @@ export async function encodeBestUnderTarget({
   progressStart = 0,
   progressEnd = 100,
   cropFocusX = 0.5,
-  cropFocusY = 0.5
+  cropFocusY = 0.5,
+  cropRect = null
 }) {
   let best = null;
 
@@ -39,7 +41,7 @@ export async function encodeBestUnderTarget({
 
     if (mime === "image/png") {
       const blob = await encodeImageAtQuality({
-        image, width, height, mime, quality: 1, cropMode, background, cropFocusX, cropFocusY
+        image, width, height, mime, quality: 1, cropMode, background, cropFocusX, cropFocusY, cropRect
       });
 
       if (!best || blob.size < best.blob.size) {
@@ -63,7 +65,7 @@ export async function encodeBestUnderTarget({
 
     for (const quality of QUALITY_LADDER) {
       const blob = await encodeImageAtQuality({
-        image, width, height, mime, quality, cropMode, background, cropFocusX, cropFocusY
+        image, width, height, mime, quality, cropMode, background, cropFocusX, cropFocusY, cropRect
       });
 
       if (!bestAny || blob.size < bestAny.blob.size) {
@@ -83,7 +85,7 @@ export async function encodeBestUnderTarget({
     for (let iteration = 0; iteration < 5 && low < high; iteration += 1) {
       const quality = (low + high) / 2;
       const blob = await encodeImageAtQuality({
-        image, width, height, mime, quality, cropMode, background, cropFocusX, cropFocusY
+        image, width, height, mime, quality, cropMode, background, cropFocusX, cropFocusY, cropRect
       });
 
       if (!bestAny || blob.size < bestAny.blob.size) {

@@ -1,5 +1,6 @@
 import { ToolController } from "../core/tool-controller.js";
-import { createCanvas, loadImage, makeBlob, removeNearWhite, trimWhitespace } from "../core/image-tool-kit.js";
+import { createImageAdjuster } from "../core/image-adjuster.js";
+import { createCanvas, loadImage, removeNearWhite, trimWhitespace } from "../core/image-tool-kit.js";
 import { encodeBestUnderTarget } from "../core/image-form-engine.js";
 import {
   reductionPercent,
@@ -67,7 +68,106 @@ function renderPreview(url, container, label) {
   container.appendChild(figure);
 }
 
+function canvasToSource(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("encode-failed"));
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const image = new Image();
+      image.onload = () => resolve({
+        image,
+        url,
+        width: canvas.width,
+        height: canvas.height,
+        suggestedCrop: { x: 0, y: 0, width: canvas.width, height: canvas.height }
+      });
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("image-load-failed"));
+      };
+      image.src = url;
+    }, "image/png");
+  });
+}
+
+function dimensionsForEditor(el) {
+  const mode = el.dimensionMode.value;
+  return (mode === "exact" || mode === "physical") && !el.keepAspect.checked;
+}
+
+function resolveCropAspect(el, source) {
+  const width = Number(el.width.value || 600);
+  const height = Number(el.height.value || 200);
+  if (dimensionsForEditor(el) && width > 0 && height > 0) return width / height;
+  return source.naturalWidth / Math.max(1, source.naturalHeight);
+}
+
+async function prepareEditorSource(file, autoTrim, transparent) {
+  const image = await loadImage(file);
+  const preparedCanvas = await prepareSignatureSource(image, autoTrim, transparent);
+  return canvasToSource(preparedCanvas);
+}
+
 export function mount() {
+  async function showActiveEditor(files, state, el, index) {
+    state.activeIndex = Math.max(0, Math.min(index, files.length - 1));
+    const file = files[state.activeIndex];
+    const transparent = el.background.value === "transparent";
+    const autoTrim = el.autoTrim.checked;
+
+    state.editorUrls = state.editorUrls || [];
+    state.editorSources = state.editorSources || [];
+    state.cropSelections = state.cropSelections || [];
+
+    if (state.editorUrls[state.activeIndex]) {
+      URL.revokeObjectURL(state.editorUrls[state.activeIndex]);
+      state.editorUrls[state.activeIndex] = null;
+    }
+
+    const source = await prepareEditorSource(file, autoTrim, transparent);
+    state.editorSources[state.activeIndex] = source;
+    state.editorUrls[state.activeIndex] = source.url;
+
+    if (!state.editor) {
+      state.editor = createImageAdjuster({
+        container: el.adjuster,
+        aspectRatio: resolveCropAspect(el, source.image),
+        label: "Signature framing"
+      });
+      state.editor.setOnChange((crop) => {
+        state.cropSelections[state.activeIndex] = crop;
+      });
+    }
+
+    state.editor.setAspectRatio(resolveCropAspect(el, source.image));
+    state.editor.setSource(
+      source,
+      source.suggestedCrop,
+      state.cropSelections[state.activeIndex] || null
+    );
+    state.editor.getNavigationApi().setNavigation({
+      index: state.activeIndex,
+      count: files.length,
+      onPrevious: () => showActiveEditor(files, state, el, state.activeIndex - 1),
+      onNext: () => showActiveEditor(files, state, el, state.activeIndex + 1)
+    });
+
+    el.adjuster.hidden = !dimensionsForEditor(el);
+  }
+
+  function syncBackgroundFormat(el) {
+    const transparent = el.background.value === "transparent";
+    if (transparent) {
+      el.format.value = "image/png";
+      el.format.disabled = true;
+    } else {
+      el.format.disabled = false;
+    }
+  }
+
   const controller = new ToolController({
     multiple: true,
     maxFiles: MAX_FILES,
@@ -99,7 +199,8 @@ export function mount() {
       outputSummary: "#outputSummary",
       resultList: "#resultList",
       batchCount: "#batchCount",
-      batchSize: "#batchSize"
+      batchSize: "#batchSize",
+      adjuster: "#signatureAdjuster"
     },
     maxFileBytes: MAX_FILE,
     accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name),
@@ -109,32 +210,41 @@ export function mount() {
     initialMessage: "Select one or more signature images. Processing stays in your browser.",
     readyMessage: "Ready. Review the dimensions, background and target size, then prepare the signature file(s).",
     readErrorMessage: "One or more signature images could not be read by your browser.",
-    onFilesSelected: ({ files, state, el }) => {
+    onFilesSelected: async ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
-      state.previewUrls = [];
-      state.outputUrls = [];
-      state.images = [];
+      revokeUrls(state.editorUrls || []);
 
-      state.images = [];
-      state.previewUrls = files.map(function (file) {
-        return URL.createObjectURL(file);
-      });
+      state.previewUrls = files.map((file) => URL.createObjectURL(file));
+      state.outputUrls = [];
+      state.editorUrls = [];
+      state.editorSources = [];
+      state.cropSelections = [];
+      state.activeIndex = 0;
 
       if (state.previewUrls[0]) renderPreview(state.previewUrls[0], el.inputPreview, files[0].name);
       el.batchCount.textContent = files.length + " selected";
       el.batchSize.textContent = window.FreePDF.formatBytes(files.reduce((sum, file) => sum + file.size, 0));
       el.outputSummary.textContent = "Not processed yet";
       el.resultList.textContent = "";
+
+      await showActiveEditor(files, state, el, 0);
     },
     onReset: ({ state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
+      revokeUrls(state.editorUrls || []);
+      state.editor?.destroy?.();
 
       state.previewUrls = [];
       state.outputUrls = [];
-      state.images = [];
+      state.editorUrls = [];
+      state.editorSources = [];
+      state.cropSelections = [];
+      state.editor = null;
+      state.activeIndex = 0;
 
+      el.adjuster.hidden = true;
       el.batchCount.textContent = "0 selected";
       el.batchSize.textContent = "0 B";
       el.outputSummary.textContent = "Not processed yet";
@@ -156,7 +266,8 @@ export function mount() {
       const autoTrim = el.autoTrim.checked;
       const transparent = el.background.value === "transparent";
       const background = transparent ? "keep" : "white";
-      const mime = el.format.value;
+      const mime = transparent ? "image/png" : el.format.value;
+      if (transparent) el.format.value = "image/png";
       const results = [];
 
       revokeUrls(state.outputUrls || []);
@@ -169,12 +280,14 @@ export function mount() {
           "info"
         );
 
-        const cached = state.images.find(function (entry) {
-          return entry.file === file;
-        });
-        const originalImage = cached?.image || await loadImage(file);
-        const preparedCanvas = await prepareSignatureSource(originalImage, autoTrim, transparent);
-        const preparedImage = await canvasToImage(preparedCanvas);
+        let source = state.editorSources[index];
+        if (!source) {
+          source = await prepareEditorSource(file, autoTrim, transparent);
+          state.editorSources[index] = source;
+          state.editorUrls[index] = source.url;
+        }
+        const preparedImage = source.image;
+        const cropSelection = state.cropSelections[index] || null;
 
         const dimensions = resolveDimensions({
           ...baseOptions,
@@ -187,8 +300,9 @@ export function mount() {
           dimensions,
           mime,
           targetBytes,
-          cropMode: el.dimensionMode.value === "exact" && !el.keepAspect.checked ? "fill" : "contain",
+          cropMode: dimensionsForEditor(el) ? "fill" : "contain",
           background,
+          cropRect: dimensionsForEditor(el) ? cropSelection : null,
           setProgress,
           progressStart: (index / files.length) * 75,
           progressEnd: ((index + 1) / files.length) * 75
@@ -264,17 +378,45 @@ export function mount() {
 
   controller.mount();
   controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
+  syncBackgroundFormat(controller.el);
 
   controller.el.targetSize.addEventListener("change", function () {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
   });
 
+  controller.el.background.addEventListener("change", function () {
+    syncBackgroundFormat(controller.el);
+    if (controller.ready && controller.files.length) {
+      showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0);
+    }
+  });
+
+  controller.el.autoTrim.addEventListener("change", function () {
+    if (controller.ready && controller.files.length) {
+      showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0);
+    }
+  });
+
+  function refreshEditorMode() {
+    const visible = dimensionsForEditor(controller.el);
+    controller.el.adjuster.hidden = !visible;
+    if (visible && controller.ready && controller.files.length) {
+      showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0);
+    }
+  }
+
   controller.el.dimensionMode.addEventListener("change", function () {
     controller.el.dimensionUnit.disabled = controller.el.dimensionMode.value === "original";
     controller.el.dpi.disabled = controller.el.dimensionMode.value !== "physical";
+    refreshEditorMode();
   });
 
   controller.el.dimensionUnit.addEventListener("change", function () {
     controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
+    refreshEditorMode();
   });
+
+  controller.el.keepAspect.addEventListener("change", refreshEditorMode);
+  controller.el.width.addEventListener("input", refreshEditorMode);
+  controller.el.height.addEventListener("input", refreshEditorMode);
 }

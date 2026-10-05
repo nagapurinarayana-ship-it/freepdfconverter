@@ -633,3 +633,33 @@ body{min-height:100vh}
 @media(max-width:760px){html{scroll-padding-top:70px}.site-header .header-inner{min-height:58px}.article,.content-narrow{width:min(calc(100% - 24px),860px)}.article{padding:42px 0 58px}.article h1{font-size:clamp(2.05rem,9.5vw,3.2rem)}.article p,.article li{font-size:1rem;line-height:1.7}.tool-hero{padding:36px 0 22px}.tool-shell{padding-bottom:52px}.tool-panel{border-radius:16px;padding:18px}.guide-index{padding:34px 0 54px}.search-links-card{padding:19px}.search-links-grid{grid-template-columns:1fr}.popular-searches-section{padding-bottom:32px}.ad-container[data-ad-zone="top"]{min-height:64px;max-height:96px;overflow:hidden}}
 @media(max-width:520px){.article,.content-narrow{width:min(calc(100% - 20px),860px)}.article{padding-top:34px}.tool-hero .breadcrumbs{font-size:.8rem}.tool-shell{gap:14px}.tool-panel{box-shadow:0 10px 26px rgba(24,55,100,.055)}.ad-container[data-ad-zone="top"]{max-height:94px}}
 @media(prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}.site-header .main-nav a,.guide-card,.popular-search-link,.button{transition:none}}
+
+
+/* Interactive image framing editor. File-picker lifecycle remains untouched. */
+.image-adjuster-host { margin: 18px 0 8px; }
+.image-adjuster { border: 1px solid var(--ui-line); border-radius: 16px; background: var(--ui-surface-soft); padding: 14px; }
+.image-adjuster-toolbar { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.image-adjuster-toolbar strong { display:block; font-size:.98rem; }
+.image-adjuster-help { display:block; margin-top:3px; color:var(--ui-muted); font-size:.8rem; }
+.image-adjuster-nav { display:flex; gap:7px; flex-wrap:wrap; justify-content:flex-end; }
+.image-adjuster-nav .button { min-height:40px; padding:8px 12px; font-size:.84rem; }
+.image-adjuster-viewport { position:relative; width:100%; max-height:520px; overflow:hidden; border-radius:14px; background:#eef2f7; touch-action:none; user-select:none; cursor:grab; }
+.image-adjuster-viewport:active { cursor:grabbing; }
+.image-adjuster-checker { position:absolute; inset:0; background-color:#f3f5f8; background-image:linear-gradient(45deg,#e4e9f0 25%,transparent 25%),linear-gradient(-45deg,#e4e9f0 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e4e9f0 75%),linear-gradient(-45deg,transparent 75%,#e4e9f0 75%); background-position:0 0,0 8px,8px -8px,-8px 0; background-size:16px 16px; }
+.image-adjuster-image { position:absolute; left:0; top:0; max-width:none; display:block; transform-origin:0 0; will-change:transform; pointer-events:none; }
+.image-adjuster-guide { position:absolute; inset:0; pointer-events:none; box-shadow:inset 0 0 0 2px rgba(31,103,255,.9), inset 0 0 0 9999px rgba(18,32,51,.24); }
+.image-adjuster-guide::before,.image-adjuster-guide::after { content:""; position:absolute; pointer-events:none; }
+.image-adjuster-guide::before { left:33.333%; right:33.333%; top:0; bottom:0; border-inline:1px solid rgba(255,255,255,.45); }
+.image-adjuster-guide::after { top:33.333%; bottom:33.333%; left:0; right:0; border-block:1px solid rgba(255,255,255,.45); }
+.image-adjuster-controls { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:11px; }
+.image-adjuster-zoom { display:flex; align-items:center; gap:7px; }
+.image-adjuster-zoom output { min-width:55px; text-align:center; font-size:.82rem; font-weight:800; color:#4f6075; }
+.image-adjuster-status { margin:9px 2px 0; color:#66768b; font-size:.8rem; }
+@media(max-width:760px) {
+  .image-adjuster { padding:11px; }
+  .image-adjuster-toolbar { flex-direction:column; }
+  .image-adjuster-nav { width:100%; justify-content:flex-start; }
+  .image-adjuster-nav .button { flex:1 1 auto; }
+  .image-adjuster-controls { gap:8px; }
+  .image-adjuster-controls .button { flex:1 1 auto; }
+}

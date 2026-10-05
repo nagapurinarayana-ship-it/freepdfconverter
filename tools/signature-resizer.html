@@ -39,7 +39,7 @@
 <label class="field"><span>Target maximum size</span><select id="targetSize"><option value="10">10 KB</option><option value="20">20 KB</option><option value="50" selected>50 KB</option><option value="100">100 KB</option><option value="custom">Custom</option></select></label>
 <label class="field" id="customTargetWrap" hidden><span>Custom target (KB)</span><input id="customTarget" type="number" min="10" max="50000" value="50"></label>
 <label class="field"><span>Output format</span><select id="outputFormat"><option value="image/jpeg" selected>JPG</option><option value="image/png">PNG — transparency</option><option value="image/webp">WebP — if accepted by the form</option></select></label>
-<label class="field"><span>Background</span><select id="backgroundMode"><option value="white" selected>White</option><option value="transparent">Remove near-white background</option></select></label>
+<label class="field"><span>Background</span><select id="backgroundMode"><option value="white" selected>Keep a white background</option><option value="transparent">Transparent background</option></select></label>
 </div>
 <div class="section-heading compact"><span class="eyebrow">3. Dimensions and cleanup</span><h2>Crop the whitespace without distorting the signature</h2></div>
 <div class="form-grid">
@@ -49,8 +49,10 @@
 <label class="field"><span>Height</span><input id="signatureHeight" type="number" min="32" max="6000" value="200"></label>
 <label class="field"><span>DPI for mm/cm</span><select id="dpi"><option value="72">72 DPI</option><option value="96" selected>96 DPI</option><option value="150">150 DPI</option><option value="300">300 DPI</option></select></label>
 <label class="check-row"><input id="keepAspect" type="checkbox"><span><strong>Keep aspect ratio</strong><small>Use this when the form gives a maximum box rather than an exact shape.</small></span></label>
-<label class="check-row"><input id="autoTrim" type="checkbox" checked><span><strong>Auto-crop extra whitespace</strong><small>Trims near-white margins around the actual signature before resizing.</small></span></label>
+<label class="check-row"><input id="autoTrim" type="checkbox" checked><span><strong>Smart starting crop</strong><small>Starts with the signature framed tightly. You can always drag and zoom to change it.</small></span></label>
 </div>
+<div class="section-heading compact"><span class="eyebrow">4. Adjust framing</span><h2>Position the complete signature inside the output box</h2><p>Drag the image, pinch or zoom, and make sure no part of the signature is cut off. Your framing is used for the exported file.</p></div>
+<div id="signatureAdjuster" class="image-adjuster-host" hidden></div>
 <div class="preview-grid"><div class="side-card"><h3>Source preview</h3><div id="inputPreview" class="preview-host"></div></div><div class="side-card"><h3>Prepared preview</h3><div id="outputPreview" class="preview-host"></div></div></div>
 <div class="card-grid"><div class="side-card"><h3>Total input size</h3><p id="originalSize">—</p></div><div class="side-card"><h3>Result</h3><p id="outputSummary">Not processed yet</p></div><div class="side-card"><h3>Privacy</h3><p>Signatures are processed locally in your browser; the source image does not need to be uploaded.</p></div></div>
 <div class="action-row"><button class="button" id="processButton" type="button" disabled>Prepare signature(s)</button><button class="button danger" id="clearButton" type="button" disabled>Clear</button></div>
@@ -66,7 +68,7 @@
 <section class="content-section"><div class="container content-narrow">
 <h2>Signature image compressor for online forms</h2>
 <p>A signature upload usually has two separate constraints: a particular image shape or dimension and a maximum file size. This tool handles both while keeping the original file untouched.</p>
-<h2>Background cleanup</h2><p>Near-white cleanup can make a photographed or scanned signature cleaner. It is conservative by design; inspect the prepared image so light strokes are not removed.</p>
+<h2>Background cleanup</h2><p>Transparent background is useful when the receiving document places the signature over a page. PNG is selected automatically because JPEG cannot preserve transparency. Always inspect the preview before submitting.</p>
 <h2>Batch signatures</h2><p>Select several images with the same requirements and the tool processes them sequentially, then starts each result as an individual download.</p>
 <h2>Related guide</h2><p><a href="../guides/resize-signature-for-forms">How to resize and compress a signature for online forms →</a></p>
 </div></section>

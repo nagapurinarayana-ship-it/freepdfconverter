@@ -82,6 +82,15 @@ export function removeNearWhite(canvas, threshold = 238) {
   ctx.putImageData(pixels, 0, 0);
 }
 
+export function drawSourceCrop(image, ctx, width, height, cropRect) {
+  const crop = cropRect || { x: 0, y: 0, width: image.naturalWidth, height: image.naturalHeight };
+  const x = Math.max(0, Math.min(image.naturalWidth - 1, Number(crop.x) || 0));
+  const y = Math.max(0, Math.min(image.naturalHeight - 1, Number(crop.y) || 0));
+  const w = Math.max(1, Math.min(image.naturalWidth - x, Number(crop.width) || image.naturalWidth));
+  const h = Math.max(1, Math.min(image.naturalHeight - y, Number(crop.height) || image.naturalHeight));
+  ctx.drawImage(image, x, y, w, h, 0, 0, width, height);
+}
+
 export function drawCover(image, ctx, width, height, focusX = 0.5, focusY = 0.5) {
   const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
   const drawWidth = Math.max(1, Math.round(image.naturalWidth * scale));
