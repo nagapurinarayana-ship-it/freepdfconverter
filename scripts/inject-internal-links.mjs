@@ -63,6 +63,55 @@ for (const file of files) {
   }
 }
 
+const IMAGE_CLUSTER_START = "<!-- freepdf-image-cluster:start -->";
+const IMAGE_CLUSTER_END = "<!-- freepdf-image-cluster:end -->";
+
+const imageClusters = [
+  ["tools/photo-compressor.html", "Photo Compressor", "guides/compress-photo-to-20kb.html", "How to Compress a Photo to 20KB, 50KB or 100KB"],
+  ["tools/signature-resizer.html", "Signature Resizer", "guides/resize-signature-for-forms.html", "How to Resize a Signature for Online Forms"],
+  ["tools/passport-id-photo-maker.html", "Passport & ID Photo Maker", "guides/passport-id-photo-size.html", "How to Resize a Passport or ID Photo"],
+  ["tools/thumb-impression-resizer.html", "Thumb Impression Resizer", "guides/resize-thumb-impression.html", "How to Resize a Thumb Impression for Online Forms"],
+  ["tools/handwritten-declaration-resizer.html", "Handwritten Declaration Resizer", "guides/resize-handwritten-declaration.html", "How to Resize a Handwritten Declaration for an Online Form"]
+];
+
+for (const file of files) {
+  const relative = path.relative(dist, file).replaceAll(path.sep, "/");
+  if (!imageClusters.some(([tool, , guide]) => relative === tool || relative === guide)) continue;
+
+  let html = await readFile(file, "utf8");
+  html = html.replace(new RegExp(escapeRegex(IMAGE_CLUSTER_START) + "[\\s\\S]*?" + escapeRegex(IMAGE_CLUSTER_END), "g"), "");
+
+  const relatedTools = imageClusters
+    .filter(([tool]) => tool !== relative)
+    .slice(0, 4)
+    .map(([tool, label]) => "<li><a href=\"" + relativePath(relative, tool) + "\">" + escapeHtml(label) + "</a></li>")
+    .join("");
+
+  const relatedGuides = imageClusters
+    .filter(([, , guide]) => guide !== relative)
+    .slice(0, 4)
+    .map(([, , guide, label]) => "<li><a href=\"" + relativePath(relative, guide) + "\">" + escapeHtml(label) + "</a></li>")
+    .join("");
+
+  const clusterBlock = "\n" + IMAGE_CLUSTER_START + "\n<section class=\"section related-content\" aria-labelledby=\"related-image-tools\">\n" +
+    "  <div class=\"container\">\n" +
+    "    <div class=\"section-heading\">\n" +
+    "      <h2 id=\"related-image-tools\">Related image and form tools</h2>\n" +
+    "      <p>These tools solve adjacent image-upload requirements such as photos, signatures, thumb impressions and handwritten declarations.</p>\n" +
+    "      <ul class=\"footer-links\">" + relatedTools + "</ul>\n" +
+    "      <h3>Related preparation guides</h3>\n" +
+    "      <ul class=\"footer-links\">" + relatedGuides + "</ul>\n" +
+    "    </div>\n" +
+    "  </div>\n" +
+    "</section>\n" + IMAGE_CLUSTER_END;
+
+  if (html.includes("</main>")) {
+    html = html.replace("</main>", clusterBlock + "\n</main>");
+    await writeFile(file, html, "utf8");
+  }
+}
+
+console.log("Enhanced image/form topical internal linking.");
 console.log("Enhanced tool-guide internal linking for matched PDF topic clusters.");
 
 async function collectHtml(directory) {
