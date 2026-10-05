@@ -28,7 +28,7 @@
 <main id="main">
 <section class="tool-hero"><div class="container"><div class="breadcrumbs"><a href="../">Home</a> / Handwritten Declaration Resizer</div><span class="eyebrow">Free · local processing · direct downloads</span>
 <h1>Resize and compress a handwritten declaration for online forms</h1>
-<p class="lead">Prepare a handwritten declaration scan or photo by trimming blank paper, matching the form's required dimensions and reducing the file to a maximum upload size. Your source image stays on your device.</p></div></section>
+<p class="lead">Prepare a handwritten declaration scan or photo by trimming blank paper, matching the form's required dimensions, adjusting the final framing yourself when cropping is required, and reducing the file to a maximum upload size. Your source image stays on your device.</p></div></section>
 <div class="container"><div class="ad-container" data-ad-zone="top" aria-label="Advertisement"></div></div>
 <div class="container tool-shell">
 <section class="tool-panel" aria-labelledby="declaration-title">
@@ -55,6 +55,9 @@
 <label class="check-row"><input id="autoTrim" type="checkbox" checked><span><strong>Auto-crop extra whitespace</strong><small>Removes blank paper margins around the handwritten content before resizing.</small></span></label>
 </div>
 
+<div class="section-heading compact"><span class="eyebrow">4. Adjust framing</span><h2>Keep every important handwritten line inside the output box</h2><p>When exact dimensions require a crop, drag the prepared image, pinch or zoom, and review the final framing before processing. For non-cropping modes, the full image is preserved.</p></div>
+<div id="declarationAdjuster" class="image-adjuster-host" hidden></div>
+
 <div class="preview-grid"><div class="side-card"><h3>Source preview</h3><div id="inputPreview" class="preview-host"></div></div><div class="side-card"><h3>Prepared preview</h3><div id="outputPreview" class="preview-host"></div></div></div>
 <div class="card-grid"><div class="side-card"><h3>Total input size</h3><p id="originalSize">—</p></div><div class="side-card"><h3>Result</h3><p id="outputSummary">Not processed yet</p></div><div class="side-card"><h3>Privacy</h3><p>Handwritten declaration images are processed locally in your browser; the source file does not need to be uploaded.</p></div></div>
 <div class="action-row"><button class="button" id="processButton" type="button" disabled>Prepare declaration(s)</button><button class="button danger" id="clearButton" type="button" disabled>Clear</button></div>
@@ -73,8 +76,8 @@
 <section class="content-section"><div class="container content-narrow">
 <h2>Prepare handwritten declarations without uploading the source</h2>
 <p>Use this tool when a form asks for a handwritten declaration as an image with strict dimensions or a maximum upload size. Start from a clear scan or photograph, then match the exact rules shown by the application.</p>
-<h2>Why trimming helps</h2>
-<p>Phone photos and scans often contain unused paper around the writing. Removing those margins before resizing gives the handwriting more useful image area and can reduce the final file size.</p>
+<h2>Why trimming and manual framing help</h2>
+<p>Phone photos and scans often contain unused paper around the writing. Removing those margins before resizing gives the handwriting more useful image area, and the framing editor prevents an off-centre line from being silently cut when an exact output box is required.</p>
 <h2>Choose the output format carefully</h2>
 <p>JPG is compact and broadly supported for ordinary form uploads. PNG can preserve transparency and sharp edges. WebP may be smaller, but use it only when the receiving form accepts it.</p>
 <h2>Keep a visual quality check</h2>

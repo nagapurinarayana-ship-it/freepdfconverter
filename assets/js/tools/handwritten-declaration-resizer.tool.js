@@ -1,4 +1,5 @@
 import { ToolController } from "../core/tool-controller.js";
+import { createImageAdjuster } from "../core/image-adjuster.js";
 import { createCanvas, loadImage, makeBlob, removeNearWhite, trimWhitespace } from "../core/image-tool-kit.js";
 import { encodeBestUnderTarget } from "../core/image-form-engine.js";
 import {
@@ -24,20 +25,48 @@ function escapeText(value) {
   })[char]);
 }
 
-async function canvasToImage(canvas) {
+async function canvasToSource(canvas) {
   const blob = await makeBlob(canvas, "image/png");
   if (!blob) throw new Error("encode-failed");
   const url = URL.createObjectURL(blob);
-  try {
-    return await new Promise((resolve, reject) => {
-      const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("image-load-failed"));
-      image.src = url;
-    });
-  } finally {
-    URL.revokeObjectURL(url);
+  const image = await new Promise((resolve, reject) => {
+    const nextImage = new Image();
+    nextImage.onload = () => resolve(nextImage);
+    nextImage.onerror = () => reject(new Error("image-load-failed"));
+    nextImage.src = url;
+  });
+  return {
+    image,
+    url,
+    width: canvas.width,
+    height: canvas.height,
+    suggestedCrop: { x: 0, y: 0, width: canvas.width, height: canvas.height }
+  };
+}
+
+function buildSmartCrop(image, aspectRatio) {
+  const sourceWidth = image.naturalWidth;
+  const sourceHeight = image.naturalHeight;
+  const sourceRatio = sourceWidth / Math.max(1, sourceHeight);
+  let width = sourceWidth;
+  let height = sourceHeight;
+
+  if (sourceRatio > aspectRatio) {
+    width = sourceHeight * aspectRatio;
+  } else {
+    height = sourceWidth / aspectRatio;
   }
+
+  return {
+    x: Math.max(0, (sourceWidth - width) / 2),
+    y: Math.max(0, (sourceHeight - height) / 2),
+    width,
+    height
+  };
+}
+
+function croppingIsActive(el) {
+  return el.dimensionMode.value === "exact" && !el.keepAspect.checked;
 }
 
 async function prepareSource(image, autoTrim, removeBackground) {
@@ -69,6 +98,83 @@ function renderPreview(url, container, label) {
 }
 
 export function mount() {
+  async function showActiveEditor(files, state, el, index, resetCrop = false) {
+    state.activeIndex = Math.max(0, Math.min(index, files.length - 1));
+    const file = files[state.activeIndex];
+    const active = croppingIsActive(el);
+
+    if (!active) {
+      el.adjuster.hidden = true;
+      return;
+    }
+
+    state.editorUrls = state.editorUrls || [];
+    state.editorSources = state.editorSources || [];
+    state.cropSelections = state.cropSelections || [];
+
+    if (state.editorUrls[state.activeIndex]) {
+      URL.revokeObjectURL(state.editorUrls[state.activeIndex]);
+      state.editorUrls[state.activeIndex] = null;
+    }
+
+    const originalImage = await loadImage(file);
+    const preparedCanvas = await prepareSource(
+      originalImage,
+      el.autoTrim.checked,
+      el.background.value === "transparent"
+    );
+    const source = await canvasToSource(preparedCanvas);
+    state.editorSources[state.activeIndex] = source;
+    state.editorUrls[state.activeIndex] = source.url;
+
+    const dimensions = resolveDimensions({
+      mode: "exact",
+      width: Number(el.width.value || 1200),
+      height: Number(el.height.value || 800),
+      unit: el.dimensionUnit.value,
+      dpi: Number(el.dpi.value || 96),
+      keepAspect: false,
+      sourceWidth: source.width,
+      sourceHeight: source.height
+    });
+    const aspectRatio = dimensions.width / Math.max(1, dimensions.height);
+    const suggestedCrop = buildSmartCrop(source.image, aspectRatio);
+    source.suggestedCrop = suggestedCrop;
+
+    if (resetCrop) {
+      state.cropSelections[state.activeIndex] = null;
+    }
+
+    el.adjuster.hidden = false;
+
+    if (!state.editor) {
+      state.editor = createImageAdjuster({
+        container: el.adjuster,
+        aspectRatio,
+        label: "Declaration framing",
+        instructions: "Drag to move · pinch or wheel to zoom. Keep every important handwritten line inside the frame."
+      });
+      state.editor.setOnChange((crop) => {
+        state.cropSelections[state.activeIndex] = crop;
+      });
+    } else {
+      state.editor.setAspectRatio(aspectRatio);
+    }
+
+    state.editor.setAspectRatio(aspectRatio);
+    state.editor.setSource(
+      source,
+      suggestedCrop,
+      state.cropSelections[state.activeIndex] || suggestedCrop
+    );
+    state.editor.getNavigationApi().setNavigation({
+      index: state.activeIndex,
+      count: files.length,
+      onPrevious: () => showActiveEditor(files, state, el, state.activeIndex - 1),
+      onNext: () => showActiveEditor(files, state, el, state.activeIndex + 1)
+    });
+  }
+
   const controller = new ToolController({
     multiple: true,
     maxFiles: MAX_FILES,
@@ -100,7 +206,8 @@ export function mount() {
       outputSummary: "#outputSummary",
       resultList: "#resultList",
       batchCount: "#batchCount",
-      batchSize: "#batchSize"
+      batchSize: "#batchSize",
+      adjuster: "#declarationAdjuster"
     },
     maxFileBytes: MAX_FILE,
     accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name),
@@ -110,15 +217,18 @@ export function mount() {
     initialMessage: "Select one or more declaration images. Processing stays in your browser.",
     readyMessage: "Ready. Review the dimensions, cleanup and target size, then prepare the declaration file(s).",
     readErrorMessage: "One or more handwritten-declaration images could not be read by your browser.",
-    onFilesSelected: ({ files, state, el }) => {
+    onFilesSelected: async ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
-      state.previewUrls = [];
-      state.outputUrls = [];
-      state.images = [];
+      revokeUrls(state.editorUrls || []);
 
-      state.images = [];
       state.previewUrls = files.map((file) => URL.createObjectURL(file));
+      state.outputUrls = [];
+      state.editorUrls = [];
+      state.editorSources = [];
+      state.cropSelections = [];
+      state.images = [];
+      state.activeIndex = 0;
 
       if (state.previewUrls[0]) {
         renderPreview(state.previewUrls[0], el.inputPreview, files[0].name);
@@ -130,14 +240,25 @@ export function mount() {
       );
       el.outputSummary.textContent = "Not processed yet";
       el.resultList.textContent = "";
+
+      await showActiveEditor(files, state, el, 0);
     },
     onReset: ({ state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
+      revokeUrls(state.editorUrls || []);
+      state.editor?.destroy?.();
+
       state.previewUrls = [];
       state.outputUrls = [];
+      state.editorUrls = [];
+      state.editorSources = [];
+      state.cropSelections = [];
       state.images = [];
+      state.editor = null;
+      state.activeIndex = 0;
 
+      el.adjuster.hidden = true;
       el.batchCount.textContent = "0 selected";
       el.batchSize.textContent = "0 B";
       el.outputSummary.textContent = "Not processed yet";
@@ -171,14 +292,20 @@ export function mount() {
           "info"
         );
 
-        const cached = state.images.find((entry) => entry.file === file);
-        const originalImage = cached?.image || await loadImage(file);
-        const preparedCanvas = await prepareSource(
-          originalImage,
-          el.autoTrim.checked,
-          removeBackground
-        );
-        const preparedImage = await canvasToImage(preparedCanvas);
+        let editorSource = state.editorSources[index];
+        if (!editorSource) {
+          const originalImage = await loadImage(file);
+          const preparedCanvas = await prepareSource(
+            originalImage,
+            el.autoTrim.checked,
+            removeBackground
+          );
+          editorSource = await canvasToSource(preparedCanvas);
+          state.editorSources[index] = editorSource;
+          state.editorUrls[index] = editorSource.url;
+        }
+
+        const preparedImage = editorSource.image;
 
         const dimensions = resolveDimensions({
           ...baseOptions,
@@ -186,7 +313,14 @@ export function mount() {
           sourceHeight: preparedImage.naturalHeight
         });
 
-        const useContain = baseOptions.mode !== "exact" || baseOptions.keepAspect;
+        const useContain = !croppingIsActive(el);
+        const cropSelection = croppingIsActive(el)
+          ? (state.cropSelections[index] || buildSmartCrop(
+              preparedImage,
+              dimensions.width / Math.max(1, dimensions.height)
+            ))
+          : null;
+
         const result = await encodeBestUnderTarget({
           image: preparedImage,
           dimensions,
@@ -196,6 +330,7 @@ export function mount() {
           background,
           cropFocusX: 0.5,
           cropFocusY: 0.5,
+          cropRect: cropSelection,
           setProgress,
           progressStart: (index / files.length) * 75,
           progressEnd: ((index + 1) / files.length) * 75
@@ -277,19 +412,42 @@ export function mount() {
 
   controller.mount();
 
+  const refreshEditor = async (resetCrop = true) => {
+    if (controller.ready && controller.files.length) {
+      await showActiveEditor(
+        controller.files,
+        controller.state,
+        controller.el,
+        controller.state.activeIndex || 0,
+        resetCrop
+      );
+    }
+  };
+
   controller.el.targetSize.addEventListener("change", () => {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
   });
 
-  controller.el.dimensionMode.addEventListener("change", () => {
+  controller.el.dimensionMode.addEventListener("change", async () => {
     const mode = controller.el.dimensionMode.value;
     controller.el.dimensionUnit.disabled = mode === "original";
     controller.el.dpi.disabled = mode !== "physical";
+    await refreshEditor();
   });
 
-  controller.el.dimensionUnit.addEventListener("change", () => {
+  controller.el.dimensionUnit.addEventListener("change", async () => {
     controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
+    await refreshEditor();
   });
+
+  controller.el.dpi.addEventListener("change", refreshEditor);
+  controller.el.keepAspect.addEventListener("change", refreshEditor);
+  controller.el.autoTrim.addEventListener("change", refreshEditor);
+  controller.el.background.addEventListener("change", refreshEditor);
+
+  const refreshCustomDimensions = () => refreshEditor();
+  controller.el.width.addEventListener("input", refreshCustomDimensions);
+  controller.el.height.addEventListener("input", refreshCustomDimensions);
 
   controller.el.dpi.hidden = controller.el.dimensionUnit.value === "px";
 }
