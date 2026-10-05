@@ -81,20 +81,109 @@ async function prepareSource(image, autoTrim, removeBackground) {
   if (removeBackground) removeNearWhite(canvas);
 
   return autoTrim
-    ? trimWhitespace(canvas, removeBackground ? 245 : 250, 10)
+    ? trimWhitespace(canvas, 250, 10)
     : canvas;
 }
 
-function renderPreview(url, container, label) {
+function renderPreview(url, container, label, options = {}) {
   container.textContent = "";
   const figure = document.createElement("figure");
   figure.className = "image-preview-card";
+
+  if (options.transparent) {
+    figure.style.backgroundImage =
+      "linear-gradient(45deg, #e7e9ee 25%, transparent 25%)," +
+      "linear-gradient(-45deg, #e7e9ee 25%, transparent 25%)," +
+      "linear-gradient(45deg, transparent 75%, #e7e9ee 75%)," +
+      "linear-gradient(-45deg, transparent 75%, #e7e9ee 75%)";
+    figure.style.backgroundSize = "16px 16px";
+    figure.style.backgroundPosition = "0 0, 0 8px, 8px -8px, -8px 0";
+    figure.style.backgroundColor = "#ffffff";
+
+    const badge = document.createElement("span");
+    badge.textContent = "Transparent PNG";
+    badge.style.display = "inline-block";
+    badge.style.margin = "0 0 8px";
+    badge.style.padding = "4px 8px";
+    badge.style.borderRadius = "999px";
+    badge.style.background = "rgba(255,255,255,.92)";
+    badge.style.border = "1px solid rgba(22,38,62,.14)";
+    badge.style.fontSize = "12px";
+    badge.style.fontWeight = "700";
+    badge.style.color = "#24344d";
+    figure.appendChild(badge);
+  }
+
   const image = document.createElement("img");
   image.alt = label;
   image.loading = "lazy";
   image.src = url;
   figure.appendChild(image);
   container.appendChild(figure);
+}
+
+function syncBackgroundFormat(el) {
+  const transparent = el.background.value === "transparent";
+  if (transparent) {
+    el.format.value = "image/png";
+    el.format.disabled = true;
+  } else {
+    el.format.disabled = false;
+  }
+}
+
+async function validatePreparedDeclaration(blob, transparent) {
+  const url = URL.createObjectURL(blob);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("output-validation-failed"));
+      element.src = url;
+    });
+
+    const maxDimension = 256;
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(1, image.naturalWidth),
+      maxDimension / Math.max(1, image.naturalHeight)
+    );
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+    if (!transparent) {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+    }
+    ctx.drawImage(image, 0, 0, width, height);
+
+    const pixels = ctx.getImageData(0, 0, width, height).data;
+    let meaningfulPixels = 0;
+
+    for (let index = 0; index < pixels.length; index += 4) {
+      const alpha = pixels[index + 3];
+      if (transparent) {
+        if (alpha > 8) meaningfulPixels += 1;
+      } else if (
+        alpha > 8 &&
+        (pixels[index] < 245 || pixels[index + 1] < 245 || pixels[index + 2] < 245)
+      ) {
+        meaningfulPixels += 1;
+      }
+    }
+
+    if (meaningfulPixels === 0) {
+      throw new Error(
+        transparent ? "blank-transparent-output" : "blank-declaration-output"
+      );
+    }
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 export function mount() {
@@ -279,7 +368,8 @@ export function mount() {
       };
       const removeBackground = el.background.value === "transparent";
       const background = removeBackground ? "keep" : "white";
-      const mime = el.format.value;
+      const mime = removeBackground ? "image/png" : el.format.value;
+      if (removeBackground) el.format.value = "image/png";
       const results = [];
 
       revokeUrls(state.outputUrls || []);
@@ -314,12 +404,17 @@ export function mount() {
         });
 
         const useContain = !croppingIsActive(el);
-        const cropSelection = croppingIsActive(el)
+        let cropSelection = croppingIsActive(el)
           ? (state.cropSelections[index] || buildSmartCrop(
               preparedImage,
               dimensions.width / Math.max(1, dimensions.height)
             ))
           : null;
+
+        if (index === state.activeIndex && state.editor?.getCropRect && croppingIsActive(el)) {
+          cropSelection = state.editor.getCropRect() || cropSelection;
+          if (cropSelection) state.cropSelections[index] = cropSelection;
+        }
 
         const result = await encodeBestUnderTarget({
           image: preparedImage,
@@ -338,6 +433,13 @@ export function mount() {
 
         if (!result) throw new Error("encode-failed");
 
+        try {
+          await validatePreparedDeclaration(result.blob, removeBackground);
+        } catch (error) {
+          error.message = error.message + ":" + file.name;
+          throw error;
+        }
+
         const outputUrl = URL.createObjectURL(result.blob);
         state.outputUrls.push(outputUrl);
 
@@ -355,7 +457,10 @@ export function mount() {
           renderPreview(
             outputUrl,
             el.outputPreview,
-            "Prepared handwritten declaration preview for " + file.name
+            removeBackground
+              ? "Prepared transparent handwritten declaration preview for " + file.name
+              : "Prepared handwritten declaration preview for " + file.name,
+            { transparent: removeBackground }
           );
         }
       }
@@ -367,9 +472,14 @@ export function mount() {
         );
       }
 
+      const targetMissed = results.some((result) => !result.reached);
       el.outputSummary.textContent =
         results.length + " file" + (results.length === 1 ? "" : "s") +
-        " prepared · target " + formatBytes(targetBytes) + " maximum";
+        " prepared · target " + formatBytes(targetBytes) + " maximum" +
+        (removeBackground ? " · transparent PNG" : "") +
+        (targetMissed
+          ? " · closest safe result for one or more files"
+          : " · target met");
 
       el.resultList.textContent = "";
       for (const result of results) {
@@ -404,13 +514,20 @@ export function mount() {
       setStatus(
         error?.message === "encode-failed"
           ? "The browser could not encode the declaration. Try a larger target or a different output format."
-          : "The selected handwritten-declaration image could not be prepared in your browser.",
+          : /^blank-transparent-output:/.test(error?.message || "")
+            ? "The transparent result appears empty. Keep the handwriting visible inside the framing box and try again."
+            : /^blank-declaration-output:/.test(error?.message || "")
+              ? "The prepared declaration appears empty. Adjust the framing so the handwriting is inside the output box and try again."
+              : /^output-validation-failed:/.test(error?.message || "")
+                ? "The prepared file could not be verified. Try preparing the declaration again."
+                : "The selected handwritten-declaration image could not be prepared in your browser.",
         "error"
       );
     }
   });
 
   controller.mount();
+  syncBackgroundFormat(controller.el);
 
   const refreshEditor = async (resetCrop = true) => {
     if (controller.ready && controller.files.length) {
@@ -443,7 +560,10 @@ export function mount() {
   controller.el.dpi.addEventListener("change", refreshEditor);
   controller.el.keepAspect.addEventListener("change", refreshEditor);
   controller.el.autoTrim.addEventListener("change", refreshEditor);
-  controller.el.background.addEventListener("change", refreshEditor);
+  controller.el.background.addEventListener("change", async () => {
+    syncBackgroundFormat(controller.el);
+    await refreshEditor();
+  });
 
   const refreshCustomDimensions = () => refreshEditor();
   controller.el.width.addEventListener("input", refreshCustomDimensions);
