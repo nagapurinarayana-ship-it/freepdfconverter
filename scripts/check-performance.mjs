@@ -44,7 +44,9 @@ for (const file of jsFiles) {
   jsSources.push({ relative, source });
 }
 
-const monetizationSource = jsSources.map(item => item.source).join("\n");
+const sourceConfigPath = path.join(process.cwd(), "assets/js/monetization-config.js");
+const sourceConfig = await readFile(sourceConfigPath, "utf8");
+const monetizationSource = sourceConfig + "\n" + jsSources.map(item => item.source).join("\n");
 if (!/FreePDFMonetization|bannerKey|smartlinkUrl/.test(monetizationSource)) {
   failures.push("monetization -> runtime Adsterra configuration is missing");
 }
