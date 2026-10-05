@@ -13,34 +13,43 @@ for (const file of htmlFiles) {
   let html = await readFile(file, "utf8");
   html = stripLegacyAdMarkup(html);
 
-  const h1Match = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
+  const zonePattern = /<div class="container">\s*<div class="ad-container[^>]*data-ad-zone=["'][^"']+["'][^>]*><\/div>\s*<\/div>/gi;
+
+  // Remove stale placements that were generated above the primary H1. Recalculate
+  // the H1 after removal because deleting markup shifts string offsets.
+  let h1Match = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
   if (!h1Match || h1Match.index === undefined) {
     await writeFile(file, html, "utf8");
     continue;
   }
 
-  const h1End = h1Match.index + h1Match[0].length;
-  const zonePattern = /<div class="container">\s*<div class="ad-container[^>]*data-ad-zone=["'][^"']+["'][^>]*><\/div>\s*<\/div>/gi;
-
-  // Remove stale placements that were generated above the primary H1. This is
-  // what prevents an ad from becoming the first visual element of a page.
+  const originalH1End = h1Match.index + h1Match[0].length;
   const zonesToRemove = [];
   for (const match of html.matchAll(zonePattern)) {
-    if (match.index < h1End) zonesToRemove.push({ start: match.index, end: match.index + match[0].length });
+    if (match.index < originalH1End) zonesToRemove.push({ start: match.index, end: match.index + match[0].length });
   }
   for (let i = zonesToRemove.length - 1; i >= 0; i -= 1) {
     const zone = zonesToRemove[i];
     html = html.slice(0, zone.start) + html.slice(zone.end);
   }
 
+  // Recalculate the H1 after all pre-H1 zones are removed so any fallback
+  // insertion is guaranteed to occur after the actual primary H1.
+  h1Match = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
+  if (!h1Match || h1Match.index === undefined) {
+    await writeFile(file, html, "utf8");
+    continue;
+  }
+  const h1End = h1Match.index + h1Match[0].length;
+
   if (!html.includes(MARKER_START)) {
     const zoneAfterH1 = html.match(zonePattern);
-    if (zoneAfterH1 && zoneAfterH1.index !== undefined) {
-      const start = zoneAfterH1.index;
-      const end = start + zoneAfterH1[0].length;
-      html = html.slice(0, start) + MARKER_START + "\n" + zoneAfterH1[0] + "\n" + MARKER_END + html.slice(end);
+    if (zoneAfterH1 && zoneAfterH1.index !== undefined && zoneAfterH1.index >= h1End) {
+      const zoneStart = zoneAfterH1.index;
+      const zoneEnd = zoneStart + zoneAfterH1[0].length;
+      html = html.slice(0, zoneStart) + MARKER_START + "\n" + zoneAfterH1[0] + "\n" + MARKER_END + html.slice(zoneEnd);
     } else {
-      const pageAds = `\n${MARKER_START}\n<div class="container"><div class="ad-container ad-container-managed" data-ad-zone="content" aria-label="Advertisement"></div></div>\n${MARKER_END}`;
+      const pageAds = "\n" + MARKER_START + "\n<div class=\"container\"><div class=\"ad-container ad-container-managed\" data-ad-zone=\"content\" aria-label=\"Advertisement\"></div></div>\n" + MARKER_END;
       html = html.slice(0, h1End) + pageAds + html.slice(h1End);
     }
   }
