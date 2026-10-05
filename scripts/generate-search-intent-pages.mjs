@@ -309,6 +309,28 @@ export const SEARCH_INTENT_PAGES = {
       ["https://tools.pdf24.org/en/","PDF24 online tools"]
     ]
   },
+  "topics/image-upload-requirements.html": {
+    title: "Image Upload Requirements — Photo, Signature & Form Images | FreePDF Tools",
+    description: "Learn how to prepare passport photos, signatures, thumb impressions and handwritten declarations for online forms, including dimensions, file size, framing, background and format requirements.",
+    h1: "Image upload requirements for online forms",
+    intro: "Online forms often ask for an image with a specific width and height, a maximum file size, an accepted format and sometimes a required background or framing. There is no single universal specification, so the receiving application remains the authority.",
+    sections: [
+      ["Passport and ID photos", "Passport, visa, exam and employment systems can use different physical dimensions, pixel sizes, headroom rules, backgrounds and maximum bytes. Start with the exact requirement, set the canvas, adjust the framing manually and verify the exported pixels before submitting."],
+      ["Signatures", "Signature uploads are usually constrained by both image dimensions and maximum file size. Crop unnecessary paper, keep every part of the signature visible, choose the required background and compress only as far as the form permits."],
+      ["Thumb impressions", "Thumb-impression requirements vary by application. Trim blank paper first so the impression uses the available canvas efficiently, then match the requested dimensions, background, format and byte limit."],
+      ["Handwritten declarations", "A photographed or scanned declaration can contain large blank margins and uneven paper lighting. Crop the useful writing area, match the destination dimensions and inspect every character after compression or background cleanup."],
+      ["20KB, 50KB and 100KB photo limits", "A file-size limit is a maximum target rather than a promise of an exact byte count. Dimensions, image complexity and format all affect the result, so reduce dimensions first when the form allows it and then compress toward the maximum size."],
+      ["Keep the original and verify the final file", "Always retain the source image. Before submission, check the exported dimensions, file type, file size, framing, readability and background against the receiving application's current instructions."]
+    ],
+    tool: ["/tools/photo-compressor","Photo Compressor"],
+    guides: [
+      ["/guides/passport-id-photo-size","Passport and ID photo guide"],
+      ["/guides/resize-signature-for-forms","Signature image guide"],
+      ["/guides/resize-thumb-impression","Thumb impression guide"],
+      ["/guides/resize-handwritten-declaration","Handwritten declaration guide"],
+      ["/guides/compress-photo-to-20kb","20KB / 50KB / 100KB photo guide"]
+    ]
+  },
   "topics/cloud-vs-browser-pdf-converter.html": {
     title: "Cloud vs Browser PDF Converter — Privacy | FreePDF Tools",
     description: "Understand cloud/server PDF conversion versus browser-local processing, with practical tradeoffs around privacy, features, file limits, collaboration and device resources.",
