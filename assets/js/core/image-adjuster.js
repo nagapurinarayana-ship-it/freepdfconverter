@@ -56,6 +56,11 @@ export function createImageAdjuster({ container, aspectRatio = 1, label = "Image
   let observer = null;
   let destroyed = false;
 
+  // The crop math is expressed from the image's top-left origin. The CSS
+  // transform must use the same origin or the visible frame and exported crop
+  // diverge as soon as zooming is applied.
+  image.style.transformOrigin = "0 0";
+
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const stage = () => ({ width: Math.max(1, viewport.clientWidth), height: Math.max(1, viewport.clientHeight) });
 
