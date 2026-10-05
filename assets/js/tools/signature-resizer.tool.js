@@ -20,7 +20,7 @@ function revokeUrls(urls = []) {
 }
 
 function escapeText(value) {
-  return String(value).replace(/[&<>"]/g, function (char) {
+  return String(value).replace(/[&<>\"]/g, function (char) {
     return ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char];
   });
 }
@@ -192,7 +192,7 @@ export function mount() {
     emptySummary: "No signatures selected",
     initialMessage: "Select one or more signature images. Processing stays in your browser.",
     readyMessage: "Ready. Review the dimensions, background and target size, then prepare the signature file(s).",
-    readErrorMessage: "One or more signature images could not be read by your browser.",
+    readErrorMessage: "One or more selected signature images could not be read by your browser.",
     onFilesSelected: async ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
@@ -270,7 +270,11 @@ export function mount() {
           state.editorUrls[index] = source.url;
         }
         const preparedImage = source.image;
-        const cropSelection = state.cropSelections[index] || null;
+        let cropSelection = state.cropSelections[index] || null;
+        if (index === state.activeIndex && state.editor?.getCropRect) {
+          cropSelection = state.editor.getCropRect() || cropSelection;
+          if (cropSelection) state.cropSelections[index] = cropSelection;
+        }
 
         const dimensions = resolveDimensions({
           ...baseOptions,
