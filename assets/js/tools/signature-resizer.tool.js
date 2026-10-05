@@ -1,6 +1,6 @@
 import { ToolController } from "../core/tool-controller.js";
 import { createImageAdjuster } from "../core/image-adjuster.js";
-import { createCanvas, loadImage, removeNearWhite, trimWhitespace } from "../core/image-tool-kit.js";
+import { createCanvas, loadImage, trimWhitespace } from "../core/image-tool-kit.js";
 import { encodeBestUnderTarget } from "../core/image-form-engine.js";
 import {
   reductionPercent,
@@ -69,8 +69,8 @@ function removeSignaturePaperBackground(canvas) {
 
   // Scanned paper is often gray/off-white instead of pure white. Use the
   // observed page tone to remove the paper while preserving dark ink.
-  const cutoff = backgroundLuma * 0.70;
-  const feather = Math.max(10, backgroundLuma * 0.10);
+  const cutoff = Math.max(24, backgroundLuma * 0.25);
+  const feather = Math.max(10, backgroundLuma * 0.08);
 
   for (let index = 0; index < data.length; index += 4) {
     if (data[index + 3] < 8) continue;
