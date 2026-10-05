@@ -25,23 +25,6 @@ function escapeText(value) {
   });
 }
 
-async function canvasToImage(canvas) {
-  const blob = await makeBlob(canvas, "image/png");
-  if (!blob) throw new Error("encode-failed");
-
-  const url = URL.createObjectURL(blob);
-  try {
-    return await new Promise((resolve, reject) => {
-      const image = new Image();
-      image.onload = function () { resolve(image); };
-      image.onerror = function () { reject(new Error("image-load-failed")); };
-      image.src = url;
-    });
-  } finally {
-    URL.revokeObjectURL(url);
-  }
-}
-
 async function prepareSignatureSource(image, autoTrim, removeBackground) {
   const { canvas, ctx } = createCanvas(image, {
     width: image.naturalWidth,
