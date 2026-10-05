@@ -86,7 +86,7 @@ function resolveDimensions(preset) {
   };
 }
 
-function buildSmartPassportCrop(image, aspectRatio, focusY = 0.40) {
+function buildPassportCrop(image, aspectRatio) {
   const sourceWidth = image.naturalWidth;
   const sourceHeight = image.naturalHeight;
   const sourceRatio = sourceWidth / Math.max(1, sourceHeight);
@@ -102,21 +102,14 @@ function buildSmartPassportCrop(image, aspectRatio, focusY = 0.40) {
     height = sourceWidth / aspectRatio;
   }
 
-  const centerX = sourceWidth / 2;
-  const desiredCenterY = sourceHeight * focusY;
-  const minCenterY = height / 2;
-  const maxCenterY = sourceHeight - height / 2;
-  const centerY = Math.min(maxCenterY, Math.max(minCenterY, desiredCenterY));
-
   return {
-    x: Math.max(0, centerX - width / 2),
-    y: Math.max(0, centerY - height / 2),
+    x: Math.max(0, (sourceWidth - width) / 2),
+    y: Math.max(0, (sourceHeight - height) / 2),
     width,
     height
   };
 }
-
-function sourceForFile(file, image, url, preset, focusY = 0.40) {
+function sourceForFile(file, image, url, preset) {
   const dimensions = resolveDimensions(preset);
   const aspectRatio = dimensions.width / dimensions.height;
   return {
@@ -125,7 +118,7 @@ function sourceForFile(file, image, url, preset, focusY = 0.40) {
     url,
     width: image.naturalWidth,
     height: image.naturalHeight,
-    suggestedCrop: buildSmartPassportCrop(image, aspectRatio, focusY)
+    suggestedCrop: buildPassportCrop(image, aspectRatio)
   };
 }
 
@@ -146,8 +139,7 @@ export function mount() {
       file,
       cached.image,
       state.previewUrls[state.activeIndex],
-      preset,
-      Number(el.focusY.value || 40) / 100
+      preset
     );
     state.editorSources[state.activeIndex] = source;
 
@@ -211,8 +203,6 @@ export function mount() {
       resultList: "#resultList",
       batchCount: "#batchCount",
       batchSize: "#batchSize",
-      focusY: "#focusY",
-      focusValue: "#focusValue",
       passportAdjuster: "#passportAdjuster"
     },
     maxFileBytes: MAX_FILE,
@@ -299,12 +289,10 @@ export function mount() {
           targetBytes,
           cropMode: "fill",
           background: "white",
-          cropRect: state.cropSelections[index] || buildSmartPassportCrop(
+          cropRect: state.cropSelections[index] || buildPassportCrop(
             image,
-            dimensions.width / dimensions.height,
-            Number(el.focusY.value || 40) / 100
+            dimensions.width / dimensions.height
           ),
-          cropFocusY: Number(el.focusY.value || 40) / 100,
           allowDownscale: false,
           setProgress,
           progressStart: (index / files.length) * 80,
@@ -381,12 +369,6 @@ export function mount() {
 
   controller.mount();
 
-  controller.el.focusY.addEventListener("input", async () => {
-    controller.el.focusValue.textContent = controller.el.focusY.value + "%";
-    if (controller.ready && controller.files.length) {
-      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
-    }
-  });
 
   controller.el.preset.addEventListener("change", async () => {
     updatePresetControls(controller.el);
