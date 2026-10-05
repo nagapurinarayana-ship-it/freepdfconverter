@@ -58,6 +58,44 @@ jobs:
               echo "Live deployment matches GitHub commit."
               exit 0
             fi
+            if [ "$marker" = "$EXPECTED_SHA" ]; then
+              printf '%s' "$body" > /tmp/live-home.html
+              grep -qi '<header class="site-header">' /tmp/live-home.html
+              grep -qi 'FreePDF Tools' /tmp/live-home.html
+              grep -qi 'PDF to Word' /tmp/live-home.html
+              grep -qi 'JPG / PNG to PDF' /tmp/live-home.html
+
+              python3 - <<'PY'
+from pathlib import Path
+html = Path("/tmp/live-home.html").read_text(encoding="utf-8")
+h1 = html.lower().find("<h1")
+ad = html.find("<!-- freepdf-effectivecpm:start -->")
+if h1 < 0:
+    raise SystemExit("Live homepage has no H1")
+if ad >= 0 and ad < h1:
+    raise SystemExit("Managed advertisement appears before the primary H1")
+print("Live UI/header/ad placement contract passed.")
+PY
+
+              config_path="$(sed -n 's/.*<script[^>]*src="\([^"]*monetization-config[^"]*\.js\)".*/\1/p' /tmp/live-home.html | head -n 1)"
+              if [ -z "$config_path" ]; then
+                echo "Live monetization configuration script was not found."
+                exit 1
+              fi
+              case "$config_path" in
+                /*) config_url="${SITE_ORIGIN}${config_path}" ;;
+                *) config_url="${SITE_ORIGIN}/${config_path}" ;;
+              esac
+              curl -fsSL "$config_url" -o /tmp/live-monetization.js
+              grep -q '7b9ff27e517a15dcbdb8b889b758ec1b' /tmp/live-monetization.js
+              grep -q 'd0874cab14ed56771eb0d709062b71da' /tmp/live-monetization.js
+              grep -q '64d880a1349413fe7dcb55cf8a8b6379' /tmp/live-monetization.js
+              grep -q 'a8897ecee48386eabd13ef3cbb2661c5' /tmp/live-monetization.js
+              grep -q 'c1kt57md?key=16cfe2b361699a8b0b12a8dc0c8c79b7' /tmp/live-monetization.js
+
+              echo "Live deployment matches GitHub commit and core UI/Adsterra contracts."
+              exit 0
+            fi
             sleep 30
           done
           echo "Live deployment did not expose the expected commit marker."
