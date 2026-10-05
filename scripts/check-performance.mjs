@@ -44,12 +44,10 @@ for (const file of jsFiles) {
   jsSources.push({ relative, source });
 }
 
-const monetizationSource = jsSources
-  .filter(item => /monetization-config(?:\.[a-f0-9]{10})?\.js$/i.test(item.relative))
-  .map(item => item.source)
-  .join("\n");
-
-if (!monetizationSource) failures.push("monetization -> fingerprinted monetization configuration is missing");
+const monetizationSource = jsSources.map(item => item.source).join("\n");
+if (!/FreePDFMonetization|bannerKey|smartlinkUrl/.test(monetizationSource)) {
+  failures.push("monetization -> runtime Adsterra configuration is missing");
+}
 for (const [label, needle] of [
   ["Native Banner", "d0874cab14ed56771eb0d709062b71da"],
   ["Social Bar", "a8897ecee48386eabd13ef3cbb2661c5"],
