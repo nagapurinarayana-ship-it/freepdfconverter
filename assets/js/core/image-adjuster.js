@@ -56,9 +56,6 @@ export function createImageAdjuster({ container, aspectRatio = 1, label = "Image
   let observer = null;
   let destroyed = false;
 
-  // The crop math is expressed from the image's top-left origin. The CSS
-  // transform must use the same origin or the visible frame and exported crop
-  // diverge as soon as zooming is applied.
   image.style.transformOrigin = "0 0";
 
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -72,22 +69,54 @@ export function createImageAdjuster({ container, aspectRatio = 1, label = "Image
     ty = h <= s.height ? (s.height - h) / 2 : clamp(ty, s.height - h, 0);
   }
 
+  // Derive the export crop from the actual rendered intersection of the
+  // image and viewport. This makes the exported crop exactly match what the
+  // user can see, independent of CSS transform order, device-pixel ratio,
+  // fractional zoom, or responsive viewport sizing.
   function getCropRect() {
     if (!source) return null;
-    const s = stage();
-    const width = Math.min(imageWidth, s.width / scale);
-    const height = Math.min(imageHeight, s.height / scale);
-    return {
-      x: clamp(-tx / scale, 0, Math.max(0, imageWidth - width)),
-      y: clamp(-ty / scale, 0, Math.max(0, imageHeight - height)),
-      width,
-      height
-    };
+
+    const viewportRect = viewport.getBoundingClientRect();
+    const imageRect = image.getBoundingClientRect();
+    const renderedWidth = Math.max(1e-6, imageRect.width);
+    const renderedHeight = Math.max(1e-6, imageRect.height);
+    const sourceScaleX = renderedWidth / Math.max(1, imageWidth);
+    const sourceScaleY = renderedHeight / Math.max(1, imageHeight);
+
+    const left = Math.max(viewportRect.left, imageRect.left);
+    const top = Math.max(viewportRect.top, imageRect.top);
+    const right = Math.min(viewportRect.right, imageRect.right);
+    const bottom = Math.min(viewportRect.bottom, imageRect.bottom);
+
+    const visibleWidth = Math.max(1, right - left);
+    const visibleHeight = Math.max(1, bottom - top);
+    const x = clamp(
+      (left - imageRect.left) / sourceScaleX,
+      0,
+      Math.max(0, imageWidth - 1)
+    );
+    const y = clamp(
+      (top - imageRect.top) / sourceScaleY,
+      0,
+      Math.max(0, imageHeight - 1)
+    );
+    const width = clamp(
+      visibleWidth / sourceScaleX,
+      1,
+      Math.max(1, imageWidth - x)
+    );
+    const height = clamp(
+      visibleHeight / sourceScaleY,
+      1,
+      Math.max(1, imageHeight - y)
+    );
+
+    return { x, y, width, height };
   }
 
   function notify() {
     crop = getCropRect();
-    if (crop) onChange(crop);
+    if (crop) onChange({ ...crop });
   }
 
   function render() {
