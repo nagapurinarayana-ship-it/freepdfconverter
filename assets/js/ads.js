@@ -248,11 +248,10 @@
   }
 
   function loadGlobalAdsterraFormats() {
-    // Keep the homepage deliberately restrained: its controlled banner/native
-    // zones are enough. Overlay-style/global formats stay on inner pages.
-    if (document.body.classList.contains("home-page")) return;
-    if (popunderSrc) appendExternalScript(popunderSrc, {}, document.head);
-    if (socialBarSrc) appendExternalScript(socialBarSrc, {}, document.body);
+    // Intentionally disabled: popunders and social bars can cover tool controls,
+    // obscure previews, and interrupt form completion. Monetization stays in
+    // explicit, layout-controlled ad zones only.
+    return;
   }
 
   function moveHomeTopAd() {
