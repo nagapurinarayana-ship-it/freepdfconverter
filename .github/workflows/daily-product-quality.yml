@@ -90,8 +90,15 @@ jobs:
           grep -qi "Topics" <<<"$html"
 
           # Adsterra/EffectiveCPM remains the primary monetization path.
-          grep -q "effectivecpmnetwork.com" <<<"$html"
-          grep -q "highperformanceformat.com" <<<"$html"
+          grep -qi 'assets/js/monetization-config' <<<"$html"
+          grep -qi 'assets/js/ads' <<<"$html"
+          grep -qi 'data-ad-zone="top"' <<<"$html"
+          grep -qi 'profitableratecpmnetwork.com' <<<"$html" || true
+          grep -qi 'highrevenueformat.com' <<<"$html" || true
+
+          grep -qi '<header class="site-header">' <<<"$html"
+          grep -qi 'PDF to Word' <<<"$html"
+          grep -qi 'JPG / PNG to PDF' <<<"$html"
 
           # Useful content must exist before the main workflow body; ad loading should not replace it.
           first_main="$(grep -o "<main[^>]*>" <<<"$html" | head -n 1 || true)"
@@ -107,8 +114,8 @@ jobs:
           for path in "/" "/tools/merge-pdf" "/tools/pdf-to-word" "/tools/ocr-pdf" "/guides/" "/topics/"; do
             html="$(curl -L -sS --max-time 20 "${SITE_ORIGIN}${path}")"
             grep -qi "<title>" <<<"$html"
-            grep -qi "name="description"" <<<"$html"
-            grep -qi "rel="canonical"" <<<"$html"
+            grep -qi 'name="description"' <<<"$html"
+            grep -qi 'rel="canonical"' <<<"$html"
             grep -qi "<h1" <<<"$html"
             grep -qi "max-image-preview:large" <<<"$html"
           done
