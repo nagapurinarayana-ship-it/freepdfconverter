@@ -106,7 +106,7 @@
       return;
     }
     if (mountAdSenseUnit(zone, slot, labelText)) return;
-    if (adsenseAutoAds) loadAdSense();
+    if (adsenseAutoAds && !document.body.classList.contains("home-page")) loadAdSense();
     clearZone(zone);
   }
 
@@ -248,6 +248,9 @@
   }
 
   function loadGlobalAdsterraFormats() {
+    // Keep the homepage deliberately restrained: its controlled banner/native
+    // zones are enough. Overlay-style/global formats stay on inner pages.
+    if (document.body.classList.contains("home-page")) return;
     if (popunderSrc) appendExternalScript(popunderSrc, {}, document.head);
     if (socialBarSrc) appendExternalScript(socialBarSrc, {}, document.body);
   }
@@ -279,13 +282,17 @@
     }
 
     var footerZones = document.querySelectorAll('[data-ad-zone="footer"]');
-    footerZones.forEach(function (zone) {
-      if (slots.footer) {
-        mountAdSenseUnit(zone, slots.footer, "Advertisement");
-      } else {
-        mountSmartlink(zone);
-      }
-    });
+    if (!document.body.classList.contains("home-page")) {
+      footerZones.forEach(function (zone) {
+        if (slots.footer) {
+          mountAdSenseUnit(zone, slots.footer, "Advertisement");
+        } else {
+          mountSmartlink(zone);
+        }
+      });
+    } else {
+      footerZones.forEach(clearZone);
+    }
 
     var loadGlobal = function () {
       window.setTimeout(loadGlobalAdsterraFormats, 900);
