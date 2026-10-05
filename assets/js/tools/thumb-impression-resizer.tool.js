@@ -39,10 +39,10 @@ async function prepareThumbSource(image, autoTrim, removeBackground) {
 
   ctx.drawImage(image, 0, 0);
 
-  if (removeBackground) removeNearWhite(canvas);
+  if (removeBackground) removeNearWhite(canvas, 250);
 
   return autoTrim
-    ? trimWhitespace(canvas, removeBackground ? 245 : 250, 10)
+    ? trimWhitespace(canvas, 250, 10)
     : canvas;
 }
 
@@ -88,10 +88,35 @@ function buildSmartThumbCrop(image, aspectRatio) {
   };
 }
 
-function renderPreview(url, container, label) {
+function renderPreview(url, container, label, options = {}) {
   container.textContent = "";
   const figure = document.createElement("figure");
   figure.className = "image-preview-card";
+
+  if (options.transparent) {
+    figure.style.backgroundImage =
+      "linear-gradient(45deg, #e7e9ee 25%, transparent 25%)," +
+      "linear-gradient(-45deg, #e7e9ee 25%, transparent 25%)," +
+      "linear-gradient(45deg, transparent 75%, #e7e9ee 75%)," +
+      "linear-gradient(-45deg, transparent 75%, #e7e9ee 75%)";
+    figure.style.backgroundSize = "16px 16px";
+    figure.style.backgroundPosition = "0 0, 0 8px, 8px -8px, -8px 0";
+    figure.style.backgroundColor = "#ffffff";
+
+    const badge = document.createElement("span");
+    badge.textContent = "Transparent PNG";
+    badge.style.display = "inline-block";
+    badge.style.margin = "0 0 8px";
+    badge.style.padding = "4px 8px";
+    badge.style.borderRadius = "999px";
+    badge.style.background = "rgba(255,255,255,.92)";
+    badge.style.border = "1px solid rgba(22,38,62,.14)";
+    badge.style.fontSize = "12px";
+    badge.style.fontWeight = "700";
+    badge.style.color = "#24344d";
+    figure.appendChild(badge);
+  }
+
   const image = document.createElement("img");
   image.alt = label;
   image.loading = "lazy";
@@ -102,6 +127,69 @@ function renderPreview(url, container, label) {
 
 function updateCustomFields(el) {
   el.customFields.hidden = el.preset.value !== "custom";
+}
+
+function syncBackgroundFormat(el) {
+  const transparent = el.background.value === "transparent";
+  if (transparent) {
+    el.format.value = "image/png";
+    el.format.disabled = true;
+  } else {
+    el.format.disabled = false;
+  }
+}
+
+async function validatePreparedThumb(blob, transparent) {
+  const url = URL.createObjectURL(blob);
+  try {
+    const image = await new Promise((resolve, reject) => {
+      const element = new Image();
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error("output-validation-failed"));
+      element.src = url;
+    });
+
+    const maxDimension = 256;
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(1, image.naturalWidth),
+      maxDimension / Math.max(1, image.naturalHeight)
+    );
+    const width = Math.max(1, Math.round(image.naturalWidth * scale));
+    const height = Math.max(1, Math.round(image.naturalHeight * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+    if (!transparent) {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+    }
+    ctx.drawImage(image, 0, 0, width, height);
+
+    const pixels = ctx.getImageData(0, 0, width, height).data;
+    let meaningfulPixels = 0;
+    for (let index = 0; index < pixels.length; index += 4) {
+      const alpha = pixels[index + 3];
+      if (transparent) {
+        if (alpha > 8) meaningfulPixels += 1;
+      } else if (
+        alpha > 8 &&
+        (pixels[index] < 245 || pixels[index + 1] < 245 || pixels[index + 2] < 245)
+      ) {
+        meaningfulPixels += 1;
+      }
+    }
+
+    if (meaningfulPixels === 0) {
+      throw new Error(
+        transparent ? "blank-transparent-output" : "blank-thumb-output"
+      );
+    }
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
   async function showActiveEditor(files, state, el, index, resetCrop = false) {
@@ -294,7 +382,8 @@ export function mount() {
       const targetBytes = targetBytesFromSelection(el.targetSize.value, el.customTarget.value);
       const removeBackground = el.background.value === "transparent";
       const background = removeBackground ? "keep" : "white";
-      const mime = el.format.value;
+      const mime = removeBackground ? "image/png" : el.format.value;
+      if (removeBackground) el.format.value = "image/png";
       const results = [];
 
       revokeUrls(state.outputUrls || []);
@@ -321,10 +410,14 @@ export function mount() {
         }
 
         const preparedImage = editorSource.image;
-        const cropSelection = state.cropSelections[index] || buildSmartThumbCrop(
+        let cropSelection = state.cropSelections[index] || buildSmartThumbCrop(
           preparedImage,
           (preset.width / Math.max(1, preset.height))
         );
+        if (index === state.activeIndex && state.editor?.getCropRect) {
+          cropSelection = state.editor.getCropRect() || cropSelection;
+          if (cropSelection) state.cropSelections[index] = cropSelection;
+        }
 
         const dimensions = resolveDimensions({
           mode: "exact",
@@ -354,6 +447,13 @@ export function mount() {
 
         if (!result) throw new Error("encode-failed");
 
+        try {
+          await validatePreparedThumb(result.blob, removeBackground);
+        } catch (error) {
+          error.message = error.message + ":" + file.name;
+          throw error;
+        }
+
         const outputUrl = URL.createObjectURL(result.blob);
         state.outputUrls.push(outputUrl);
 
@@ -371,7 +471,10 @@ export function mount() {
           renderPreview(
             outputUrl,
             el.outputPreview,
-            "Prepared thumb-impression preview for " + file.name
+            removeBackground
+              ? "Prepared transparent thumb-impression preview for " + file.name
+              : "Prepared thumb-impression preview for " + file.name,
+            { transparent: removeBackground }
           );
         }
       }
@@ -383,9 +486,14 @@ export function mount() {
         );
       }
 
+      const targetMissed = results.some((result) => !result.reached);
       el.outputSummary.textContent =
         results.length + " file" + (results.length === 1 ? "" : "s") +
-        " prepared · " + preset.label + " · " + formatBytes(targetBytes) + " maximum";
+        " prepared · " + preset.label + " · " + formatBytes(targetBytes) + " maximum" +
+        (removeBackground ? " · transparent PNG" : "") +
+        (targetMissed
+          ? " · closest safe result for one or more files"
+          : " · target met");
 
       el.resultList.textContent = "";
       for (const result of results) {
@@ -420,13 +528,20 @@ export function mount() {
       setStatus(
         error?.message === "encode-failed"
           ? "The browser could not encode the image. Try a larger target size or JPG output."
-          : "The selected thumb-impression image could not be prepared in your browser.",
+          : /^blank-transparent-output:/.test(error?.message || "")
+            ? "The transparent result appears empty. Keep the thumb impression inside the framing box and try again."
+            : /^blank-thumb-output:/.test(error?.message || "")
+              ? "The prepared thumb impression appears empty. Adjust the framing so the impression is inside the output box and try again."
+              : /^output-validation-failed:/.test(error?.message || "")
+                ? "The prepared file could not be verified. Try preparing the thumb impression again."
+                : "The selected thumb-impression image could not be prepared in your browser.",
         "error"
       );
     }
   });
 
   controller.mount();
+  syncBackgroundFormat(controller.el);
 
   controller.el.preset.addEventListener("change", async () => {
     updateCustomFields(controller.el);
@@ -439,13 +554,18 @@ export function mount() {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
   });
 
-  for (const selector of ["background", "autoTrim"]) {
-    controller.el[selector].addEventListener("change", async () => {
-      if (controller.ready && controller.files.length) {
-        await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
-      }
-    });
-  }
+  controller.el.background.addEventListener("change", async () => {
+    syncBackgroundFormat(controller.el);
+    if (controller.ready && controller.files.length) {
+      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+    }
+  });
+
+  controller.el.autoTrim.addEventListener("change", async () => {
+    if (controller.ready && controller.files.length) {
+      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+    }
+  });
 
   const refreshCustomFraming = async () => {
     if (controller.ready && controller.files.length && controller.el.preset.value === "custom") {
