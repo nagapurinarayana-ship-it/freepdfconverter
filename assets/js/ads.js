@@ -100,7 +100,11 @@
     }
   }
 
-  function fallback(zone, slot, labelText) {
+  function fallback(zone, slot, labelText, preferNative) {
+    if (preferNative && !nativeMounted && nativeSrc) {
+      mountNative(zone);
+      return;
+    }
     if (mountAdSenseUnit(zone, slot, labelText)) return;
     if (adsenseAutoAds) loadAdSense();
     clearZone(zone);
@@ -159,7 +163,25 @@
 
     window.setTimeout(function () {
       if (!document.documentElement.contains(zone)) return;
-      if (!zone.querySelector("iframe")) fallback(zone, slots.top, "Advertisement");
+
+      var iframeDocument = null;
+      try {
+        iframeDocument = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document) || null;
+      } catch (_) {
+        iframeDocument = null;
+      }
+
+      var iframeFilled = Boolean(
+        iframeDocument &&
+        (
+          iframeDocument.querySelector("iframe, video, img, object, embed") ||
+          (iframeDocument.body && iframeDocument.body.textContent.trim().length > 24)
+        )
+      );
+
+      if (!iframeFilled) {
+        fallback(zone, slots.top, "Advertisement", true);
+      }
     }, fallbackDelay);
   }
 
@@ -185,7 +207,7 @@
     script.src = nativeSrc;
     script.addEventListener("error", function () {
       nativeMounted = false;
-      fallback(zone, slots.content || "", "Advertisement");
+      fallback(zone, slots.content || "", "Advertisement", false);
     }, { once: true });
     zone.appendChild(script);
     activateZone(zone);
