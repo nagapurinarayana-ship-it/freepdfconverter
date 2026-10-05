@@ -1,0 +1,36 @@
+/* FreePDF Tools — shared header visibility guard.
+   The runtime header normalizer was intentionally removed after build-time normalization was introduced.
+   Keep the already-rendered server HTML visible immediately on first paint and on mobile browsers. */
+body .site-header {
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+body:not(.nav-ready) .site-header {
+  visibility: visible !important;
+}
+
+.site-header .header-inner {
+  display: flex;
+  visibility: visible !important;
+}
+
+.site-header .logo,
+.site-header .main-nav,
+.site-header .main-nav a {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 760px) {
+  body .site-header {
+    min-height: 58px;
+  }
+
+  .site-header .header-inner {
+    min-height: 58px;
+  }
+}
