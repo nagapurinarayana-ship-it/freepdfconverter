@@ -30,12 +30,14 @@ export async function encodeBestUnderTarget({
   progressEnd = 100,
   cropFocusX = 0.5,
   cropFocusY = 0.5,
-  cropRect = null
+  cropRect = null,
+  allowDownscale = true
 }) {
   let best = null;
+  const widthLadder = allowDownscale ? WIDTH_LADDER : [1.00];
 
-  for (let widthIndex = 0; widthIndex < WIDTH_LADDER.length; widthIndex += 1) {
-    const factor = WIDTH_LADDER[widthIndex];
+  for (let widthIndex = 0; widthIndex < widthLadder.length; widthIndex += 1) {
+    const factor = widthLadder[widthIndex];
     const width = clampPixels(dimensions.width * factor, dimensions.width);
     const height = clampPixels(dimensions.height * factor, dimensions.height);
 
@@ -53,7 +55,7 @@ export async function encodeBestUnderTarget({
       }
 
       setProgress(
-        progressStart + ((widthIndex + 1) / WIDTH_LADDER.length) * (progressEnd - progressStart)
+        progressStart + ((widthIndex + 1) / widthLadder.length) * (progressEnd - progressStart)
       );
       continue;
     }

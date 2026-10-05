@@ -221,7 +221,7 @@ export function mount() {
     maxFileMessage: "Each source image must be 20 MB or smaller.",
     emptySummary: "No photos selected",
     initialMessage: "Choose a photo. Processing stays on your device.",
-    readyMessage: "Ready. Choose the required photo size and framing, then create the image file(s).",
+    readyMessage: "Ready. Choose the required photo size and framing, then create the image file(s). The export preserves the required pixel dimensions; if the size target is too small, the safest higher-quality result is used instead of making the photo blurry.",
     readErrorMessage: "One or more selected images could not be read by your browser.",
     onFilesSelected: async ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
@@ -305,6 +305,7 @@ export function mount() {
             Number(el.focusY.value || 40) / 100
           ),
           cropFocusY: Number(el.focusY.value || 40) / 100,
+          allowDownscale: false,
           setProgress,
           progressStart: (index / files.length) * 80,
           progressEnd: ((index + 1) / files.length) * 80
