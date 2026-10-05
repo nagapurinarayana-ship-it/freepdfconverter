@@ -246,7 +246,7 @@ export function mount() {
     initialMessage: "Select one or more images. Everything is processed locally in your browser.",
     readyMessage: "Ready. Review the settings, then create your optimized file(s).",
     readErrorMessage: "One or more selected images could not be read by your browser.",
-    onFilesSelected: ({ files, state, el }) => {
+    onFilesSelected: async ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
       state.previewUrls = [];
