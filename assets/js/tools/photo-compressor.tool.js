@@ -485,12 +485,21 @@ export function mount() {
     syncDimensionControls();
   });
 
+  function syncFramingAspect() {
+    if (!framingIsActive(controller.el) || !controller.state.editor) return;
+    controller.state.editor.setAspectRatio(resolveCropAspect(
+      controller.el,
+      controller.state.editorSources?.[controller.state.activeIndex || 0]?.image ||
+        { naturalWidth: Number(controller.el.width.value || 1600), naturalHeight: Number(controller.el.height.value || 1200) }
+    ));
+  }
+
   controller.el.width.addEventListener("input", function () {
-    if (framingIsActive(controller.el)) refreshEditorMode(controller);
+    syncFramingAspect();
   });
 
   controller.el.height.addEventListener("input", function () {
-    if (framingIsActive(controller.el)) refreshEditorMode(controller);
+    syncFramingAspect();
   });
 
   controller.el.cropMode.addEventListener("change", function () {
