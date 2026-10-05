@@ -25,6 +25,75 @@ function escapeText(value) {
   });
 }
 
+function median(values) {
+  if (!values.length) return 0;
+  const sorted = values.slice().sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2
+    ? sorted[middle]
+    : (sorted[middle - 1] + sorted[middle]) / 2;
+}
+
+function removeSignaturePaperBackground(canvas) {
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+  const width = canvas.width;
+  const height = canvas.height;
+  const edgeSamples = [];
+
+  const sampleStepX = Math.max(1, Math.floor(width / 160));
+  const sampleStepY = Math.max(1, Math.floor(height / 80));
+
+  function addSample(x, y) {
+    const index = (y * width + x) * 4;
+    if (data[index + 3] < 8) return;
+    const r = data[index];
+    const g = data[index + 1];
+    const b = data[index + 2];
+    edgeSamples.push(0.299 * r + 0.587 * g + 0.114 * b);
+  }
+
+  for (let x = 0; x < width; x += sampleStepX) {
+    addSample(x, 0);
+    addSample(x, height - 1);
+  }
+
+  for (let y = 0; y < height; y += sampleStepY) {
+    addSample(0, y);
+    addSample(width - 1, y);
+  }
+
+  const backgroundLuma = median(edgeSamples);
+  if (!Number.isFinite(backgroundLuma) || backgroundLuma <= 0) return;
+
+  // Scanned paper is often gray/off-white instead of pure white. Use the
+  // observed page tone to remove the paper while preserving dark ink.
+  const cutoff = backgroundLuma * 0.70;
+  const feather = Math.max(10, backgroundLuma * 0.10);
+
+  for (let index = 0; index < data.length; index += 4) {
+    if (data[index + 3] < 8) continue;
+
+    const r = data[index];
+    const g = data[index + 1];
+    const b = data[index + 2];
+    const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+    const contrast = backgroundLuma - luma;
+
+    if (contrast >= cutoff) {
+      data[index + 3] = 255;
+    } else if (contrast >= cutoff - feather) {
+      const keep = (contrast - (cutoff - feather)) / feather;
+      data[index + 3] = Math.round(255 * Math.max(0, Math.min(1, keep)));
+    } else {
+      data[index + 3] = 0;
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
+
 async function prepareSignatureSource(image, autoTrim, removeBackground) {
   const { canvas, ctx } = createCanvas(image, {
     width: image.naturalWidth,
@@ -34,7 +103,7 @@ async function prepareSignatureSource(image, autoTrim, removeBackground) {
 
   ctx.drawImage(image, 0, 0);
 
-  if (removeBackground) removeNearWhite(canvas);
+  if (removeBackground) removeSignaturePaperBackground(canvas);
 
   return autoTrim ? trimWhitespace(canvas, removeBackground ? 245 : 250, 10) : canvas;
 }
