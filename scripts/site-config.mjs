@@ -74,6 +74,7 @@ export const indexablePages = [
     "topics/adobe-acrobat-alternative.html",
     "topics/smallpdf-alternative.html",
     "topics/pdf24-alternative.html",
+    "topics/image-upload-requirements.html",
     "topics/cloud-vs-browser-pdf-converter.html"
   ]
 ];
@@ -163,6 +164,7 @@ for (const localizedTopicKey of [
   "topic-pdf-word-private","topic-scanned-pdf-word","topic-pdf-word-formatting","topic-ocr-pdf-online","topic-ocr-pdf-accuracy","topic-word-97-2003-pdf","topic-docx-to-pdf","topic-private-pdf","topic-pdf-to-text","topic-compress-target","topic-jpg-mobile","topic-pdf-page-size"
 ]) pageDates[localizedTopicKey] = "2026-09-28";
 for (const relative of [
+  "topics/image-upload-requirements.html",
   "topics/adobe-acrobat-alternative.html",
   "topics/smallpdf-alternative.html",
   "topics/pdf24-alternative.html",
@@ -321,6 +323,7 @@ export const pageLabels = {
   "topics/adobe-acrobat-alternative.html": "Adobe Acrobat Online Alternative",
   "topics/smallpdf-alternative.html": "Smallpdf Alternative",
   "topics/pdf24-alternative.html": "PDF24 Alternative",
+  "topics/image-upload-requirements.html": "Image Upload Requirements",
   "topics/cloud-vs-browser-pdf-converter.html": "Cloud vs Browser PDF Converter"
 };
 
