@@ -8,33 +8,40 @@ const htmlFiles = [];
 await collectHtml(dist);
 
 // Runtime monetization lives in assets/js/ads.js. This build step owns only the
-// stable placement contract required by the quality checks and page layout.
+// stable placement contract: one managed placement after the page's primary H1.
 for (const file of htmlFiles) {
   let html = await readFile(file, "utf8");
   html = stripLegacyAdMarkup(html);
 
-  if (!html.includes(MARKER_START) && html.includes("</main>")) {
-    const existingZone = html.match(/<div class="container">\s*<div class="ad-container[^>]*data-ad-zone=["'][^"']+["'][^>]*><\/div>\s*<\/div>/i);
-    if (existingZone && existingZone.index !== undefined) {
-      const before = html.slice(0, existingZone.index);
-      const after = html.slice(existingZone.index + existingZone[0].length);
-      html = before + MARKER_START + "\n" + existingZone[0] + "\n" + MARKER_END + after;
+  const h1Match = html.match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i);
+  if (!h1Match || h1Match.index === undefined) {
+    await writeFile(file, html, "utf8");
+    continue;
+  }
+
+  const h1End = h1Match.index + h1Match[0].length;
+  const zonePattern = /<div class="container">\s*<div class="ad-container[^>]*data-ad-zone=["'][^"']+["'][^>]*><\/div>\s*<\/div>/gi;
+
+  // Remove stale placements that were generated above the primary H1. This is
+  // what prevents an ad from becoming the first visual element of a page.
+  const zonesToRemove = [];
+  for (const match of html.matchAll(zonePattern)) {
+    if (match.index < h1End) zonesToRemove.push({ start: match.index, end: match.index + match[0].length });
+  }
+  for (let i = zonesToRemove.length - 1; i >= 0; i -= 1) {
+    const zone = zonesToRemove[i];
+    html = html.slice(0, zone.start) + html.slice(zone.end);
+  }
+
+  if (!html.includes(MARKER_START)) {
+    const zoneAfterH1 = html.match(zonePattern);
+    if (zoneAfterH1 && zoneAfterH1.index !== undefined) {
+      const start = zoneAfterH1.index;
+      const end = start + zoneAfterH1[0].length;
+      html = html.slice(0, start) + MARKER_START + "\n" + zoneAfterH1[0] + "\n" + MARKER_END + html.slice(end);
     } else {
       const pageAds = `\n${MARKER_START}\n<div class="container"><div class="ad-container ad-container-managed" data-ad-zone="content" aria-label="Advertisement"></div></div>\n${MARKER_END}`;
-      const toolHero = html.match(/<section[^>]*class=["'][^"']*tool-hero[^"']*["'][^>]*>[\s\S]*?<\/section>/i);
-      if (toolHero && toolHero.index !== undefined) {
-        const insertAt = toolHero.index + toolHero[0].length;
-        html = html.slice(0, insertAt) + pageAds + html.slice(insertAt);
-      } else {
-        const article = html.match(/<article\b[\s\S]*?<\/article>/i);
-        if (article && article.index !== undefined) {
-          const insertAt = article.index + article[0].length;
-          html = html.slice(0, insertAt) + pageAds + html.slice(insertAt);
-        } else {
-          const mainEnd = html.lastIndexOf("</main>");
-          html = html.slice(0, mainEnd) + pageAds + html.slice(mainEnd);
-        }
-      }
+      html = html.slice(0, h1End) + pageAds + html.slice(h1End);
     }
   }
 
