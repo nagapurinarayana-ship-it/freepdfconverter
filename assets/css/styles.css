@@ -575,8 +575,6 @@ h3 { font-size: 1.16rem; margin: 0 0 8px; }
 /* Shared navigation stability — applies to every page. */
 @view-transition { navigation: auto; }
 body .site-header { min-height: 64px; view-transition-name: site-header; }
-body:not(.nav-ready) .site-header { visibility: hidden; }
-body.nav-ready .site-header { visibility: visible; }
 .site-header .header-inner { min-height: 64px; overflow: hidden; }
 .site-header .logo { flex: 0 0 auto; white-space: nowrap; min-width: 0; }
 .site-header .logo > span:last-child { white-space: nowrap; }
