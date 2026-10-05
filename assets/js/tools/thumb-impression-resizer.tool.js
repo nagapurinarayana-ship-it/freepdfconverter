@@ -39,10 +39,10 @@ async function prepareThumbSource(image, autoTrim, removeBackground) {
 
   ctx.drawImage(image, 0, 0);
 
-  if (removeBackground) removeNearWhite(canvas);
+  if (removeBackground) removeNearWhite(canvas, 250);
 
   return autoTrim
-    ? trimWhitespace(canvas, removeBackground ? 245 : 250, 10)
+    ? trimWhitespace(canvas, 250, 10)
     : canvas;
 }
 
@@ -88,10 +88,35 @@ function buildSmartThumbCrop(image, aspectRatio) {
   };
 }
 
-function renderPreview(url, container, label) {
+function renderPreview(url, container, label, options = {}) {
   container.textContent = "";
   const figure = document.createElement("figure");
   figure.className = "image-preview-card";
+
+  if (options.transparent) {
+    figure.style.backgroundImage =
+      "linear-gradient(45deg, #e7e9ee 25%, transparent 25%)," +
+      "linear-gradient(-45deg, #e7e9ee 25%, transparent 25%)," +
+      "linear-gradient(45deg, transparent 75%, #e7e9ee 75%)," +
+      "linear-gradient(-45deg, transparent 75%, #e7e9ee 75%)";
+    figure.style.backgroundSize = "16px 16px";
+    figure.style.backgroundPosition = "0 0, 0 8px, 8px -8px, -8px 0";
+    figure.style.backgroundColor = "#ffffff";
+
+    const badge = document.createElement("span");
+    badge.textContent = "Transparent PNG";
+    badge.style.display = "inline-block";
+    badge.style.margin = "0 0 8px";
+    badge.style.padding = "4px 8px";
+    badge.style.borderRadius = "999px";
+    badge.style.background = "rgba(255,255,255,.92)";
+    badge.style.border = "1px solid rgba(22,38,62,.14)";
+    badge.style.fontSize = "12px";
+    badge.style.fontWeight = "700";
+    badge.style.color = "#24344d";
+    figure.appendChild(badge);
+  }
+
   const image = document.createElement("img");
   image.alt = label;
   image.loading = "lazy";
@@ -294,7 +319,8 @@ export function mount() {
       const targetBytes = targetBytesFromSelection(el.targetSize.value, el.customTarget.value);
       const removeBackground = el.background.value === "transparent";
       const background = removeBackground ? "keep" : "white";
-      const mime = el.format.value;
+      const mime = removeBackground ? "image/png" : el.format.value;
+      if (removeBackground) el.format.value = "image/png";
       const results = [];
 
       revokeUrls(state.outputUrls || []);
@@ -321,10 +347,14 @@ export function mount() {
         }
 
         const preparedImage = editorSource.image;
-        const cropSelection = state.cropSelections[index] || buildSmartThumbCrop(
+        let cropSelection = state.cropSelections[index] || buildSmartThumbCrop(
           preparedImage,
           (preset.width / Math.max(1, preset.height))
         );
+        if (index === state.activeIndex && state.editor?.getCropRect) {
+          cropSelection = state.editor.getCropRect() || cropSelection;
+          if (cropSelection) state.cropSelections[index] = cropSelection;
+        }
 
         const dimensions = resolveDimensions({
           mode: "exact",
