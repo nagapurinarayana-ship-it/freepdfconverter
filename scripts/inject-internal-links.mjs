@@ -93,6 +93,7 @@ for (const file of files) {
     .map(([, , guide, label]) => "<li><a href=\"" + relativePath(relative, guide) + "\">" + escapeHtml(label) + "</a></li>")
     .join("");
 
+  const requirementsHref = relativePath(relative, "topics/image-upload-requirements.html");
   const clusterBlock = "\n" + IMAGE_CLUSTER_START + "\n<section class=\"section related-content\" aria-labelledby=\"related-image-tools\">\n" +
     "  <div class=\"container\">\n" +
     "    <div class=\"section-heading\">\n" +
@@ -101,6 +102,8 @@ for (const file of files) {
     "      <ul class=\"footer-links\">" + relatedTools + "</ul>\n" +
     "      <h3>Related preparation guides</h3>\n" +
     "      <ul class=\"footer-links\">" + relatedGuides + "</ul>\n" +
+    "      <h3>Image upload requirements</h3>\n" +
+    "      <p><a href=\"" + requirementsHref + "\">Image upload requirements for online forms →</a></p>\n" +
     "    </div>\n" +
     "  </div>\n" +
     "</section>\n" + IMAGE_CLUSTER_END;
