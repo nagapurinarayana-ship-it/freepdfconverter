@@ -14,6 +14,10 @@ const MAX_FILE = 20 * MB;
 const MAX_FILES = 20;
 const MAX_TOTAL_BYTES = 100 * MB;
 
+// cropFocusY is retained as a fixed compatibility value only; the interactive
+// cropRect is the sole source of truth for the exported framing.
+const MANUAL_CROP_FOCUS_Y = 0.5;
+
 const PRESETS = Object.freeze({
   "35x45": { width: 35, height: 45, unit: "mm", dpi: 300, label: "35 × 45 mm" },
   "2x2": { width: 51, height: 51, unit: "mm", dpi: 300, label: "2 × 2 in / 51 × 51 mm" },
@@ -293,6 +297,7 @@ export function mount() {
             image,
             dimensions.width / dimensions.height
           ),
+          cropFocusY: MANUAL_CROP_FOCUS_Y,
           allowDownscale: false,
           setProgress,
           progressStart: (index / files.length) * 80,
