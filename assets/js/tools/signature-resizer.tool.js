@@ -39,10 +39,36 @@ async function prepareSignatureSource(image, autoTrim, removeBackground) {
   return autoTrim ? trimWhitespace(canvas, removeBackground ? 245 : 250, 10) : canvas;
 }
 
-function renderPreview(url, container, label) {
+function renderPreview(url, container, label, options = {}) {
   container.textContent = "";
   const figure = document.createElement("figure");
   figure.className = "image-preview-card";
+
+  if (options.transparent) {
+    figure.title = "Transparent PNG preview";
+    figure.style.backgroundImage =
+      "linear-gradient(45deg, #e7e9ee 25%, transparent 25%)," +
+      "linear-gradient(-45deg, #e7e9ee 25%, transparent 25%)," +
+      "linear-gradient(45deg, transparent 75%, #e7e9ee 75%)," +
+      "linear-gradient(-45deg, transparent 75%, #e7e9ee 75%)";
+    figure.style.backgroundSize = "16px 16px";
+    figure.style.backgroundPosition = "0 0, 0 8px, 8px -8px, -8px 0";
+    figure.style.backgroundColor = "#ffffff";
+
+    const badge = document.createElement("span");
+    badge.textContent = "Transparent PNG";
+    badge.style.display = "inline-block";
+    badge.style.margin = "0 0 8px";
+    badge.style.padding = "4px 8px";
+    badge.style.borderRadius = "999px";
+    badge.style.background = "rgba(255,255,255,.92)";
+    badge.style.border = "1px solid rgba(22,38,62,.14)";
+    badge.style.fontSize = "12px";
+    badge.style.fontWeight = "700";
+    badge.style.color = "#24344d";
+    figure.appendChild(badge);
+  }
+
   const image = document.createElement("img");
   image.alt = label;
   image.loading = "lazy";
@@ -88,6 +114,28 @@ function resolveCropAspect(el, source) {
   return source.naturalWidth / Math.max(1, source.naturalHeight);
 }
 
+function buildSuggestedCrop(source, aspectRatio) {
+  const sourceWidth = Math.max(1, Number(source.width) || 1);
+  const sourceHeight = Math.max(1, Number(source.height) || 1);
+  const ratio = Math.max(0.05, Number(aspectRatio) || (sourceWidth / sourceHeight));
+
+  let width = sourceWidth;
+  let height = sourceHeight;
+
+  if (sourceWidth / sourceHeight > ratio) {
+    width = sourceHeight * ratio;
+  } else {
+    height = sourceWidth / ratio;
+  }
+
+  return {
+    x: Math.max(0, (sourceWidth - width) / 2),
+    y: Math.max(0, (sourceHeight - height) / 2),
+    width,
+    height
+  };
+}
+
 async function prepareEditorSource(file, autoTrim, transparent) {
   const image = await loadImage(file);
   const preparedCanvas = await prepareSignatureSource(image, autoTrim, transparent);
@@ -111,6 +159,10 @@ export function mount() {
     }
 
     const source = await prepareEditorSource(file, autoTrim, transparent);
+    source.suggestedCrop = buildSuggestedCrop(
+      source,
+      resolveCropAspect(el, source.image)
+    );
     state.editorSources[state.activeIndex] = source;
     state.editorUrls[state.activeIndex] = source.url;
 
@@ -311,7 +363,14 @@ export function mount() {
         });
 
         if (index === 0) {
-          renderPreview(outputUrl, el.outputPreview, "Prepared signature preview for " + file.name);
+          renderPreview(
+            outputUrl,
+            el.outputPreview,
+            transparent
+              ? "Prepared transparent signature preview for " + file.name
+              : "Prepared signature preview for " + file.name,
+            { transparent }
+          );
         }
       }
 
@@ -322,9 +381,16 @@ export function mount() {
         );
       }
 
+      const targetMissed = results.some((result) => !result.reached);
       el.outputSummary.textContent =
         results.length + " file" + (results.length === 1 ? "" : "s") +
-        " prepared · target " + formatBytes(targetBytes);
+        " prepared · target " + formatBytes(targetBytes) +
+        (transparent ? " · transparent PNG" : "") +
+        (targetMissed
+          ? transparent
+            ? " · closest safe result for one or more files (PNG transparency is lossless)"
+            : " · closest safe result for one or more files"
+          : " · target met");
 
       el.resultList.textContent = "";
       for (const result of results) {
@@ -374,12 +440,14 @@ export function mount() {
   controller.el.background.addEventListener("change", function () {
     syncBackgroundFormat(controller.el);
     if (controller.ready && controller.files.length) {
+      controller.state.cropSelections[controller.state.activeIndex || 0] = null;
       showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0);
     }
   });
 
   controller.el.autoTrim.addEventListener("change", function () {
     if (controller.ready && controller.files.length) {
+      controller.state.cropSelections[controller.state.activeIndex || 0] = null;
       showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0);
     }
   });
