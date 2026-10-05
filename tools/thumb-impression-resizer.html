@@ -49,13 +49,15 @@
 <label class="field"><span>DPI</span><select id="dpi"><option value="72">72 DPI</option><option value="96" selected>96 DPI</option><option value="150">150 DPI</option><option value="300">300 DPI</option></select></label>
 </div>
 
-<div class="section-heading compact"><span class="eyebrow">3. Cleanup</span><h2>Trim blank margins and choose the background</h2></div>
+<div class="section-heading compact"><span class="eyebrow">3. Clean up</span><h2>Trim blank margins and choose the background</h2></div>
 <div class="form-grid">
 <label class="check-row"><input id="autoTrim" type="checkbox" checked><span><strong>Auto-crop extra whitespace</strong><small>Trims empty paper or background around the impression before resizing.</small></span></label>
 <label class="field"><span>Background</span><select id="backgroundMode"><option value="white" selected>White</option><option value="transparent">Remove near-white background</option></select></label>
 <label class="field"><span>Output format</span><select id="outputFormat"><option value="image/jpeg" selected>JPG</option><option value="image/png">PNG — transparency</option><option value="image/webp">WebP — if accepted by the form</option></select></label>
 </div>
 
+<div class="section-heading compact"><span class="eyebrow">4. Adjust framing</span><h2>Keep the complete thumb impression inside the output box</h2><p>Drag the prepared image, pinch or zoom, and review the final framing before processing. The starting crop is only a suggestion.</p></div>
+<div id="thumbAdjuster" class="image-adjuster-host" hidden></div>
 <div class="preview-grid"><div class="side-card"><h3>Source preview</h3><div id="inputPreview" class="preview-host"></div></div><div class="side-card"><h3>Prepared preview</h3><div id="outputPreview" class="preview-host"></div></div></div>
 <div class="card-grid"><div class="side-card"><h3>Total input size</h3><p id="originalSize">—</p></div><div class="side-card"><h3>Result</h3><p id="outputSummary">Not processed yet</p></div><div class="side-card"><h3>Privacy</h3><p>Thumb-impression images are processed locally in your browser; the source file does not need to be uploaded.</p></div></div>
 <div class="action-row"><button class="button" id="processButton" type="button" disabled>Prepare thumb impression(s)</button><button class="button danger" id="clearButton" type="button" disabled>Clear</button></div>
@@ -74,7 +76,7 @@
 <h2>Prepare thumb impressions without uploading the source image</h2>
 <p>Use the tool when an online form asks for a scanned or photographed thumb impression with strict file dimensions or a maximum upload size. Start with a square canvas or enter the exact dimensions specified by the form.</p>
 <h2>Trim before compressing</h2>
-<p>A tight crop usually makes better use of a fixed canvas than shrinking a large page photograph containing unused paper. Preview the cleaned result before submission so light ink has not been removed by background cleanup.</p>
+<p>A tight crop usually makes better use of a fixed canvas than shrinking a large page photograph containing unused paper. The framing editor then lets you reposition the impression before compression, so an off-centre thumb is not silently cut in half.</p>
 <h2>Target file size</h2>
 <p>The file-size setting is a maximum goal, not a guarantee that every image will land on an exact byte count. Simple black-on-white impressions usually compress more efficiently than noisy photographs or textured paper.</p>
 <h2>Related tools</h2>

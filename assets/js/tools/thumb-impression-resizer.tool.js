@@ -1,4 +1,5 @@
 import { ToolController } from "../core/tool-controller.js";
+import { createImageAdjuster } from "../core/image-adjuster.js";
 import { createCanvas, loadImage, makeBlob, removeNearWhite, trimWhitespace } from "../core/image-tool-kit.js";
 import { encodeBestUnderTarget } from "../core/image-form-engine.js";
 import {
@@ -29,23 +30,6 @@ function escapeText(value) {
   })[char]);
 }
 
-async function canvasToImage(canvas) {
-  const blob = await makeBlob(canvas, "image/png");
-  if (!blob) throw new Error("encode-failed");
-
-  const url = URL.createObjectURL(blob);
-  try {
-    return await new Promise((resolve, reject) => {
-      const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("image-load-failed"));
-      image.src = url;
-    });
-  } finally {
-    URL.revokeObjectURL(url);
-  }
-}
-
 async function prepareThumbSource(image, autoTrim, removeBackground) {
   const { canvas, ctx } = createCanvas(image, {
     width: image.naturalWidth,
@@ -60,6 +44,48 @@ async function prepareThumbSource(image, autoTrim, removeBackground) {
   return autoTrim
     ? trimWhitespace(canvas, removeBackground ? 245 : 250, 10)
     : canvas;
+}
+
+async function canvasToSource(canvas) {
+  const blob = await makeBlob(canvas, "image/png");
+  if (!blob) throw new Error("encode-failed");
+
+  const url = URL.createObjectURL(blob);
+  const image = await new Promise((resolve, reject) => {
+    const nextImage = new Image();
+    nextImage.onload = () => resolve(nextImage);
+    nextImage.onerror = () => reject(new Error("image-load-failed"));
+    nextImage.src = url;
+  });
+
+  return {
+    image,
+    url,
+    width: canvas.width,
+    height: canvas.height,
+    suggestedCrop: { x: 0, y: 0, width: canvas.width, height: canvas.height }
+  };
+}
+
+function buildSmartThumbCrop(image, aspectRatio) {
+  const sourceWidth = image.naturalWidth;
+  const sourceHeight = image.naturalHeight;
+  const sourceRatio = sourceWidth / Math.max(1, sourceHeight);
+
+  let width = sourceWidth;
+  let height = sourceHeight;
+  if (sourceRatio > aspectRatio) {
+    width = sourceHeight * aspectRatio;
+  } else {
+    height = sourceWidth / aspectRatio;
+  }
+
+  return {
+    x: Math.max(0, (sourceWidth - width) / 2),
+    y: Math.max(0, (sourceHeight - height) / 2),
+    width,
+    height
+  };
 }
 
 function renderPreview(url, container, label) {
@@ -77,6 +103,89 @@ function renderPreview(url, container, label) {
 function updateCustomFields(el) {
   el.customFields.hidden = el.preset.value !== "custom";
 }
+
+  async function showActiveEditor(files, state, el, index, resetCrop = false) {
+    state.activeIndex = Math.max(0, Math.min(index, files.length - 1));
+    const file = files[state.activeIndex];
+    const removeBackground = el.background.value === "transparent";
+
+    state.editorUrls = state.editorUrls || [];
+    state.editorSources = state.editorSources || [];
+    state.cropSelections = state.cropSelections || [];
+
+    if (state.editorUrls[state.activeIndex]) {
+      URL.revokeObjectURL(state.editorUrls[state.activeIndex]);
+      state.editorUrls[state.activeIndex] = null;
+    }
+
+    const rawSource = await loadImage(file);
+    const preparedCanvas = await prepareThumbSource(
+      rawSource,
+      el.autoTrim.checked,
+      removeBackground
+    );
+    const source = await canvasToSource(preparedCanvas);
+    state.editorSources[state.activeIndex] = source;
+    state.editorUrls[state.activeIndex] = source.url;
+
+    if (resetCrop) {
+      state.cropSelections[state.activeIndex] = null;
+    }
+
+    const preset = el.preset.value === "custom"
+      ? {
+          width: Number(el.width.value || 600),
+          height: Number(el.height.value || 600),
+          unit: el.unit.value,
+          dpi: Number(el.dpi.value || 96),
+          label: "Custom size"
+        }
+      : PRESETS[el.preset.value];
+
+    const requestedDimensions = resolveDimensions({
+      mode: "exact",
+      width: preset.width,
+      height: preset.height,
+      unit: preset.unit,
+      dpi: preset.dpi,
+      sourceWidth: source.width,
+      sourceHeight: source.height,
+      keepAspect: false
+    });
+
+    const aspectRatio = requestedDimensions.width / Math.max(1, requestedDimensions.height);
+    const suggestedCrop = buildSmartThumbCrop(source.image, aspectRatio);
+    source.suggestedCrop = suggestedCrop;
+
+    el.adjuster.hidden = false;
+
+    if (!state.editor) {
+      state.editor = createImageAdjuster({
+        container: el.adjuster,
+        aspectRatio,
+        label: "Thumb impression framing",
+        instructions: "Drag to move · pinch or wheel to zoom. Keep the complete thumb impression inside the frame."
+      });
+      state.editor.setOnChange((crop) => {
+        state.cropSelections[state.activeIndex] = crop;
+      });
+    } else {
+      state.editor.setAspectRatio(aspectRatio);
+    }
+
+    state.editor.setAspectRatio(aspectRatio);
+    state.editor.setSource(
+      source,
+      suggestedCrop,
+      state.cropSelections[state.activeIndex] || suggestedCrop
+    );
+    state.editor.getNavigationApi().setNavigation({
+      index: state.activeIndex,
+      count: files.length,
+      onPrevious: () => showActiveEditor(files, state, el, state.activeIndex - 1),
+      onNext: () => showActiveEditor(files, state, el, state.activeIndex + 1)
+    });
+  }
 
 export function mount() {
   const controller = new ToolController({
@@ -110,7 +219,8 @@ export function mount() {
       outputSummary: "#outputSummary",
       resultList: "#resultList",
       batchCount: "#batchCount",
-      batchSize: "#batchSize"
+      batchSize: "#batchSize",
+      adjuster: "#thumbAdjuster"
     },
     maxFileBytes: MAX_FILE,
     accept: (file) => /^image\/(jpeg|png|webp)$/i.test(file.type) || /\.(jpe?g|png|webp)$/i.test(file.name),
@@ -120,15 +230,18 @@ export function mount() {
     initialMessage: "Select a thumb-impression image. Processing stays in your browser.",
     readyMessage: "Ready. Choose the dimensions and file-size limit, then prepare the image file(s).",
     readErrorMessage: "One or more selected thumb-impression images could not be read.",
-    onFilesSelected: ({ files, state, el }) => {
+    onFilesSelected: async ({ files, state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
-      state.previewUrls = [];
-      state.outputUrls = [];
-      state.images = [];
+      revokeUrls(state.editorUrls || []);
 
-      state.images = [];
       state.previewUrls = files.map((file) => URL.createObjectURL(file));
+      state.outputUrls = [];
+      state.editorUrls = [];
+      state.editorSources = [];
+      state.cropSelections = [];
+      state.images = [];
+      state.activeIndex = 0;
 
       if (state.previewUrls[0]) {
         renderPreview(state.previewUrls[0], el.inputPreview, files[0].name);
@@ -140,14 +253,25 @@ export function mount() {
       );
       el.outputSummary.textContent = "Not processed yet";
       el.resultList.textContent = "";
+
+      await showActiveEditor(files, state, el, 0);
     },
     onReset: ({ state, el }) => {
       revokeUrls(state.previewUrls || []);
       revokeUrls(state.outputUrls || []);
+      revokeUrls(state.editorUrls || []);
+      state.editor?.destroy?.();
+
       state.previewUrls = [];
       state.outputUrls = [];
+      state.editorUrls = [];
+      state.editorSources = [];
+      state.cropSelections = [];
       state.images = [];
+      state.editor = null;
+      state.activeIndex = 0;
 
+      el.adjuster.hidden = true;
       el.batchCount.textContent = "0 selected";
       el.batchSize.textContent = "0 B";
       el.outputSummary.textContent = "Not processed yet";
@@ -183,14 +307,24 @@ export function mount() {
           "info"
         );
 
-        const cached = state.images.find((entry) => entry.file === file);
-        const source = cached?.image || await loadImage(file);
-        const preparedCanvas = await prepareThumbSource(
-          source,
-          el.autoTrim.checked,
-          removeBackground
+        let editorSource = state.editorSources[index];
+        if (!editorSource) {
+          const rawSource = await loadImage(file);
+          const preparedCanvas = await prepareThumbSource(
+            rawSource,
+            el.autoTrim.checked,
+            removeBackground
+          );
+          editorSource = await canvasToSource(preparedCanvas);
+          state.editorSources[index] = editorSource;
+          state.editorUrls[index] = editorSource.url;
+        }
+
+        const preparedImage = editorSource.image;
+        const cropSelection = state.cropSelections[index] || buildSmartThumbCrop(
+          preparedImage,
+          (preset.width / Math.max(1, preset.height))
         );
-        const preparedImage = await canvasToImage(preparedCanvas);
 
         const dimensions = resolveDimensions({
           mode: "exact",
@@ -212,6 +346,7 @@ export function mount() {
           background,
           cropFocusX: 0.5,
           cropFocusY: 0.5,
+          cropRect: cropSelection,
           setProgress,
           progressStart: (index / files.length) * 75,
           progressEnd: ((index + 1) / files.length) * 75
@@ -293,9 +428,35 @@ export function mount() {
 
   controller.mount();
 
-  controller.el.preset.addEventListener("change", () => updateCustomFields(controller.el));
+  controller.el.preset.addEventListener("change", async () => {
+    updateCustomFields(controller.el);
+    if (controller.ready && controller.files.length) {
+      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+    }
+  });
+
   controller.el.targetSize.addEventListener("change", () => {
     controller.el.customTargetWrap.hidden = controller.el.targetSize.value !== "custom";
   });
+
+  for (const selector of ["background", "autoTrim"]) {
+    controller.el[selector].addEventListener("change", async () => {
+      if (controller.ready && controller.files.length) {
+        await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+      }
+    });
+  }
+
+  const refreshCustomFraming = async () => {
+    if (controller.ready && controller.files.length && controller.el.preset.value === "custom") {
+      await showActiveEditor(controller.files, controller.state, controller.el, controller.state.activeIndex || 0, true);
+    }
+  };
+
+  controller.el.width.addEventListener("input", refreshCustomFraming);
+  controller.el.height.addEventListener("input", refreshCustomFraming);
+  controller.el.unit.addEventListener("change", refreshCustomFraming);
+  controller.el.dpi.addEventListener("change", refreshCustomFraming);
+
   updateCustomFields(controller.el);
 }
