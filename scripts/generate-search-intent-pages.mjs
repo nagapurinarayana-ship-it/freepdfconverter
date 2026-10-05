@@ -310,8 +310,8 @@ export const SEARCH_INTENT_PAGES = {
     ]
   },
   "topics/image-upload-requirements.html": {
-    title: "Image Upload Requirements — Photo, Signature & Form Images | FreePDF Tools",
-    description: "Learn how to prepare passport photos, signatures, thumb impressions and handwritten declarations for online forms, including dimensions, file size, framing, background and format requirements.",
+    title: "Image Upload Requirements for Online Forms | FreePDF Tools",
+    description: "Prepare passport photos, signatures, thumb impressions and handwritten declarations for online forms: check dimensions, file-size limits, framing, background and format.",
     h1: "Image upload requirements for online forms",
     intro: "Online forms often ask for an image with a specific width and height, a maximum file size, an accepted format and sometimes a required background or framing. There is no single universal specification, so the receiving application remains the authority.",
     sections: [
