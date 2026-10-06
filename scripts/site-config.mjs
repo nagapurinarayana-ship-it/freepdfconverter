@@ -191,6 +191,13 @@ for (const relative of [
 for (const tool of toolRegistry) {
   if (tool.lastmod) pageDates[tool.path] = tool.lastmod;
 }
+for (const imageFormPath of [
+  "tools/photo-compressor.html",
+  "tools/signature-resizer.html",
+  "tools/thumb-impression-resizer.html",
+  "tools/passport-id-photo-maker.html",
+  "tools/handwritten-declaration-resizer.html"
+]) pageDates[imageFormPath] = "2026-10-06";
 
 export const articlePublishedDates = {
   "guides/reduce-pdf-file-size-for-email.html": "2026-08-31",
