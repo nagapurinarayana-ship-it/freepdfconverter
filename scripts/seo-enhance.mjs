@@ -108,11 +108,11 @@ async function collectHtml(directory) {
 
 function generatedToolSeo(tool) {
   const titles = {
-    "photo-compressor": "Compress Images Online Free — Photo Compressor | FreePDF Tools",
-    "signature-resizer": "Resize Signature Online — Free Signature Tool | FreePDF Tools",
-    "passport-id-photo-maker": "Passport & ID Photo Maker — Resize Online | FreePDF Tools",
-    "thumb-impression-resizer": "Thumb Impression Resizer — Free Online Tool | FreePDF Tools",
-    "handwritten-declaration-resizer": "Handwritten Declaration Resizer — Free Tool | FreePDF Tools"
+    "photo-compressor": "Compress Image to 20KB, 50KB or 100KB Online | FreePDF Tools",
+    "signature-resizer": "Signature Resizer for Online Forms — 20KB, 50KB or 100KB | FreePDF Tools",
+    "passport-id-photo-maker": "Passport Size Photo Maker Online — 35×45 mm & 2×2 in | FreePDF Tools",
+    "thumb-impression-resizer": "Left Thumb Impression Resizer Online — 20KB, 50KB or 100KB | FreePDF Tools",
+    "handwritten-declaration-resizer": "Handwritten Declaration Resizer for Online Forms | FreePDF Tools"
   };
   const title = titles[tool.id] || (tool.label + " Online Free — Browser Tool | FreePDF Tools");
   const description = String(tool.description).replace(/\.$/, "") + ". Process supported files locally in your browser without uploading the source file.";
