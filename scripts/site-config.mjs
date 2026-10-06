@@ -188,6 +188,8 @@ for (const relative of [
   "topics/private-pdf-converter.html"
 ]) pageDates[relative] = "2026-09-28";
 
+pageDates["topics/image-upload-requirements.html"] = "2026-10-06";
+
 for (const tool of toolRegistry) {
   if (tool.lastmod) pageDates[tool.path] = tool.lastmod;
 }
