@@ -41,6 +41,26 @@ const blocks = {
   "tools/organize-pdf.html": {
     heading: "Organize or organise PDF pages",
     html: "Use this free <strong>PDF organizer</strong> for <strong>organize PDF</strong>, <strong>organise PDF</strong>, <strong>reorder PDF pages</strong>, <strong>arrange PDF pages</strong> and deleting unwanted pages. The spelling varies by region, but the workflow is the same."
+  },
+  "tools/photo-compressor.html": {
+    heading: "Compress an image to 20KB, 50KB or 100KB",
+    html: "For searches such as <strong>compress image to 20KB</strong>, <strong>compress image to 50KB</strong>, <strong>compress image to 100KB</strong> or <strong>photo compressor for online forms</strong>, set the maximum file size and review the dimensions before downloading. Common exam, job and government-form limits vary, so follow the current application instructions."
+  },
+  "tools/signature-resizer.html": {
+    heading: "Resize a signature for online forms",
+    html: "This browser tool covers <strong>signature resizer</strong>, <strong>resize signature to 20KB</strong>, <strong>signature to 50KB</strong> and similar online-form workflows. Crop and frame the signature, set the required dimensions and maximum file size, then inspect the result before submission."
+  },
+  "tools/passport-id-photo-maker.html": {
+    heading: "Passport size photo maker: 35×45 mm and 2×2 inch",
+    html: "Use this as a <strong>passport size photo maker</strong> for common <strong>35×45 mm</strong> and <strong>2×2 inch</strong> layouts, or enter custom dimensions. Passport, visa, ID and application requirements vary by destination, so verify the current specification before submitting the generated photo."
+  },
+  "tools/thumb-impression-resizer.html": {
+    heading: "Left thumb impression resizer for forms",
+    html: "Common searches include <strong>thumb impression resizer</strong>, <strong>left thumb impression resize</strong> and <strong>thumb impression to 20KB or 50KB</strong>. Use the exact dimensions, format and maximum file size stated by the receiving application rather than assuming a universal specification."
+  },
+  "tools/handwritten-declaration-resizer.html": {
+    heading: "Handwritten declaration resizer for online forms",
+    html: "Prepare a <strong>handwritten declaration image</strong> by cropping blank paper, matching the required dimensions and reducing the file to the application's maximum size. This workflow is useful for exam and recruitment forms, but the current application notice remains the source of truth."
   }
 };
 
