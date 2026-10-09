@@ -3,9 +3,9 @@ import path from "node:path";
 
 const dist = path.join(process.cwd(), "dist");
 const titles = {
-  "tools/organize-pdf.html": "Free PDF Organizer — Reorder & Delete Pages | FreePDF Tools",
+  "tools/organize-pdf.html": "Organize PDF Pages Online Free | FreePDF Tools",
   "tools/word-to-pdf.html": "Word to PDF Converter — DOC, DOCX & 97–2003 | FreePDF Tools",
-  "guides/organize-pdf-pages.html": "Organize PDF Pages — Reorder & Delete | FreePDF Tools"
+  "guides/organize-pdf-pages.html": "How to Reorder or Delete PDF Pages (Step-by-Step)"
 };
 
 for (const [relative, title] of Object.entries(titles)) {
