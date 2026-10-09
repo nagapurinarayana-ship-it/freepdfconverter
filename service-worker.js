@@ -32,7 +32,9 @@ self.addEventListener("fetch", function (event) {
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
-    event.respondWith(fetch(request).then(function (response) {
+    // Revalidate the document on every navigation so a deployment is picked up
+    // on ordinary reloads. The runtime cache remains an offline fallback only.
+    event.respondWith(fetch(request, { cache: "no-cache" }).then(function (response) {
       if (!response.ok) return response;
 
       const copy = response.clone();
@@ -50,12 +52,28 @@ self.addEventListener("fetch", function (event) {
     return;
   }
 
-  // Image-tool entry bootstraps intentionally keep stable public URLs. They
-  // are changed during deployments, so never satisfy them from the browser
-  // HTTP cache or the service-worker runtime cache. The actual tool modules
-  // remain fingerprinted and can stay aggressively cached.
-  if (url.pathname.startsWith("/assets/js/tools/") && url.pathname.endsWith(".entry.js")) {
-    event.respondWith(fetch(request, { cache: "no-store" }));
+  // Treat every executable/style asset as network-first. Cache-Control plus
+  // cache:"no-cache" forces revalidation even when a stable URL was cached
+  // before deployment; the Cache API is only the offline fallback.
+  const isCodeAsset =
+    url.pathname.startsWith("/assets/js/") ||
+    url.pathname.startsWith("/assets/css/") ||
+    url.pathname.startsWith("/assets/vendor/");
+
+  if (isCodeAsset) {
+    event.respondWith(fetch(request, { cache: "no-cache" }).then(function (response) {
+      if (response.ok) {
+        const copy = response.clone();
+        event.waitUntil(caches.open(RUNTIME_CACHE).then(function (cache) {
+          return cache.put(request, copy);
+        }));
+      }
+      return response;
+    }).catch(function () {
+      return caches.match(request).then(function (cached) {
+        return cached || Response.error();
+      });
+    }));
     return;
   }
 
