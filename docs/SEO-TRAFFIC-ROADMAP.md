@@ -171,3 +171,15 @@ Two frozen requirements cannot be completed by source-code changes alone:
 
 - A dedicated production domain requires a domain choice, DNS changes and a controlled canonical/redirect migration.
 - External authority requires legitimate third-party references, software-directory listings, documentation mentions or editorial links; the repository can prepare linkable resources but cannot create independent third-party links.
+
+## Global visibility and page-preservation rule (9 October 2026)
+
+Preserve all existing public tool, guide, topic, localized and trust-page URLs. Do not delete or consolidate a page merely because its current impression count is low; first establish its purpose, age, indexability and query footprint. Globally relevant pages and recently launched tools need time to accumulate data.
+
+The 9 October Search Console export covers the last three months through 6 October. The country table shows the United States (310 impressions), Philippines (128), India (114), United Kingdom (70), Malaysia (42) and Indonesia (39) among the largest listed markets. This is early global visibility, not proof of demand or strong rankings: average positions are still weak across most of these markets. Keep titles and content in natural global English for globally applicable tasks, and use query/page/country data before prioritizing localized copy.
+
+The new image-form tools and image-upload requirements hub were added on 5–6 October, very near the end of that Performance export. That export is too early to judge their organic performance. Keep all five tool URLs in the sitemap and crawlable homepage/internal-link paths; assess them after Google has had time to crawl and after a fresh Search Console export.
+
+The Coverage export shows 7 indexed pages until 21 September, then 5 from 22 September through 4 October, with 2 pages classified as “Crawled — currently not indexed”. The supplied export reports the issue count but does not include the affected URLs. Do not guess which pages were excluded. Retrieve the affected URL list and URL Inspection details in Search Console before changing page-level canonicals, content or indexability.
+
+The XML sitemap must include every canonical public page intended to be indexed, including the public Privacy, Terms and Contact pages. The 404 and offline pages remain deliberately noindex and are not sitemap entries.
