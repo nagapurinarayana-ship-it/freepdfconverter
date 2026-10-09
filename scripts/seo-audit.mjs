@@ -126,6 +126,10 @@ for (const relative of indexablePages) {
   const url = SITE + pagePathname(relative);
   if (!sitemapUrls.has(url)) fail("sitemap missing " + url);
 }
+for (const relative of supplementalPages) {
+  const url = SITE + pagePathname(relative);
+  if (!sitemapUrls.has(url)) fail("sitemap missing supplemental public page " + url);
+}
 for (const item of allLocalizedPaths()) {
   const url = SITE + item.path;
   if (!sitemapUrls.has(url)) fail("sitemap missing localized URL " + url);

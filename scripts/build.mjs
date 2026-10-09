@@ -142,8 +142,14 @@ if (origin) {
     const next = html.replace("</head>", metadata + "\n</head>");
     await writeFile(file, next, "utf8");
   }
-  const urls = indexablePages.map((relative) => {
-    return "  <url><loc>" + origin + pagePathname(relative) + "</loc><lastmod>" + pageDates[relative] + "</lastmod></url>";
+  // Keep all public, canonical pages discoverable. Supplemental trust pages
+  // (privacy, terms and contact) are indexable too; include them without
+  // inventing a last-modified date when no verified page date is maintained.
+  const sitemapPages = [...indexablePages, ...supplementalPages];
+  const urls = sitemapPages.map((relative) => {
+    const lastmod = pageDates[relative];
+    return "  <url><loc>" + origin + pagePathname(relative) + "</loc>" +
+      (lastmod ? "<lastmod>" + lastmod + "</lastmod>" : "") + "</url>";
   }).join("\n");
   const sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + '\n</urlset>\n';
   await writeFile(path.join(dist, "sitemap.xml"), sitemap, "utf8");

@@ -1,6 +1,6 @@
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import { articlePages, indexablePages, pageDates, pagePathname } from "./site-config.mjs";
+import { articlePages, indexablePages, supplementalPages, pageDates, pagePathname } from "./site-config.mjs";
 import { allLocalizedPaths, englishPath } from "./localized-content.mjs";
 
 const root = process.cwd();
@@ -74,9 +74,10 @@ const localizedPageDate = (key) => pageDates[key === "home" ? "index.html" : (it
 function itemEnglishPath(key) { return englishPath(key).replace(/^\//, ""); }
 const expectedLocations = [
   ...indexablePages.map((relative) => origin + pagePathname(relative)),
+  ...supplementalPages.map((relative) => origin + pagePathname(relative)),
   ...localizedItems.map((item) => origin + item.path)
 ];
-if (JSON.stringify(locations) !== JSON.stringify(expectedLocations)) failures.push("sitemap.xml -> URL set does not match indexable pages");
+if (JSON.stringify(locations) !== JSON.stringify(expectedLocations)) failures.push("sitemap.xml -> URL set does not match public pages");
 if (locations.some((location) => location.endsWith(".html"))) failures.push("sitemap.xml -> contains redirecting .html URL");
 const lastmods = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
 const expectedLastmods = [
