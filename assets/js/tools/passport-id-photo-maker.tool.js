@@ -1,19 +1,21 @@
-import { ToolController } from "../core/tool-controller.js";
-import { createImageAdjuster } from "../core/image-adjuster.js";
-import { loadImage } from "../core/image-tool-kit.js";
-import { encodeBestUnderTarget } from "../core/image-form-engine.js";
+import { ToolController } from "../core/tool-controller.js?v=20261009-passport-crop-v1";
+import { createImageAdjuster } from "../core/image-adjuster.js?v=20261009-passport-crop-v1";
+import { loadImage } from "../core/image-tool-kit.js?v=20261009-passport-crop-v1";
+import { encodeBestUnderTarget } from "../core/image-form-engine.js?v=20261009-passport-crop-v1";
 import {
   chooseExtension,
   reductionPercent,
   targetBytesFromSelection,
   isTargetReached
-} from "../core/image-form-policy.js";
+} from "../core/image-form-policy.js?v=20261009-passport-crop-v1";
 
 const MB = window.FreePDF.MB;
 const MAX_FILE = 20 * MB;
 const MAX_FILES = 20;
 const MAX_TOTAL_BYTES = 100 * MB;
 
+// Cache-bust the editor and export dependencies together: older service-worker
+// caches can otherwise pair a new tool module with stale crop/export logic.
 // cropFocusY is retained as a fixed compatibility value only; the interactive
 // cropRect is the sole source of truth for the exported framing.
 const MANUAL_CROP_FOCUS_Y = 0.5;
