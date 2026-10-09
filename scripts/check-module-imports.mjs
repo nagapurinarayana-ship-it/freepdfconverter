@@ -17,9 +17,12 @@ for (const file of await walk(path.join(dist, "assets", "js"))) {
   for (const specifier of specifiers) {
     if (!(specifier.startsWith(".") || specifier.startsWith("/assets/js/"))) continue;
 
-    const target = specifier.startsWith("/")
-      ? path.join(dist, specifier.slice(1))
-      : path.resolve(path.dirname(file), specifier);
+    // Query/hash suffixes are valid browser cache-busters, not filesystem
+    // path segments. Strip them only for existence checks, not from imports.
+    const localPath = specifier.split(/[?#]/, 1)[0];
+    const target = localPath.startsWith("/")
+      ? path.join(dist, localPath.slice(1))
+      : path.resolve(path.dirname(file), localPath);
 
     try {
       await access(target);
