@@ -1,6 +1,6 @@
 import { readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { pagePathname } from "./site-config.mjs";
+import { canonicalPagePathname } from "./site-config.mjs";
 import { toolRegistry } from "./tool-registry.mjs";
 
 const dist = path.join(process.cwd(), "dist");
@@ -77,7 +77,7 @@ for (const file of htmlFiles) {
   const values = seo[relative] || (tool ? generatedToolSeo(tool) : undefined);
 
   let html = await readFile(file, "utf8");
-  const canonicalUrl = origin + pagePathname(relative);
+  const canonicalUrl = origin + canonicalPagePathname(relative);
   const nonIndexable = relative === "404.html" || relative === "offline.html";
 
   if (nonIndexable) {
