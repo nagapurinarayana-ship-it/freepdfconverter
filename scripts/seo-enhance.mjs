@@ -155,9 +155,20 @@ function escapeHtml(value) {
 
 function replaceMeta(html, property, value) {
   const escaped = escapeAttribute(value);
-  const pattern = new RegExp(`(<meta\\s+[^>]*(?:property|name)=["']${property}["'][^>]*content=["'])[^"']*(["'][^>]*>)`, "i");
-  const reversePattern = new RegExp(`(<meta\\s+[^>]*(?:property|name)=["']${property}["'][^>]*content=["'])[^"']*(["'][^>]*>)`, "i");
-  if (pattern.test(html)) return html.replace(pattern, `$1${escaped}$2`);
-  if (reversePattern.test(html)) return html.replace(reversePattern, `$1${escaped}$2`);
-  return html;
+  const attribute = property.startsWith("og:") ? "property" : "name";
+  const tag = `<meta ${attribute}="${property}" content="${escaped}">`;
+  const metaPattern = /<meta\\b[^>]*>/gi;
+  let replaced = false;
+
+  html = html.replace(metaPattern, (existing) => {
+    const propertyMatch = existing.match(/\\bproperty=["']([^"']+)["']/i)?.[1];
+    const nameMatch = existing.match(/\\bname=["']([^"']+)["']/i)?.[1];
+    if (propertyMatch?.toLowerCase() !== property.toLowerCase() &&
+        nameMatch?.toLowerCase() !== property.toLowerCase()) return existing;
+    if (replaced) return "";
+    replaced = true;
+    return tag;
+  });
+
+  return replaced ? html : html.replace(/<\\/head>/i, tag + "\\n</head>");
 }
