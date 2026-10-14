@@ -1,6 +1,6 @@
 import { access, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import { articlePages, indexablePages, supplementalPages, pageDates, pagePathname } from "./site-config.mjs";
+import { articlePages, canonicalAliases, canonicalPagePathname, indexablePages, supplementalPages, pageDates, pagePathname } from "./site-config.mjs";
 import { allLocalizedPaths, englishPath } from "./localized-content.mjs";
 
 const root = process.cwd();
@@ -25,7 +25,7 @@ const guidesWithMatchingTools = new Set([
 
 for (const relative of indexablePages) {
   const html = await readFile(path.join(dist, relative), "utf8");
-  const expectedCanonical = origin + pagePathname(relative);
+  const expectedCanonical = origin + canonicalPagePathname(relative);
   const canonical = html.match(/<link rel="canonical" href="([^"]+)">/i)?.[1];
   if (canonical !== expectedCanonical) failures.push(relative + " -> unexpected canonical " + canonical);
   if (!html.includes('<meta property="og:url" content="' + expectedCanonical + '">')) failures.push(relative + " -> missing og:url");
@@ -73,15 +73,18 @@ const localizedItems = allLocalizedPaths();
 const localizedPageDate = (key) => pageDates[key === "home" ? "index.html" : (itemEnglishPath(key) + ".html")];
 function itemEnglishPath(key) { return englishPath(key).replace(/^\//, ""); }
 const expectedLocations = [
-  ...indexablePages.map((relative) => origin + pagePathname(relative)),
+  ...indexablePages.filter((relative) => !canonicalAliases[relative]).map((relative) => origin + pagePathname(relative)),
   ...supplementalPages.map((relative) => origin + pagePathname(relative)),
   ...localizedItems.map((item) => origin + item.path)
 ];
 if (JSON.stringify(locations) !== JSON.stringify(expectedLocations)) failures.push("sitemap.xml -> URL set does not match public pages");
+for (const alias of Object.keys(canonicalAliases)) {
+  if (locations.includes(origin + pagePathname(alias))) failures.push("sitemap.xml -> includes canonical alias " + alias);
+}
 if (locations.some((location) => location.endsWith(".html"))) failures.push("sitemap.xml -> contains redirecting .html URL");
 const lastmods = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
 const expectedLastmods = [
-  ...indexablePages.map((relative) => pageDates[relative]),
+  ...indexablePages.filter((relative) => !canonicalAliases[relative]).map((relative) => pageDates[relative]),
   ...localizedItems.map((item) => localizedPageDate(item.key))
 ];
 if (JSON.stringify(lastmods) !== JSON.stringify(expectedLastmods)) failures.push("sitemap.xml -> lastmod set does not match page dates");
