@@ -1,6 +1,6 @@
 import { access, readFile } from "node:fs/promises";
 import path from "node:path";
-import { indexablePages, supplementalPages, pagePathname } from "./site-config.mjs";
+import { canonicalAliases, canonicalPagePathname, indexablePages, supplementalPages, pagePathname } from "./site-config.mjs";
 import { allLocalizedPaths } from "./localized-content.mjs";
 
 const dist = path.join(process.cwd(), "dist");
@@ -111,7 +111,7 @@ async function readFileSync(file) {
 }
 
 for (const relative of [...indexablePages, ...supplementalPages]) {
-  await checkPage(relative, SITE + pagePathname(relative));
+  await checkPage(relative, SITE + canonicalPagePathname(relative));
 }
 
 for (const item of allLocalizedPaths()) {
@@ -126,9 +126,16 @@ const sitemapUrls = new Set([...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m
 
 if (!sitemapUrls.size) fail("dist/sitemap.xml has no URLs");
 if (new Set([...sitemapUrls]).size !== sitemapUrls.size) fail("sitemap contains duplicate URLs");
-for (const relative of indexablePages) {
+for (const relative of indexablePages.filter((item) => !canonicalAliases[item])) {
   const url = SITE + pagePathname(relative);
-  if (!sitemapUrls.has(url)) fail("sitemap missing " + url);
+  if (!sitemapUrls.has(url)) fail("sitemap missing canonical page " + url);
+}
+for (const [alias, target] of Object.entries(canonicalAliases)) {
+  const aliasUrl = SITE + pagePathname(alias);
+  const targetUrl = SITE + pagePathname(target);
+  if (!indexablePages.includes(target)) fail(alias + ": canonical target is not in indexablePages: " + target);
+  if (sitemapUrls.has(aliasUrl)) fail("sitemap must not include canonical alias " + aliasUrl);
+  if (!sitemapUrls.has(targetUrl)) fail("sitemap missing canonical target " + targetUrl);
 }
 for (const relative of supplementalPages) {
   const url = SITE + pagePathname(relative);

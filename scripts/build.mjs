@@ -1,7 +1,7 @@
 import { cp, mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
-import { articlePages, articlePublishedDates, indexablePages, pageDates, pageLabels, pagePathname, supplementalPages } from "./site-config.mjs";
+import { articlePages, articlePublishedDates, canonicalAliases, canonicalPagePathname, indexablePages, pageDates, pageLabels, pagePathname, supplementalPages } from "./site-config.mjs";
 import { SEARCH_INTENT_PATHS, generateSearchIntentPages } from "./generate-search-intent-pages.mjs";
 import { toolRegistry } from "./tool-registry.mjs";
 import { injectToolRegistry } from "./inject-tool-registry.mjs";
@@ -116,7 +116,7 @@ if (origin) {
     const file = path.join(dist, relative);
     const html = await readFile(file, "utf8");
     const pathname = pagePathname(relative);
-    const canonical = origin + pathname;
+    const canonical = origin + canonicalPagePathname(relative);
     const title = extract(html, /<title>([^<]+)<\/title>/i);
     const description = extract(html, /<meta\s+name="description"\s+content="([^"]+)"/i);
     const socialType = articlePages.has(relative) ? "article" : "website";
@@ -152,7 +152,7 @@ if (origin) {
   // Keep all public, canonical pages discoverable. Supplemental trust pages
   // (privacy, terms and contact) are indexable too; include them without
   // inventing a last-modified date when no verified page date is maintained.
-  const sitemapPages = [...indexablePages, ...supplementalPages];
+  const sitemapPages = [...indexablePages.filter((relative) => !canonicalAliases[relative]), ...supplementalPages];
   const urls = sitemapPages.map((relative) => {
     const lastmod = pageDates[relative];
     return "  <url><loc>" + origin + pagePathname(relative) + "</loc>" +
