@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { canonicalPagePathname } from './site-config.mjs';
 
 const root = fs.existsSync(path.join(process.cwd(), 'dist')) ? path.join(process.cwd(), 'dist') : process.cwd();
 const site = 'https://freepdfconverter-all-in-one.pages.dev';
@@ -19,10 +20,7 @@ function walk(dir) {
 
 function canonicalFor(file) {
   const rel = path.relative(root, file).replaceAll(path.sep, '/');
-  if (rel === 'index.html') return `${site}/`;
-  if (rel.endsWith('/index.html')) return `${site}/${rel.slice(0, -'index.html'.length)}`;
-  if (rel.endsWith('.html')) return `${site}/${rel.slice(0, -'.html'.length)}`;
-  return `${site}/${rel}`;
+  return `${site}${canonicalPagePathname(rel)}`;
 }
 
 function routeKind(rel) {
