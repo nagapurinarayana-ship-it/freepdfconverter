@@ -344,3 +344,23 @@ export function pagePathname(relative) {
   return "/" + withoutIndex.replace(/\.html$/, "");
 }
 
+/**
+ * Older public tool routes remain available for existing users and links,
+ * but the newer /tools/ routes are the preferred search result URLs.
+ * Keep aliases out of the sitemap and point their canonical metadata at the
+ * matching primary tool page; do not redirect or delete the legacy routes.
+ */
+export const canonicalAliases = Object.freeze({
+  "merge-pdf-online.html": "tools/merge-pdf.html",
+  "split-pdf-online.html": "tools/split-pdf.html",
+  "unlock-pdf-online.html": "tools/unlock-pdf.html",
+  "jpg-to-pdf-online.html": "tools/jpg-to-pdf.html",
+  "rotate-pdf-online.html": "tools/rotate-pdf.html",
+  "crop-pdf-online.html": "tools/crop-pdf.html",
+  "remove-pdf-metadata-online.html": "tools/remove-pdf-metadata.html"
+});
+
+export function canonicalPagePathname(relative) {
+  return pagePathname(canonicalAliases[relative] || relative);
+}
+
