@@ -12,7 +12,14 @@ const branch = process.env.CF_PAGES_BRANCH || process.env.WORKERS_CI_BRANCH || "
 const productionBranch = !branch || branch === "main";
 const defaultWorkersOrigin = "https://freepdfconverter.all-in-one-all.workers.dev";
 const workersOrigin = process.env.WORKERS_CI && productionBranch ? defaultWorkersOrigin : "";
-const suppliedOrigin = String(process.env.SITE_ORIGIN || (productionBranch ? process.env.CF_PAGES_URL || workersOrigin : "")).replace(/\/+$/, "");
+const suppliedOrigin = String(
+  process.env.SITE_ORIGIN ||
+    (process.env.WORKERS_CI && productionBranch
+      ? workersOrigin
+      : branch === "main"
+        ? "https://freepdfconverter-all-in-one.pages.dev"
+        : "")
+).replace(/\/+$/, "");
 const origin = /^https?:\/\/[^/]+$/i.test(suppliedOrigin) ? suppliedOrigin : "";
 
 const pageKeywords = {
