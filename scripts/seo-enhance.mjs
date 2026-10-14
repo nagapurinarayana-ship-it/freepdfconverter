@@ -78,7 +78,33 @@ for (const file of htmlFiles) {
 
   let html = await readFile(file, "utf8");
   const canonicalUrl = origin + pagePathname(relative);
-  html = html.replace(/<link\s+rel=["']canonical["']\s+href=["'][^"']+["'][^>]*>/i, `<link rel="canonical" href="${canonicalUrl}">`);
+  const nonIndexable = relative === "404.html" || relative === "offline.html";
+
+  if (nonIndexable) {
+    html = html.replace(/<link\s+[^>]*rel=["']canonical["'][^>]*>/gi, "");
+  } else {
+    const canonicalTag = `<link rel="canonical" href="${canonicalUrl}">`;
+    let canonicalSeen = false;
+    html = html.replace(/<link\s+[^>]*rel=["']canonical["'][^>]*>/gi, () => {
+      if (canonicalSeen) return "";
+      canonicalSeen = true;
+      return canonicalTag;
+    });
+    if (!canonicalSeen) html = html.replace("</head>", canonicalTag + "\n</head>");
+  }
+
+  const robotsContent = nonIndexable
+    ? "noindex,nofollow,noarchive"
+    : "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
+  const robotsTag = `<meta name="robots" content="${robotsContent}">`;
+  let robotsSeen = false;
+  html = html.replace(/<meta\s+[^>]*name=["']robots["'][^>]*>/gi, () => {
+    if (robotsSeen) return "";
+    robotsSeen = true;
+    return robotsTag;
+  });
+  if (!robotsSeen) html = html.replace("</head>", robotsTag + "\n</head>");
+
   html = replaceMeta(html, "og:url", canonicalUrl);
 
   if (values) {
