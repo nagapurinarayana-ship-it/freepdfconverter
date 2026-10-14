@@ -90,7 +90,7 @@ for (const file of htmlFiles) {
       canonicalSeen = true;
       return canonicalTag;
     });
-    if (!canonicalSeen) html = html.replace("</head>", canonicalTag + "\\n</head>");
+    if (!canonicalSeen) html = html.replace("</head>", canonicalTag + "\n</head>");
   }
 
   const robotsContent = nonIndexable
@@ -103,7 +103,7 @@ for (const file of htmlFiles) {
     robotsSeen = true;
     return robotsTag;
   });
-  if (!robotsSeen) html = html.replace("</head>", robotsTag + "\\n</head>");
+  if (!robotsSeen) html = html.replace("</head>", robotsTag + "\n</head>");
 
   html = replaceMeta(html, "og:url", canonicalUrl);
 
