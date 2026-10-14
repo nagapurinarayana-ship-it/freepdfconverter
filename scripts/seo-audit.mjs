@@ -41,6 +41,10 @@ async function checkPage(relative, expectedUrl, localized = false) {
   const description = html.match(/<meta\s+[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i)?.[1]?.trim() || "";
   const canonical = html.match(/<link\s+[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["'][^>]*>/i)?.[1] || "";
   const robots = html.match(/<meta\s+[^>]*name=["']robots["'][^>]*content=["']([^"']+)["'][^>]*>/i)?.[1] || "";
+  const canonicalCount = (html.match(/<link\s+[^>]*rel=["']canonical["'][^>]*>/gi) || []).length;
+  const robotsCount = (html.match(/<meta\s+[^>]*name=["']robots["'][^>]*>/gi) || []).length;
+  if (canonicalCount !== 1) fail(relative + ": expected exactly one canonical tag, found " + canonicalCount);
+  if (robotsCount !== 1) fail(relative + ": expected exactly one robots meta tag, found " + robotsCount);
   const h1Count = (html.match(/<h1\b/gi) || []).length;
 
   if (!title) fail(relative + ": missing title");
