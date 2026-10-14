@@ -156,7 +156,7 @@ function escapeHtml(value) {
 function replaceMeta(html, property, value) {
   const escaped = escapeAttribute(value);
   const attribute = property.startsWith("og:") ? "property" : "name";
-  const tag = `<meta ${attribute}="${property}" content="${escaped}">`;
+  const tag = "<meta " + attribute + "=\"" + property + "\" content=\"" + escaped + "\">";
   const metaPattern = /<meta\\b[^>]*>/gi;
   let replaced = false;
 
