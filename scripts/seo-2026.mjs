@@ -43,6 +43,10 @@ const overrides = {
     'Handwritten Declaration Resizer | FreePDF Tools',
     'Crop, resize and compress handwritten declaration images for online forms with custom dimensions and maximum file-size targets.'
   ],
+  'tools/organize-pdf.html': [
+    'Organize PDF Pages Online Free | Reorder & Delete | FreePDF Tools',
+    'Reorder PDF pages, move pages to the beginning or end, and delete unwanted pages online. This free PDF organizer works in your browser without uploading your file.'
+  ],
   'tools/ocr-pdf.html': [
     'OCR PDF Online Free — Scanned PDF to Word | FreePDF Tools',
     'OCR scanned PDF files in your browser and download recognized text as Word DOCX or plain text without uploading the source document.'
