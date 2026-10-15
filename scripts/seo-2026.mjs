@@ -1,7 +1,9 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { canonicalPagePathname } from './site-config.mjs'
 
 const dist = 'dist'
+const siteOrigin = String(process.env.SITE_ORIGIN || 'https://freepdfconverter-all-in-one.pages.dev').replace(/\/+$/, '')
 const overrides = {
   'index.html': [
     'Free PDF Tools — Merge, Split, Compress & Convert | FreePDF Tools',
@@ -59,6 +61,8 @@ for (const file of files) {
   let html = await readFile(file, 'utf8')
   const relative = file.slice(dist.length + 1).replaceAll('\\', '/')
 
+  html = normalizeStructuredDataUrls(html, siteOrigin)
+
   // Google no longer exposes general FAQ rich results for ordinary utility sites.
   // Keep the visible questions, but remove FAQPage JSON-LD from generated HTML.
   html = html.replace(/<script\s+type=["']application\/ld\+json["']>\s*\{[\s\S]*?["']@type["']\s*:\s*["']FAQPage["'][\s\S]*?<\/script>\s*/gi, '')
@@ -82,6 +86,43 @@ for (const file of files) {
 }
 
 console.log(`Applied people-first 2026 SEO cleanup to ${files.length} generated HTML pages.`)
+
+function normalizeStructuredDataUrls(html, origin) {
+  const urlKeys = new Set(['url', '@id', 'item', 'mainEntityOfPage', 'sameAs'])
+  function cleanUrl(value) {
+    if (typeof value !== 'string') return value
+    try {
+      const parsed = new URL(value)
+      if (parsed.origin !== origin || !/\.html$/i.test(parsed.pathname)) return value
+      const relative = parsed.pathname.replace(/^\/+/, '')
+      parsed.pathname = canonicalPagePathname(relative)
+      return parsed.toString()
+    } catch {
+      return value
+    }
+  }
+  function normalizeValue(value, key = '') {
+    if (typeof value === 'string') return urlKeys.has(key) ? cleanUrl(value) : value
+    if (Array.isArray(value)) return value.map(item => normalizeValue(item, key))
+    if (value && typeof value === 'object') {
+      const output = {}
+      for (const [childKey, childValue] of Object.entries(value)) {
+        output[childKey] = normalizeValue(childValue, childKey)
+      }
+      return output
+    }
+    return value
+  }
+  return html.replace(/(<script\s+type=["']application\/ld\+json["'][^>]*>)([\s\S]*?)(<\/script>)/gi, (full, open, raw, close) => {
+    try {
+      const parsed = JSON.parse(raw)
+      const normalized = normalizeValue(parsed)
+      return open + JSON.stringify(normalized).replace(/</g, '\\u003c') + close
+    } catch {
+      return full
+    }
+  })
+}
 
 async function collect(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
