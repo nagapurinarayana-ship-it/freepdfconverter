@@ -71,6 +71,7 @@ async function checkPage(relative, expectedUrl, localized = false) {
   }
 
   const types = schemaTypes(html, relative);
+  checkStructuredDataUrls(html, relative);
   if (!types.includes("WebPage") && !types.includes("CollectionPage")) fail(relative + ": missing WebPage/CollectionPage structured data");
   if (relative.startsWith("tools/") && !types.includes("SoftwareApplication") && !types.includes("WebApplication")) {
     fail(relative + ": tool page missing SoftwareApplication structured data");
