@@ -33,6 +33,32 @@ function schemaTypes(html, file) {
   return types;
 }
 
+function checkStructuredDataUrls(html, file) {
+  const origin = new URL(SITE).origin
+  const urlKeys = new Set(['url', '@id', 'item', 'mainEntityOfPage', 'sameAs'])
+  function visit(value, key = '') {
+    if (typeof value === 'string' && urlKeys.has(key)) {
+      try {
+        const parsed = new URL(value)
+        if (parsed.origin === origin && /\.html$/i.test(parsed.pathname)) {
+          fail(file + ': structured data still references a legacy .html URL: ' + value)
+        }
+      } catch {}
+      return
+    }
+    if (Array.isArray(value)) {
+      for (const item of value) visit(item, key)
+      return
+    }
+    if (value && typeof value === 'object') {
+      for (const [childKey, childValue] of Object.entries(value)) visit(childValue, childKey)
+    }
+  }
+  for (const match of html.matchAll(/<script\s+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+    try { visit(JSON.parse(match[1])) } catch {}
+  }
+}
+
 async function checkPage(relative, expectedUrl, localized = false) {
   const file = localPath(relative);
   if (!await requireFile(file)) return;
