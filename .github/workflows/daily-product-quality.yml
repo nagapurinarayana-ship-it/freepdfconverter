@@ -152,8 +152,14 @@ jobs:
           sw="$(curl -L -sS --max-time 20 "${SITE_ORIGIN}/service-worker.js")"
           grep -q "skipWaiting" <<<"$sw"
           grep -q "clients.claim" <<<"$sw"
-          grep -q "no-store" <<<"$sw"
           grep -q "offline.html" <<<"$sw"
+
+          # Cache-Control is served by Cloudflare Pages via _headers; it is not
+          # part of the service-worker JavaScript source. Check the live response.
+          curl -fsS -D /tmp/sw-headers -o /dev/null --max-time 20 "${SITE_ORIGIN}/service-worker.js"
+          grep -Eiq '^cache-control:[[:space:]]*.*no-cache' /tmp/sw-headers
+          grep -Eiq '^cache-control:[[:space:]]*.*no-store' /tmp/sw-headers
+          grep -Eiq '^cache-control:[[:space:]]*.*must-revalidate' /tmp/sw-headers
 
       - name: Publish sweep summary
         if: always()
